@@ -1,0 +1,454 @@
+<!-- admin_products.html -->
+{% extends "base.html" %}
+
+{% block title %}Gestione Prodotti - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .products-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .product-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .product-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+    
+    .status-active {
+        background-color: var(--success-color);
+    }
+    
+    .status-inactive {
+        background-color: #6c757d;
+    }
+    
+    .product-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .product-body {
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .product-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .add-product-card {
+        background-color: rgba(0, 0, 0, 0.02);
+        border: 2px dashed #ced4da;
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 200px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .add-product-card:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+        transform: translateY(-3px);
+    }
+    
+    .add-icon {
+        width: 60px;
+        height: 60px;
+        background-color: rgba(0, 122, 255, 0.1);
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .add-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .add-description {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        color: #ced4da;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-description {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Modal di prodotto */
+    .product-form-label {
+        font-weight: 500;
+    }
+    
+    .product-form-label::after {
+        content: ' *';
+        color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Gestione Prodotti</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
+            </a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProductModal">
+                <i class="fas fa-plus me-1"></i> Nuovo Prodotto
+            </button>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab active">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Products Grid -->
+    {% if products %}
+    <div class="products-container">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-header">
+                <h3 class="product-title">
+                    <span class="product-status {% if product.active %}status-active{% else %}status-inactive{% endif %}"></span>
+                    {{ product.name }}
+                </h3>
+            </div>
+            <div class="product-body">
+                <div class="product-price">€ {{ "%.2f"|format(product.price) }}</div>
+                <div class="product-actions">
+                    <button type="button" class="btn btn-outline-primary edit-product-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}" data-product-active="{{ '1' if product.active else '0' }}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger delete-product-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Add Product Card -->
+        <div class="add-product-card" data-bs-toggle="modal" data-bs-target="#newProductModal">
+            <div class="add-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="add-title">Aggiungi Prodotto</div>
+            <div class="add-description">Crea un nuovo prodotto per l'acquisto</div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <h3 class="empty-title">Nessun prodotto trovato</h3>
+        <p class="empty-description">Aggiungi il tuo primo prodotto per iniziare</p>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProductModal">
+            <i class="fas fa-plus me-1"></i> Aggiungi Prodotto
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal per Nuovo Prodotto -->
+<div class="modal fade" id="newProductModal" tabindex="-1" aria-labelledby="newProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newProductModalLabel">Nuovo Prodotto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newProductForm" action="{{ url_for('admin_new_product') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label product-form-label">Nome Prodotto</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label product-form-label">Prezzo (€)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" id="saveNewProductBtn">
+                    <i class="fas fa-save me-1"></i> Salva
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per Modifica Prodotto -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Modifica Prodotto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm" action="" method="POST">
+                    <input type="hidden" id="edit_product_id" name="id">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label product-form-label">Nome Prodotto</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_price" class="form-label product-form-label">Prezzo (€)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control" id="edit_price" name="price" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="edit_active" name="active">
+                        <label class="form-check-label" for="edit_active">Prodotto attivo</label>
+                        <div class="form-text">Se disattivato, il prodotto non sarà disponibile per l'acquisto</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" id="saveEditProductBtn">
+                    <i class="fas fa-save me-1"></i> Salva Modifiche
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per Eliminazione Prodotto -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProductModalLabel">Elimina Prodotto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sei sicuro di voler eliminare il prodotto <strong id="deleteProductName"></strong>?</p>
+                <p>Questa azione non può essere annullata.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <form id="deleteProductForm" action="" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Elimina
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modali
+        const newProductModal = new bootstrap.Modal(document.getElementById('newProductModal'));
+        const editProductModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        const deleteProductModal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
+        
+        // Forms
+        const newProductForm = document.getElementById('newProductForm');
+        const editProductForm = document.getElementById('editProductForm');
+        const deleteProductForm = document.getElementById('deleteProductForm');
+        
+        // Pulsanti
+        const saveNewProductBtn = document.getElementById('saveNewProductBtn');
+        const saveEditProductBtn = document.getElementById('saveEditProductBtn');
+        
+        // Gestione del pulsante "Salva" per nuovo prodotto
+        saveNewProductBtn.addEventListener('click', function() {
+            // Validazione form
+            if (newProductForm.checkValidity()) {
+                // Disabilita il pulsante durante l'invio
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvataggio...';
+                
+                // Invia il form
+                newProductForm.submit();
+            } else {
+                // Trigger validazione nativa del browser
+                newProductForm.reportValidity();
+            }
+        });
+        
+        // Gestione del pulsante "Modifica"
+        const editButtons = document.querySelectorAll('.edit-product-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+                const productPrice = this.getAttribute('data-product-price');
+                const productActive = this.getAttribute('data-product-active') === '1';
+                
+                // Imposta l'action del form
+                editProductForm.action = "{{ url_for('admin_edit_product', id=0) }}".replace('0', productId);
+                
+                // Compila il form
+                document.getElementById('edit_product_id').value = productId;
+                document.getElementById('edit_name').value = productName;
+                document.getElementById('edit_price').value = productPrice;
+                document.getElementById('edit_active').checked = productActive;
+                
+                // Mostra il modal
+                editProductModal.show();
+            });
+        });
+        
+        // Gestione del pulsante "Salva Modifiche"
+        saveEditProductBtn.addEventListener('click', function() {
+            // Validazione form
+            if (editProductForm.checkValidity()) {
+                // Disabilita il pulsante durante l'invio
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvataggio...';
+                
+                // Invia il form
+                editProductForm.submit();
+            } else {
+                // Trigger validazione nativa del browser
+                editProductForm.reportValidity();
+            }
+        });
+        
+        // Gestione del pulsante "Elimina"
+        const deleteButtons = document.querySelectorAll('.delete-product-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+                
+                // Imposta l'action del form
+                deleteProductForm.action = "{{ url_for('admin_delete_product', id=0) }}".replace('0', productId);
+                
+                // Aggiorna il nome del prodotto nel modal
+                document.getElementById('deleteProductName').textContent = productName;
+                
+                // Mostra il modal
+                deleteProductModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

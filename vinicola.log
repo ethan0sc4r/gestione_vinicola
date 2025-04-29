@@ -568,3 +568,161 @@
 2025-04-29 21:29:33,382 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 21:29:33] "GET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
 2025-04-29 21:29:33,399 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 21:29:33] "GET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
 2025-04-29 21:29:33,413 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 21:29:33] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:11:54,803 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:11:55,069 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:11:55,274 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:11:55,324 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:11:55,514 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-04-29 22:11:55,514 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-29 22:11:55,517 - werkzeug - INFO -  * Restarting with stat
+2025-04-29 22:11:55,621 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:11:55,840 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:11:55,990 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:11:56,033 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:11:56,035 - werkzeug - WARNING -  * Debugger is active!
+2025-04-29 22:11:56,044 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-04-29 22:12:06,305 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:06] "[35m[1mGET /barcode_scanner HTTP/1.1[0m" 500 -
+2025-04-29 22:12:06,317 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:06] "GET /barcode_scanner?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-04-29 22:12:06,318 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:06] "GET /barcode_scanner?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-04-29 22:12:06,323 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:06] "GET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-04-29 22:12:06,340 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:06] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:08,293 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:08] "[35m[1mGET /barcode_scanner HTTP/1.1[0m" 500 -
+2025-04-29 22:12:08,304 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:08] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-04-29 22:12:08,304 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:08] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-04-29 22:12:08,308 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:08] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:08,320 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:08] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,058 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[35m[1mGET /barcode_scanner HTTP/1.1[0m" 500 -
+2025-04-29 22:12:09,070 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,070 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,075 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,089 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,230 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[35m[1mGET /barcode_scanner HTTP/1.1[0m" 500 -
+2025-04-29 22:12:09,239 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,239 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,244 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,257 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,414 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[35m[1mGET /barcode_scanner HTTP/1.1[0m" 500 -
+2025-04-29 22:12:09,424 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,425 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,439 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:12:09,449 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:12:09] "[36mGET /barcode_scanner?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:15:35,815 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-04-29 22:15:35,896 - werkzeug - INFO -  * Restarting with stat
+2025-04-29 22:15:35,997 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:15:36,221 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:15:36,376 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:15:36,420 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:15:36,422 - werkzeug - WARNING -  * Debugger is active!
+2025-04-29 22:15:36,429 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-04-29 22:17:19,109 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-04-29 22:17:19,188 - werkzeug - INFO -  * Restarting with stat
+2025-04-29 22:17:19,318 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:17:19,573 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:17:19,733 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:17:19,778 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:17:19,780 - werkzeug - WARNING -  * Debugger is active!
+2025-04-29 22:17:19,787 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-04-29 22:20:07,449 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-04-29 22:20:07,528 - werkzeug - INFO -  * Restarting with stat
+2025-04-29 22:21:04,599 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:21:04,812 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:21:04,965 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:21:49,015 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:21:49,239 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:21:49,393 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:21:49,433 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:21:49,597 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-04-29 22:21:49,597 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-29 22:21:49,598 - werkzeug - INFO -  * Restarting with stat
+2025-04-29 22:21:49,685 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:21:49,899 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:21:50,052 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:21:50,095 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:21:50,097 - werkzeug - WARNING -  * Debugger is active!
+2025-04-29 22:21:50,105 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-04-29 22:21:55,261 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:21:55] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-04-29 22:21:55,271 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:21:55] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:21:55,288 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:21:55] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:21:57,292 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:21:57] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:21:59,290 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:21:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:22:01,292 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:22:03,293 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:22:05,293 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:22:06,700 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:06] "GET /admin HTTP/1.1" 200 -
+2025-04-29 22:22:06,712 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:06] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:22:13,173 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:13] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-04-29 22:22:13,186 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:13] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-04-29 22:22:13,197 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:13] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:22:18,157 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:18] "GET /admin/employees HTTP/1.1" 200 -
+2025-04-29 22:22:18,169 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:18] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:22:26,551 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:26] "[35m[1mGET /admin/employee/1 HTTP/1.1[0m" 500 -
+2025-04-29 22:22:26,568 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:26] "GET /admin/employee/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-04-29 22:22:26,568 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:26] "GET /admin/employee/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-04-29 22:22:26,573 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:26] "GET /admin/employee/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-04-29 22:22:26,589 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:22:26] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:25:37,727 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:37] "[35m[1mGET /admin/employee/1 HTTP/1.1[0m" 500 -
+2025-04-29 22:25:37,737 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:37] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-04-29 22:25:37,738 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:37] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-04-29 22:25:37,741 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:37] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:25:37,754 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:37] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:25:43,801 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:25:44,024 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:25:44,178 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:25:44,223 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:25:44,324 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-04-29 22:25:44,325 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-29 22:25:44,325 - werkzeug - INFO -  * Restarting with stat
+2025-04-29 22:25:44,421 - vinicola - INFO - NumPy version: 1.24.3
+2025-04-29 22:25:44,619 - vinicola - INFO - Pandas version: 1.5.3
+2025-04-29 22:25:44,771 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-04-29 22:25:44,812 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-04-29 22:25:44,814 - werkzeug - WARNING -  * Debugger is active!
+2025-04-29 22:25:44,821 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-04-29 22:25:50,185 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:50] "[35m[1mGET /admin/employee/1 HTTP/1.1[0m" 500 -
+2025-04-29 22:25:50,199 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:50] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-04-29 22:25:50,199 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:50] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-04-29 22:25:50,205 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:25:50] "[36mGET /admin/employee/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:26:07,087 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:07] "GET /admin/employee/1 HTTP/1.1" 200 -
+2025-04-29 22:26:07,098 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:07] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:26:22,031 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:22] "[32mPOST /admin/employee/1 HTTP/1.1[0m" 302 -
+2025-04-29 22:26:22,050 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:22] "GET /admin/employees HTTP/1.1" 200 -
+2025-04-29 22:26:22,067 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:22] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:26:37,309 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:37] "[32mGET / HTTP/1.1[0m" 302 -
+2025-04-29 22:26:37,335 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:37] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-04-29 22:26:37,349 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:37] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:26:37,352 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:37] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:26:39,353 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:39] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-04-29 22:26:40,967 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:40] "GET /admin HTTP/1.1" 200 -
+2025-04-29 22:26:40,985 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:40] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:26:44,945 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:44] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-04-29 22:26:44,957 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:44] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-04-29 22:26:44,973 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:44] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:26:59,866 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:59] "GET /admin/employees HTTP/1.1" 200 -
+2025-04-29 22:26:59,880 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:26:59] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:27:04,271 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:27:04] "[35m[1mGET /admin/operators HTTP/1.1[0m" 500 -
+2025-04-29 22:27:04,283 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:27:04] "GET /admin/operators?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-04-29 22:27:04,285 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:27:04] "GET /admin/operators?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-04-29 22:27:04,295 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:27:04] "GET /admin/operators?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-04-29 22:27:04,307 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:27:04] "[36mGET /admin/operators?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-29 22:32:26,790 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:32:26] "GET /admin/operators HTTP/1.1" 200 -
+2025-04-29 22:32:26,801 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:32:26] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:32:51,910 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:32:51] "GET /admin/reports HTTP/1.1" 200 -
+2025-04-29 22:32:51,926 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:32:51] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:33:10,279 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:10] "GET /admin/reports?date=2025-04-29 HTTP/1.1" 200 -
+2025-04-29 22:33:10,292 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:10] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:33:12,756 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:12] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-04-29 22:33:12,768 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:12] "[33mGET /static/logo.png HTTP/1.1[0m" 404 -
+2025-04-29 22:33:17,853 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:17] "[35m[1mGET /admin/products HTTP/1.1[0m" 500 -
+2025-04-29 22:33:17,868 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:17] "GET /admin/products?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-04-29 22:33:17,868 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:17] "GET /admin/products?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-04-29 22:33:17,881 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:17] "GET /admin/products?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-04-29 22:33:17,894 - werkzeug - INFO - 127.0.0.1 - - [29/Apr/2025 22:33:17] "[36mGET /admin/products?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -

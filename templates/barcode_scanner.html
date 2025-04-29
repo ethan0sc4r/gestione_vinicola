@@ -1,375 +1,1050 @@
 <!-- barcode_scanner.html -->
 {% extends "base.html" %}
 
-{% block title %}Scanner Codice - {{ app_name }}{% endblock %}
+{% block title %}Scanner - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .scanner-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 120px);
+    }
+    
+    .scanner-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        border: 2px dashed var(--primary-color);
+        border-radius: 20px;
+        background-color: rgba(0, 122, 255, 0.05);
+        margin-bottom: 1.5rem;
+        padding: 2rem;
+        position: relative;
+    }
+    
+    .scanner-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .scanner-pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .scanner-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .status-connected {
+        background-color: rgba(52, 199, 89, 0.2);
+        color: var(--success-color);
+    }
+    
+    .status-disconnected {
+        background-color: rgba(255, 59, 48, 0.2);
+        color: var(--danger-color);
+    }
+    
+    .status-waiting {
+        background-color: rgba(255, 204, 0, 0.2);
+        color: var(--warning-color);
+    }
+    
+    .last-scan {
+        background-color: white;
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-family: monospace;
+        font-size: 1.2rem;
+    }
+    
+    .manual-input {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    /* Stili per la scheda dipendente */
+    .employee-card {
+        display: none; /* Nascosto di default */
+        background: linear-gradient(to right, var(--primary-color), #0062cc);
+        color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .employee-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .employee-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .employee-avatar {
+        width: 60px;
+        height: 60px;
+        background-color: white;
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+    
+    .employee-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .employee-rank {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .employee-credit {
+        text-align: right;
+    }
+    
+    .credit-amount {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    .credit-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .credit-limit {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Stili per la selezione prodotti */
+    .product-selection {
+        display: none; /* Nascosto di default */
+        background-color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .product-item {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .product-item:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+    }
+    
+    .product-item.selected {
+        background-color: rgba(0, 122, 255, 0.1);
+        border-color: var(--primary-color);
+    }
+    
+    .product-name {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .custom-amount-section {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+    }
+    
+    /* Stili per la conferma */
+    .confirmation {
+        display: none; /* Nascosto di default */
+        text-align: center;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .confirmation-icon {
+        font-size: 4rem;
+        color: var(--success-color);
+        margin-bottom: 1rem;
+    }
+    
+    .confirmation-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .confirmation-message {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .confirmation-details {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+    
+    .confirmation-detail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    .confirmation-label {
+        font-weight: 500;
+        color: #6c757d;
+    }
+    
+    .confirmation-value {
+        font-weight: 600;
+    }
+    
+    /* Stili per il form di ricarica credito */
+    .credit-form {
+        display: none; /* Nascosto di default */
+        background-color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .credit-presets {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .credit-preset {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 0.75rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .credit-preset:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+    }
+    
+    .credit-preset.selected {
+        background-color: rgba(52, 199, 89, 0.1);
+        border-color: var(--success-color);
+    }
+    
+    .admin-link {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .admin-link:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: #212529;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Scanner Codice a Barre</h4>
+<div class="scanner-container">
+    <!-- Scanner Area -->
+    <div class="scanner-area" id="scannerArea">
+        <span class="scanner-status status-waiting" id="scannerStatus">
+            <i class="fas fa-circle me-1"></i> In attesa di connessione...
+        </span>
+        
+        <i class="fas fa-barcode scanner-icon scanner-pulse"></i>
+        <h3 class="mb-3">Scanner Codice a Barre</h3>
+        <p class="text-muted">Scansiona il badge del dipendente per iniziare</p>
+        
+        {% if last_barcode %}
+        <div class="last-scan">
+            <span id="lastBarcode">{{ last_barcode }}</span>
+            <button class="btn btn-sm btn-outline-primary ms-2" id="useLastBarcode">
+                <i class="fas fa-check me-1"></i> Usa
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Input manuale -->
+    <div class="manual-input">
+        <div class="input-group">
+            <input type="text" id="manualBarcode" class="form-control form-control-lg" 
+                   placeholder="Inserisci codice manualmente..." aria-label="Barcode">
+            <button class="btn btn-primary" type="button" id="submitManualBarcode">
+                <i class="fas fa-search me-1"></i> Cerca
+            </button>
+        </div>
+    </div>
+    
+    <!-- Scheda dipendente (visualizzata dopo la scansione) -->
+    <div class="employee-card" id="employeeCard">
+        <div class="employee-card-header">
+            <div class="employee-info">
+                <div class="employee-avatar" id="employeeAvatar">AB</div>
                 <div>
-                    <span id="serial-status" class="badge bg-secondary">
-                        <i class="fas fa-plug"></i> Verifica connessione...
-                    </span>
+                    <div class="employee-name" id="employeeName">Nome Dipendente</div>
+                    <div class="employee-rank" id="employeeRank">Ruolo</div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="alert alert-info mb-4" id="serial-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Questa applicazione utilizza un lettore di codice a barre seriale. È possibile utilizzare l'input manuale come alternativa.
+            <div class="employee-credit">
+                <div class="credit-amount" id="creditAmount">€ 0.00</div>
+                <div class="credit-label">Credito disponibile</div>
+                <div class="credit-limit" id="creditLimit">Limite: € 0.00</div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-outline-light" id="cancelButton">
+                <i class="fas fa-times me-1"></i> Annulla
+            </button>
+            <div>
+                <button class="btn btn-light" id="addCreditButton">
+                    <i class="fas fa-plus-circle me-1"></i> Ricarica
+                </button>
+                <button class="btn btn-success" id="deductCreditButton">
+                    <i class="fas fa-shopping-cart me-1"></i> Acquista
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Selezione prodotti (visualizzata dopo aver cliccato "Acquista") -->
+    <div class="product-selection" id="productSelection">
+        <h4 class="mb-3">Seleziona Prodotto o Importo</h4>
+        
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-item" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}">
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-price">€ {{ "%.2f"|format(product.price) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="custom-amount-section">
+            <h5 class="mb-3">Importo Personalizzato</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="customAmount" class="form-label">Importo (€)</label>
+                    <input type="number" class="form-control" id="customAmount" step="0.01" min="0.01" placeholder="0.00">
                 </div>
-                
-                <div class="serial-scanner-area mb-4">
-                    <div class="text-center p-4">
-                        <i class="fas fa-barcode scanning-animation" style="font-size: 3rem; color: #007aff;"></i>
-                        <h5 class="mt-3">Lettura codice da dispositivo seriale</h5>
-                        <p class="text-muted">Il sistema è in ascolto dal lettore seriale. Scansiona il codice a barre con il lettore.</p>
-                        
-                        {% if last_barcode %}
-                        <div class="alert alert-success mt-3">
-                            <i class="fas fa-check-circle me-2"></i>
-                            Ultimo codice letto: <strong>{{ last_barcode }}</strong>
-                            <button id="use-last-barcode" class="btn btn-sm btn-primary ms-2">Usa questo codice</button>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div id="manual-input" class="mb-4">
-                    <h5 class="mb-3">Input manuale</h5>
-                    <div class="input-group">
-                        <input type="text" id="barcode-input" class="form-control" placeholder="Inserisci il codice manualmente..." autofocus>
-                        <button class="btn btn-primary" type="button" id="submit-barcode">
-                            <i class="fas fa-search me-1"></i> Cerca
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="result-container" style="display: none;">
-                    <div class="alert alert-info">
-                        <div id="result-message"></div>
-                    </div>
-                    
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="text-center">
-                                <h4 id="employee-name"></h4>
-                                <span class="badge bg-secondary" id="employee-rank"></span>
-                                <div class="mt-3">
-                                    <span class="credit-badge" id="employee-credit"></span>
-                                </div>
-                                <div class="mt-2" id="credit-integrity-status">
-                                    <span class="badge bg-success"><i class="fas fa-shield-alt me-1"></i> Integrità verificata</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Scala Credito</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="deduct-form">
-                                <input type="hidden" id="employee-id">
-                                <div class="mb-3">
-                                    <label for="units" class="form-label">Unità da scalare (0.20€ per unità)</label>
-                                    <input type="number" class="form-control" id="units" min="1" value="1" required>
-                                    <div class="form-text">Costo totale: <span id="total-cost">0.20</span>€</div>
-                                </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary">Scala Credito</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                <div class="col-md-6">
+                    <label for="customProduct" class="form-label">Descrizione (opzionale)</label>
+                    <input type="text" class="form-control" id="customProduct" placeholder="Prodotto personalizzato">
                 </div>
             </div>
         </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-outline-secondary btn-lg" id="cancelProductButton">
+                <i class="fas fa-arrow-left me-1"></i> Indietro
+            </button>
+            <button class="btn btn-success btn-lg" id="confirmProductButton">
+                <i class="fas fa-check me-1"></i> Conferma
+            </button>
+        </div>
+    </div>
+    
+    <!-- Form per aggiungere credito -->
+    <div class="credit-form" id="creditForm">
+        <h4 class="mb-3">Ricarica Credito</h4>
+        
+        <div class="mb-3">
+            <label class="form-label">Importo da aggiungere</label>
+            <div class="credit-presets">
+                <div class="credit-preset" data-amount="5">€ 5.00</div>
+                <div class="credit-preset" data-amount="10">€ 10.00</div>
+                <div class="credit-preset" data-amount="20">€ 20.00</div>
+                <div class="credit-preset" data-amount="50">€ 50.00</div>
+                <div class="credit-preset" data-amount="100">€ 100.00</div>
+            </div>
+            
+            <label for="customCreditAmount" class="form-label">O specifica un importo personalizzato</label>
+            <input type="number" class="form-control" id="customCreditAmount" step="0.01" min="0.01" placeholder="0.00">
+        </div>
+        
+        <div class="mb-3">
+            <label for="operatorPassword" class="form-label">Password Operatore</label>
+            <input type="password" class="form-control" id="operatorPassword" placeholder="Inserisci la password dell'operatore">
+            <div class="form-text">È necessaria la password di un operatore per aggiungere credito</div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-outline-secondary btn-lg" id="cancelCreditButton">
+                <i class="fas fa-arrow-left me-1"></i> Indietro
+            </button>
+            <button class="btn btn-success btn-lg" id="confirmCreditButton">
+                <i class="fas fa-check me-1"></i> Conferma Ricarica
+            </button>
+        </div>
+    </div>
+    
+    <!-- Conferma operazione (mostrata dopo che l'operazione è completata) -->
+    <div class="confirmation" id="confirmation">
+        <i class="fas fa-check-circle confirmation-icon"></i>
+        <h4 class="confirmation-title" id="confirmationTitle">Operazione Completata</h4>
+        <p class="confirmation-message" id="confirmationMessage">Operazione effettuata con successo.</p>
+        
+        <div class="confirmation-details">
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Dipendente:</span>
+                <span class="confirmation-value" id="confirmationEmployee">-</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Operazione:</span>
+                <span class="confirmation-value" id="confirmationType">-</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Importo:</span>
+                <span class="confirmation-value" id="confirmationAmount">-</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Nuovo credito:</span>
+                <span class="confirmation-value" id="confirmationCredit">-</span>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary btn-lg" id="newOperationButton">
+            <i class="fas fa-redo me-1"></i> Nuova Operazione
+        </button>
     </div>
 </div>
 
-<!-- Modal per avvisi di integrità -->
-<div class="modal fade" id="integrityModal" tabindex="-1" aria-labelledby="integrityModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="integrityModalLabel">
-                    <i class="fas fa-exclamation-triangle me-2"></i> Allarme Sicurezza
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-3">
-                    <i class="fas fa-shield-alt text-danger" style="font-size: 3rem;"></i>
-                </div>
-                <p class="text-center fs-5 fw-bold">Rilevata possibile manipolazione del credito!</p>
-                <p id="integrity-message" class="text-center">È stata rilevata un'anomalia nell'integrità del credito.</p>
-                <div class="alert alert-warning">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Questa operazione è stata bloccata per motivi di sicurezza. Contattare l'amministratore di sistema.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Link amministratore -->
+<a href="{{ url_for('admin_login') }}" class="admin-link">
+    <i class="fas fa-cog me-1"></i> Amministrazione
+</a>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Riferimenti agli elementi del DOM
-    const serialStatus = document.getElementById('serial-status');
-    const barcodeBadge = document.getElementById('last-barcode-badge');
-    const barcodeInput = document.getElementById('barcode-input');
-    const submitButton = document.getElementById('submit-barcode');
-    const resultContainer = document.getElementById('result-container');
-    const useBarcodeButton = document.getElementById('use-last-barcode');
-
-    // Modali
-    const integrityModal = new bootstrap.Modal(document.getElementById('integrityModal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
+    // Elementi DOM
+    const scannerArea = document.getElementById('scannerArea');
+    const scannerStatus = document.getElementById('scannerStatus');
+    const manualBarcodeInput = document.getElementById('manualBarcode');
+    const submitManualButton = document.getElementById('submitManualBarcode');
+    const employeeCard = document.getElementById('employeeCard');
+    const employeeAvatar = document.getElementById('employeeAvatar');
+    const employeeName = document.getElementById('employeeName');
+    const employeeRank = document.getElementById('employeeRank');
+    const creditAmount = document.getElementById('creditAmount');
+    const creditLimit = document.getElementById('creditLimit');
+    const cancelButton = document.getElementById('cancelButton');
+    const addCreditButton = document.getElementById('addCreditButton');
+    const deductCreditButton = document.getElementById('deductCreditButton');
+    const productSelection = document.getElementById('productSelection');
+    const productItems = document.querySelectorAll('.product-item');
+    const customAmountInput = document.getElementById('customAmount');
+    const customProductInput = document.getElementById('customProduct');
+    const cancelProductButton = document.getElementById('cancelProductButton');
+    const confirmProductButton = document.getElementById('confirmProductButton');
+    const creditForm = document.getElementById('creditForm');
+    const creditPresets = document.querySelectorAll('.credit-preset');
+    const customCreditInput = document.getElementById('customCreditAmount');
+    const operatorPasswordInput = document.getElementById('operatorPassword');
+    const cancelCreditButton = document.getElementById('cancelCreditButton');
+    const confirmCreditButton = document.getElementById('confirmCreditButton');
+    const confirmation = document.getElementById('confirmation');
+    const confirmationTitle = document.getElementById('confirmationTitle');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    const confirmationEmployee = document.getElementById('confirmationEmployee');
+    const confirmationType = document.getElementById('confirmationType');
+    const confirmationAmount = document.getElementById('confirmationAmount');
+    const confirmationCredit = document.getElementById('confirmationCredit');
+    const newOperationButton = document.getElementById('newOperationButton');
     
-    // Variabili globali
-    let lastCheckTime = 0;
-    let lastReadBarcode = '';
+    // Variabili di stato dell'applicazione
+    let currentEmployee = null;
+    let selectedProduct = null;
+    let selectedCreditAmount = null;
+    let pollTimer = null;
     
-    // Funzione per verificare lo stato del lettore seriale
-    function checkSerialStatus() {
-        const now = Date.now();
-        // Limita il polling a una volta ogni 1.5 secondi per evitare sovraccarichi
-        if (now - lastCheckTime < 1500) return;
-        lastCheckTime = now;
+    // Inizializza l'applicazione
+    function initApp() {
+        // Inizia a fare polling per rilevare codici a barre scansionati
+        startBarcodePoll();
         
+        // Imposta lo stato dello scanner
+        updateScannerStatus('waiting');
+        
+        // Focus sull'input manuale
+        manualBarcodeInput.focus();
+        
+        // Gestisci il pulsante "Usa" per l'ultimo codice scansionato
+        const useLastBarcodeButton = document.getElementById('useLastBarcode');
+        if (useLastBarcodeButton) {
+            useLastBarcodeButton.addEventListener('click', function() {
+                const lastBarcode = document.getElementById('lastBarcode').textContent;
+                processBarcode(lastBarcode);
+            });
+        }
+        
+        // Gestisci l'invio del codice manuale
+        submitManualButton.addEventListener('click', function() {
+            const barcode = manualBarcodeInput.value.trim();
+            if (barcode) {
+                processBarcode(barcode);
+            }
+        });
+        
+        // Gestisci l'invio con Enter
+        manualBarcodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const barcode = this.value.trim();
+                if (barcode) {
+                    processBarcode(barcode);
+                }
+            }
+        });
+        
+        // Gestisci i pulsanti della scheda dipendente
+        cancelButton.addEventListener('click', resetApp);
+        addCreditButton.addEventListener('click', showCreditForm);
+        deductCreditButton.addEventListener('click', showProductSelection);
+        
+        // Gestisci la selezione prodotti
+        productItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Rimuovi la selezione da tutti i prodotti
+                productItems.forEach(p => p.classList.remove('selected'));
+                // Seleziona questo prodotto
+                this.classList.add('selected');
+                // Salva il prodotto selezionato
+                selectedProduct = {
+                    id: this.dataset.productId,
+                    name: this.dataset.productName,
+                    price: parseFloat(this.dataset.productPrice)
+                };
+                // Pulisci l'importo personalizzato
+                customAmountInput.value = '';
+                customProductInput.value = '';
+            });
+        });
+        
+        // Gestisci l'importo personalizzato
+        customAmountInput.addEventListener('input', function() {
+            if (this.value) {
+                // Se si inserisce un importo personalizzato, deseleziona i prodotti
+                productItems.forEach(p => p.classList.remove('selected'));
+                selectedProduct = null;
+            }
+        });
+        
+        // Gestisci i pulsanti della selezione prodotti
+        cancelProductButton.addEventListener('click', function() {
+            // Torna alla scheda dipendente
+            hideProductSelection();
+            showEmployeeCard();
+        });
+        
+        confirmProductButton.addEventListener('click', processDeduction);
+        
+        // Gestisci i preset di ricarica credito
+        creditPresets.forEach(preset => {
+            preset.addEventListener('click', function() {
+                // Rimuovi la selezione da tutti i preset
+                creditPresets.forEach(p => p.classList.remove('selected'));
+                // Seleziona questo preset
+                this.classList.add('selected');
+                // Salva l'importo selezionato
+                selectedCreditAmount = parseFloat(this.dataset.amount);
+                // Pulisci l'importo personalizzato
+                customCreditInput.value = '';
+            });
+        });
+        
+        // Gestisci l'importo personalizzato per la ricarica
+        customCreditInput.addEventListener('input', function() {
+            if (this.value) {
+                // Se si inserisce un importo personalizzato, deseleziona i preset
+                creditPresets.forEach(p => p.classList.remove('selected'));
+                selectedCreditAmount = null;
+            }
+        });
+        
+        // Gestisci i pulsanti del form di ricarica
+        cancelCreditButton.addEventListener('click', function() {
+            // Torna alla scheda dipendente
+            hideCreditForm();
+            showEmployeeCard();
+        });
+        
+        confirmCreditButton.addEventListener('click', processAddCredit);
+        
+        // Gestisci il pulsante per una nuova operazione
+        newOperationButton.addEventListener('click', resetApp);
+    }
+    
+    // Polling per rilevare nuovi codici a barre
+    function startBarcodePoll() {
+        // Prima chiamata immediata
+        checkForBarcode();
+        
+        // Poi ogni 2 secondi
+        pollTimer = setInterval(checkForBarcode, 2000);
+    }
+    
+    function stopBarcodePoll() {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+    }
+    
+    // Controlla se c'è un nuovo codice a barre
+    function checkForBarcode() {
         fetch("{{ url_for('get_serial_barcode') }}")
             .then(response => response.json())
             .then(data => {
-                // Aggiorna lo stato visivo del lettore
-                if (data.barcode) {
-                    // Lettore connesso e codice ricevuto
-                    serialStatus.className = 'badge bg-success';
-                    serialStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i> Lettore connesso';
+                if (data.success) {
+                    // Un codice è stato letto e un dipendente è stato trovato
+                    updateScannerStatus('connected');
                     
-                    // Se c'è un nuovo codice ed è diverso dall'ultimo processato
-                    if (data.barcode !== lastReadBarcode) {
-                        lastReadBarcode = data.barcode;
-                        console.log('Nuovo codice rilevato:', data.barcode);
-                        
-                        // Avvisa con un "beep" o una notifica visiva
-                        const barcodeSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBhxQo97nsXQrChs2e6rM089nPhZLZX+PpNf4ulQOHnGers67aUA2iLOkdRwJLpLXx4FFFhJXwu3oj0smIWiVn3XA8dB8TkZcY2l2tOzZfzgYLoCo1tiNUDZEbIqVgWukxOXOgk1QTVpojpOk6PbprVscBxFEl8XqypdlRkFiZmLB/9mldD8nHUyU0ejchlAhJHO1ueKpbBQNMX6/z8t5PAwaLHit2uDYjmBCXWZphcLq1ndFNEU/WpS74sJ9YjBAYnqHmrHa5sF2WE1hbH6Lk6DK8vLAfCcRIFiTt8nCk3ZfWFRQjN3z4YxVPEak3d6oYEMxOWOXoIq44OKmaDwYIlifu9zMhWI9H0SXrLfWz5lnTTIuXJOq5/O2Y0sdEFCqx9jNpINlRzdTmrvnxoFMMzFgeMfWll4fDjOPy9yQVDI0NFB0wfLnoVQ0MEFqoLLO1bJ6UT5HQWqNmdHs36FRPURPYnN+qfD6vmw5ICdHhOD/mVkXC03NzqJF/CV9nl8qCyS89cuCOCJ3u9+URC4sXqXLpGA3MEVjg5O29fn0pFQq/zE9XYmStdXrxIZzSzU6RWuZyeS2cVVCHUCQp8ffwHVCLzNUf6DB6cZ+WEgpFEqA2OvtjlM4O1eWuMG8kHBYNRpMi7Tv3Z5rTkFMW2N3ttDqy3FOHCkzerj4+Z5UFw8te6PYz6RqPT5IVF+Dqdn24rVkKuP/XLvh3blGIkNcmrDZx3pPNk1miq/Yz5JZQEMlQ47T6qxXJSNLi87qtFgpMWOw1/ngeU7dJ8uYSjWH3+qsYiYgNHeq1eKHRBYyYqLM4Zg9IECmu52JJhlDu+PidzxTV2mFt9brpoQOBFusyNuNRSZMjKXF9eSXUBH3qsRy5/3Eh1k1Ro3O4Nh/SXRyYG96nc32+bdBFCNIq+vdukkNDnTH6t2MTRwEIpPn+osOwTdV0PunjA7Q7uKDSyZxqLvZ+xJRZVZwb3yo1eXlpWwhIit7mc3stV43IzIoW5nE7vOKTx4ULovj95BMFxZsrcrfxZESRp1mOjF0n7nwt24zQFljg6Ti7u+gTDodc6K9z+rLbiEWM1qDnrnj8tt8QzhLX3KFptH/8rxSDQwtjeHozYMzEjlgl78nNZLhuSoKKHm12v3Ldgt3aO1jKQwu3/TtlVQ2H1uy8OV/OxHBjuFuQDh21+O3aSM0V32JnaK2VSI5lbrEqXRMAAAsdpvG5uC0ZBoqRIrBzKeRThUHJF2t4u2dSi1JcJOzyr1/PCcrSWuEoMnl1YtgOSckUXSk1enEeEcwJiliiqPJymItKP/tgPbSiU0rBBFZoNPrr1c1JEdwpL7O1oZZJiQrP1d4oNDYj1wj//9n0vb0gUnF/H6m4Mybb09CXbP3zmEPKHutz79pJR5DjrXe7r5OMjdbfIyt2d7IlmtWLh0varmfMoXR1wJKlWBJO5z86iooNYfP77EuDUCbxtFy7dvJzjj/lPD5pU81KmiXyudcFReP7/akJRdPv/vrtDYeQZXF1WsEMunwzNB+1yP8JYPSyrdeSUWTyM1qCzy9Ts9uLhoLKMsAAOVZLAg4lrzPxn1MRnCVvOF8MwU9fqTQyqVrRkJkjazHfFQnm8G9mFmM0OXmLCMPr2nB3aovDlDj+uQqCTXW+Kx1JzSv6fW4QSGZx8iET0E4VX+i1v+7SyCrwq+syjsUF4LN1GUYKoPO0pM9B03j9/NKRSKIwMKPWFI2PnOWvPP/bB/e+LTkXTMYVZbN6O9yIA1MrNTkpiMiRJm9zKZ1ViQ+cJR/HGZ+ttPtvk0NE2mow9V2JkGDsAoKC7gCl8rzojQY');
-                        barcodeSound.play().catch(() => {
-                            // Gestione errore audio (alcuni browser richiedono interazione utente)
-                            console.log('Impossibile riprodurre suono');
-                        });
-                        
-                        // Se il dipendente è stato trovato e non ci sono problemi di integrità
-                        if (data.success) {
-                            processEmployeeData(data.employee);
-                            // Focus sul campo unità per velocizzare la transazione
-                            document.getElementById('units').focus();
-                        } else if (data.credit_integrity_failed) {
-                            // Problema di integrità rilevato
-                            document.getElementById('integrity-message').textContent = data.message;
-                            integrityModal.show();
-                        } else {
-                            // Codice letto ma dipendente non trovato
-                            showToast(`Codice letto (${data.barcode}) ma dipendente non trovato.`, 'warning');
-                        }
+                    // Se non stiamo già visualizzando un dipendente, processiamo il codice
+                    if (!employeeCard.classList.contains('active')) {
+                        processEmployeeData(data.employee);
                     }
-                } else if (data.message.includes('Nessun codice letto')) {
-                    // Lettore connesso ma nessun codice
-                    serialStatus.className = 'badge bg-warning';
-                    serialStatus.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> In attesa di codice';
+                } else if (data.barcode) {
+                    // Un codice è stato letto ma non è stato trovato un dipendente
+                    updateScannerStatus('connected');
+                    
+                    // Mostra un messaggio solo se non stiamo già visualizzando un dipendente
+                    if (!employeeCard.classList.contains('active')) {
+                        showToast(`Codice letto (${data.barcode}) ma dipendente non trovato.`, 'warning');
+                    }
                 } else {
-                    // Problemi di connessione
-                    serialStatus.className = 'badge bg-danger';
-                    serialStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Errore connessione';
+                    // Nessun codice letto ma lo scanner è connesso
+                    updateScannerStatus('waiting');
                 }
             })
             .catch(error => {
                 console.error("Errore durante il polling:", error);
-                serialStatus.className = 'badge bg-danger';
-                serialStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Connessione persa';
+                updateScannerStatus('disconnected');
             });
     }
     
-    // Controlla periodicamente lo stato del lettore e i nuovi codici
-    setInterval(checkSerialStatus, 1000);
-    
-    // Chiamata iniziale
-    checkSerialStatus();
-    
-    function processEmployeeData(employee) {
-        document.getElementById('employee-id').value = employee.id;
-        document.getElementById('employee-name').textContent = employee.first_name + " " + employee.last_name;
-        document.getElementById('employee-rank').textContent = employee.rank;
-        document.getElementById('employee-credit').textContent = "Credito: € " + employee.credit.toFixed(2);
+    // Aggiorna lo stato visivo dello scanner
+    function updateScannerStatus(status) {
+        scannerStatus.className = 'scanner-status';
         
-        // Verifica l'integrità del credito
-        const integrityStatus = document.getElementById('credit-integrity-status');
-        if (employee.credit_integrity) {
-            integrityStatus.innerHTML = '<span class="badge bg-success"><i class="fas fa-shield-alt me-1"></i> Integrità verificata</span>';
-        } else {
-            integrityStatus.innerHTML = '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> ATTENZIONE: Integrità compromessa</span>';
+        switch (status) {
+            case 'connected':
+                scannerStatus.classList.add('status-connected');
+                scannerStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i> Lettore connesso';
+                break;
+            case 'disconnected':
+                scannerStatus.classList.add('status-disconnected');
+                scannerStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Lettore disconnesso';
+                break;
+            case 'waiting':
+            default:
+                scannerStatus.classList.add('status-waiting');
+                scannerStatus.innerHTML = '<i class="fas fa-circle me-1"></i> In attesa di scansione...';
+                break;
         }
-        
-        document.getElementById('result-message').textContent = "Dipendente trovato!";
-        document.getElementById('result-container').style.display = 'block';
-        
-        // Scorre fino al risultato
-        document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
     }
     
-    function processBarcode(code) {
+    // Processa un codice a barre (manuale o scansionato)
+    function processBarcode(barcode) {
         fetch("{{ url_for('scan_barcode') }}", {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-CSRFToken": getCookie("csrf_token")
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "barcode=" + encodeURIComponent(code)
+            body: `barcode=${encodeURIComponent(barcode)}`
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 processEmployeeData(data.employee);
-            } else if (data.credit_integrity_failed) {
-                // Problema di integrità del credito
-                document.getElementById('integrity-message').textContent = data.message;
-                integrityModal.show();
-                document.getElementById('result-container').style.display = 'none';
             } else {
-                showToast("Errore: " + data.message, "danger");
+                showToast(data.message, 'danger');
             }
         })
         .catch(error => {
             console.error("Errore:", error);
-            showToast("Errore durante la ricerca del dipendente.", "danger");
+            showToast("Errore durante la ricerca del dipendente.", 'danger');
         });
     }
     
-    // Gestore per l'ultimo codice letto dal lettore seriale
-    if (useBarcodeButton) {
-        useBarcodeButton.addEventListener('click', function() {
-            const lastBarcode = "{{ last_barcode }}";
-            if (lastBarcode) {
-                processBarcode(lastBarcode);
-            }
-        });
+    // Processa i dati del dipendente e mostra la scheda
+    function processEmployeeData(employee) {
+        // Salva i dati del dipendente
+        currentEmployee = employee;
+        
+        // Aggiorna la scheda del dipendente
+        employeeAvatar.textContent = (employee.first_name[0] + employee.last_name[0]).toUpperCase();
+        employeeName.textContent = `${employee.first_name} ${employee.last_name}`;
+        employeeRank.textContent = employee.rank;
+        creditAmount.textContent = `€ ${employee.credit.toFixed(2)}`;
+        creditLimit.textContent = `Limite: € ${employee.credit_limit.toFixed(2)}`;
+        
+        // Nascondi lo scanner e mostra la scheda dipendente
+        hideScannerArea();
+        showEmployeeCard();
+        
+        // Pulisci l'input manuale
+        manualBarcodeInput.value = '';
     }
     
-    submitButton.addEventListener('click', function() {
-        const code = barcodeInput.value.trim();
-        if (code) {
-            processBarcode(code);
+    // Elabora la richiesta di deduzione di credito
+    function processDeduction() {
+        if (!currentEmployee) {
+            showToast('Nessun dipendente selezionato.', 'danger');
+            return;
+        }
+        
+        let productId = null;
+        let amount = null;
+        let customProduct = null;
+        
+        // Determina se stiamo usando un prodotto predefinito o un importo personalizzato
+        if (selectedProduct) {
+            productId = selectedProduct.id;
+        } else if (customAmountInput.value) {
+            amount = parseFloat(customAmountInput.value);
+            customProduct = customProductInput.value;
         } else {
-            showToast("Inserisci un codice valido", "warning");
-        }
-    });
-    
-    barcodeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            const code = this.value.trim();
-            if (code) {
-                processBarcode(code);
-            } else {
-                showToast("Inserisci un codice valido", "warning");
-            }
-        }
-    });
-    
-    document.getElementById('units').addEventListener('input', function() {
-        const units = parseInt(this.value) || 0;
-        const cost = (units * 0.20).toFixed(2);
-        document.getElementById('total-cost').textContent = cost;
-    });
-    
-    document.getElementById('deduct-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const employeeId = document.getElementById('employee-id').value;
-        const units = document.getElementById('units').value;
-        
-        if (!employeeId) {
-            showToast("Nessun dipendente selezionato", "warning");
+            showToast('Seleziona un prodotto o inserisci un importo personalizzato.', 'warning');
             return;
         }
         
-        if (parseInt(units) < 1) {
-            showToast("Inserisci un numero valido di unità", "warning");
-            return;
+        // Prepara i dati per la richiesta
+        const formData = new FormData();
+        formData.append('employee_id', currentEmployee.id);
+        
+        if (productId) {
+            formData.append('product_id', productId);
+        } else {
+            formData.append('custom_amount', amount);
+            formData.append('custom_product', customProduct);
         }
         
-        // Disabilita il pulsante durante l'elaborazione per evitare doppi clic
-        const submitButton = this.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
-        
+        // Invia la richiesta
         fetch("{{ url_for('deduct_credit') }}", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-CSRFToken": getCookie("csrf_token")
-            },
-            body: "employee_id=" + encodeURIComponent(employeeId) + "&units=" + encodeURIComponent(units)
+            body: formData
         })
         .then(response => response.json())
         .then(data => {
-            // Riattiva il pulsante
-            submitButton.disabled = false;
-            submitButton.innerHTML = 'Scala Credito';
-            
             if (data.success) {
-                document.getElementById('employee-credit').textContent = "Credito: € " + data.new_credit.toFixed(2);
+                // Aggiorna il credito del dipendente
+                currentEmployee.credit = data.new_credit;
                 
-                // Effetto visivo di conferma
-                const creditBadge = document.getElementById('employee-credit');
-                creditBadge.classList.add('animate__animated', 'animate__pulse');
-                setTimeout(() => {
-                    creditBadge.classList.remove('animate__animated', 'animate__pulse');
-                }, 1000);
-                
-                // Suono di conferma
-                const successSound = new Audio('data:audio/wav;base64,UklGRmYEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YUIEAACAgICAgICAgICAgICAgICAgICAgICBgYGBgYGBgYGBgYGBgYGBgYGBgYGAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgH9/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f39/f39/f39/f4CAgICAgICAgICAgICAgICAgICAgH9/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/gICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA');
-                successSound.play().catch(() => {
-                    console.log('Impossibile riprodurre suono di successo');
-                });
-                
-                showToast(data.message, "success");
-                
-                // Resetta il campo unità al valore di default
-                document.getElementById('units').value = 1;
-                document.getElementById('total-cost').textContent = '0.20';
-                
-                // Posiziona il focus sul campo unità per la prossima operazione
-                document.getElementById('units').focus();
-                
-            } else if (data.credit_integrity_failed) {
-                // Problema di integrità del credito
-                document.getElementById('integrity-message').textContent = data.message;
-                integrityModal.show();
-                document.getElementById('result-container').style.display = 'none';
+                // Mostra la conferma
+                showConfirmation(
+                    'Acquisto Completato',
+                    data.message,
+                    `${currentEmployee.first_name} ${currentEmployee.last_name}`,
+                    selectedProduct ? selectedProduct.name : customProduct || 'Importo personalizzato',
+                    selectedProduct ? `-€ ${selectedProduct.price.toFixed(2)}` : `-€ ${amount.toFixed(2)}`,
+                    `€ ${data.new_credit.toFixed(2)}`
+                );
             } else {
-                showToast("Errore: " + data.message, "danger");
+                showToast(data.message, 'danger');
             }
         })
         .catch(error => {
             console.error("Errore:", error);
-            submitButton.disabled = false;
-            submitButton.innerHTML = 'Scala Credito';
-            showToast("Errore durante l'operazione.", "danger");
+            showToast('Errore durante l\'elaborazione dell\'acquisto.', 'danger');
         });
-    });
+    }
     
-    // Focalizzati sul campo di input al caricamento della pagina
-    window.addEventListener('DOMContentLoaded', () => {
-        barcodeInput.focus();
-    });
+    // Elabora la richiesta di aggiunta credito
+    function processAddCredit() {
+        if (!currentEmployee) {
+            showToast('Nessun dipendente selezionato.', 'danger');
+            return;
+        }
+        
+        // Determina l'importo da aggiungere
+        let amount = selectedCreditAmount;
+        if (!amount && customCreditInput.value) {
+            amount = parseFloat(customCreditInput.value);
+        }
+        
+        if (!amount || amount <= 0) {
+            showToast('Inserisci un importo valido per la ricarica.', 'warning');
+            return;
+        }
+        
+        // Ottieni la password dell'operatore
+        const operatorPassword = operatorPasswordInput.value;
+        if (!operatorPassword) {
+            showToast('Inserisci la password dell\'operatore.', 'warning');
+            return;
+        }
+        
+        // Prepara i dati per la richiesta
+        const formData = new FormData();
+        formData.append('employee_id', currentEmployee.id);
+        formData.append('amount', amount);
+        formData.append('operator_password', operatorPassword);
+        
+        // Invia la richiesta
+        fetch("{{ url_for('add_credit') }}", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Aggiorna il credito del dipendente
+                currentEmployee.credit = data.new_credit;
+                
+                // Mostra la conferma
+                showConfirmation(
+                    'Ricarica Completata',
+                    data.message,
+                    `${currentEmployee.first_name} ${currentEmployee.last_name}`,
+                    'Ricarica credito',
+                    `+€ ${amount.toFixed(2)}`,
+                    `€ ${data.new_credit.toFixed(2)}`
+                );
+            } else {
+                showToast(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error("Errore:", error);
+            showToast('Errore durante l\'elaborazione della ricarica.', 'danger');
+        });
+    }
+    
+    // Mostra la schermata di conferma
+    function showConfirmation(title, message, employee, type, amount, newCredit) {
+        // Nascondi tutte le altre viste
+        hideAll();
+        
+        // Aggiorna i dati di conferma
+        confirmationTitle.textContent = title;
+        confirmationMessage.textContent = message;
+        confirmationEmployee.textContent = employee;
+        confirmationType.textContent = type;
+        confirmationAmount.textContent = amount;
+        confirmationCredit.textContent = newCredit;
+        
+        // Mostra la conferma
+        confirmation.style.display = 'block';
+        
+        // Riattiva il polling dopo un po' per permettere di vedere la conferma
+        setTimeout(() => {
+            startBarcodePoll();
+        }, 5000);
+    }
+    
+    // Funzioni di gestione della visibilità dei componenti
+    function hideAll() {
+        hideScannerArea();
+        hideEmployeeCard();
+        hideProductSelection();
+        hideCreditForm();
+        hideConfirmation();
+    }
+    
+    function showScannerArea() {
+        scannerArea.style.display = 'flex';
+        startBarcodePoll();
+        manualBarcodeInput.focus();
+    }
+    
+    function hideScannerArea() {
+        scannerArea.style.display = 'none';
+        stopBarcodePoll();
+    }
+    
+    function showEmployeeCard() {
+        employeeCard.style.display = 'block';
+        employeeCard.classList.add('active');
+    }
+    
+    function hideEmployeeCard() {
+        employeeCard.style.display = 'none';
+        employeeCard.classList.remove('active');
+    }
+    
+    function showProductSelection() {
+        hideEmployeeCard();
+        productSelection.style.display = 'block';
+        
+        // Reset della selezione
+        productItems.forEach(p => p.classList.remove('selected'));
+        selectedProduct = null;
+        customAmountInput.value = '';
+        customProductInput.value = '';
+    }
+    
+    function hideProductSelection() {
+        productSelection.style.display = 'none';
+    }
+    
+    function showCreditForm() {
+        hideEmployeeCard();
+        creditForm.style.display = 'block';
+        
+        // Reset della selezione
+        creditPresets.forEach(p => p.classList.remove('selected'));
+        selectedCreditAmount = null;
+        customCreditInput.value = '';
+        operatorPasswordInput.value = '';
+    }
+    
+    function hideCreditForm() {
+        creditForm.style.display = 'none';
+    }
+    
+    function hideConfirmation() {
+        confirmation.style.display = 'none';
+    }
+    
+    // Resetta l'app allo stato iniziale
+    function resetApp() {
+        hideAll();
+        showScannerArea();
+        
+        // Reset delle variabili di stato
+        currentEmployee = null;
+        selectedProduct = null;
+        selectedCreditAmount = null;
+        
+        // Pulisci gli input
+        manualBarcodeInput.value = '';
+        customAmountInput.value = '';
+        customProductInput.value = '';
+        customCreditInput.value = '';
+        operatorPasswordInput.value = '';
+        
+        // Focus sull'input manuale
+        manualBarcodeInput.focus();
+    }
+    
+    // Funzione per mostrare i toast
+    function showToast(message, type = 'info') {
+        // Crea un elemento toast se non esiste
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = 1050;
+            document.body.appendChild(toastContainer);
+        }
+        
+        // Crea il toast
+        const toastId = 'toast-' + Date.now();
+        const toastElement = document.createElement('div');
+        toastElement.id = toastId;
+        toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+        toastElement.role = 'alert';
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+        
+        // Imposta il contenuto del toast
+        toastElement.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Aggiungi il toast al container
+        toastContainer.appendChild(toastElement);
+        
+        // Inizializza il toast con Bootstrap
+        const toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 5000
+        });
+        
+        // Mostra il toast
+        toast.show();
+        
+        // Rimuovi il toast dal DOM quando è stato nascosto
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.remove();
+        });
+    }
+    
+    // Inizializza l'app al caricamento del documento
+    document.addEventListener('DOMContentLoaded', initApp);
 </script>
 {% endblock %}

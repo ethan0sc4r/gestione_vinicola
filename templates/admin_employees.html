@@ -1,0 +1,350 @@
+<!-- admin_employees.html -->
+{% extends "base.html" %}
+
+{% block title %}Gestione Dipendenti - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .employees-table-container {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .table-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .table-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .table-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .table-search {
+        width: 300px;
+    }
+    
+    .table-wrapper {
+        padding: 1rem 1.5rem;
+        overflow-x: auto;
+    }
+    
+    .employees-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .employees-table th {
+        padding: 0.75rem;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        text-align: left;
+        color: #6c757d;
+    }
+    
+    .employees-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        vertical-align: middle;
+    }
+    
+    .employees-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .employees-table tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .employee-avatar {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 0.75rem;
+    }
+    
+    .employee-name-cell {
+        display: flex;
+        align-items: center;
+    }
+    
+    .employee-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .employee-name {
+        font-weight: 500;
+    }
+    
+    .employee-rank {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .employee-code {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+    
+    .employee-credit {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .employee-limit {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Indicatore integrità */
+    .integrity-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    
+    .integrity-verified {
+        background-color: var(--success-color);
+    }
+    
+    .integrity-failed {
+        background-color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Gestione Dipendenti</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
+            </a>
+            <a href="{{ url_for('admin_new_employee') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-1"></i> Nuovo Dipendente
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab active">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Employees Table -->
+    <div class="employees-table-container">
+        <div class="table-toolbar">
+            <h3 class="table-title">Elenco Dipendenti</h3>
+            <div class="table-controls">
+                <div class="input-group table-search">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="employeeSearch" placeholder="Cerca dipendente...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table class="employees-table">
+                <thead>
+                    <tr>
+                        <th>Dipendente</th>
+                        <th>Codice</th>
+                        <th>Credito</th>
+                        <th>Limite</th>
+                        <th>Integrità</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td class="employee-name-cell">
+                            <div class="employee-avatar">{{ employee.first_name[0] }}{{ employee.last_name[0] }}</div>
+                            <div class="employee-info">
+                                <div class="employee-name">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                <div class="employee-rank">{{ employee.rank }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="employee-code">{{ employee.code }}</span>
+                        </td>
+                        <td>
+                            <div class="employee-credit">€ {{ "%.2f"|format(employee.credit) }}</div>
+                        </td>
+                        <td>
+                            <div class="employee-limit">€ {{ "%.2f"|format(employee.credit_limit) }}</div>
+                        </td>
+                        <td>
+                            <span class="integrity-indicator {% if employee.verify_credit_integrity() %}integrity-verified{% else %}integrity-failed{% endif %}"></span>
+                            {% if employee.verify_credit_integrity() %}
+                                <small class="text-success">OK</small>
+                            {% else %}
+                                <small class="text-danger">Errore</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{{ url_for('admin_edit_employee', id=employee.id) }}" class="btn btn-sm btn-outline-primary" title="Modifica">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ employee.id }}" title="Elimina">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ employee.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ employee.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ employee.id }}">Conferma Eliminazione</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Sei sicuro di voler eliminare il dipendente <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>?</p>
+                                            {% if employee.credit > 0 %}
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Attenzione: questo dipendente ha un credito residuo di <strong>€ {{ "%.2f"|format(employee.credit) }}</strong> che andrà perso.
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                                            <form action="{{ url_for('delete_employee', id=employee.id) }}" method="POST" style="display: inline;">
+                                                <button type="submit" class="btn btn-danger">Elimina</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Empty state -->
+        {% if not employees %}
+        <div class="text-center py-4">
+            <div class="mb-3" style="font-size: 3rem; color: #ced4da;">
+                <i class="fas fa-users"></i>
+            </div>
+            <h4>Nessun dipendente trovato</h4>
+            <p class="text-muted">Aggiungi un nuovo dipendente per iniziare</p>
+            <a href="{{ url_for('admin_new_employee') }}" class="btn btn-primary mt-2">
+                <i class="fas fa-user-plus me-1"></i> Nuovo Dipendente
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Implementazione della ricerca
+        const searchInput = document.getElementById('employeeSearch');
+        const tableRows = document.querySelectorAll('.employees-table tbody tr');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const name = row.querySelector('.employee-name').textContent.toLowerCase();
+                const rank = row.querySelector('.employee-rank').textContent.toLowerCase();
+                const code = row.querySelector('.employee-code').textContent.toLowerCase();
+                
+                const isVisible = name.includes(searchTerm) || 
+                                  rank.includes(searchTerm) || 
+                                  code.includes(searchTerm);
+                
+                row.style.display = isVisible ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

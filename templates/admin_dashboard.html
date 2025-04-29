@@ -1,0 +1,513 @@
+<!-- admin_dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard Amministrativa - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background-color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .stat-icon-blue {
+        background-color: rgba(0, 122, 255, 0.1);
+        color: var(--primary-color);
+    }
+    
+    .stat-icon-green {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .stat-icon-orange {
+        background-color: rgba(255, 149, 0, 0.1);
+        color: #ff9500;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1d1d1f;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .action-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .action-card {
+        background-color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .action-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .action-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .action-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .operators-section {
+        margin-top: 2rem;
+    }
+    
+    .operators-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .operators-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .operators-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .operators-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .operator-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .operator-avatar {
+        width: 60px;
+        height: 60px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .operator-username {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .operator-password {
+        font-family: monospace;
+        background-color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        border: 1px dashed #ced4da;
+        font-size: 0.9rem;
+    }
+    
+    .password-modal-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .password-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .password-item:last-child {
+        border-bottom: none;
+    }
+    
+    .password-username {
+        font-weight: 600;
+    }
+    
+    .password-value {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Modal di stampa */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        
+        #passwordsPrintArea, #passwordsPrintArea * {
+            visibility: visible;
+        }
+        
+        #passwordsPrintArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Dashboard Amministrativa</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab active">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ employees_count }}</div>
+            <div class="stat-label">Dipendenti Registrati</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-green">
+                <i class="fas fa-euro-sign"></i>
+            </div>
+            <div class="stat-value">€ {{ "%.2f"|format(total_credit) }}</div>
+            <div class="stat-label">Totale Credito</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-orange">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="stat-value">{{ transactions_today }}</div>
+            <div class="stat-label">Transazioni Oggi</div>
+        </div>
+    </div>
+    
+    <!-- Action Row -->
+    <div class="action-row">
+        <a href="{{ url_for('admin_employees') }}" class="action-card text-decoration-none">
+            <div class="action-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h3 class="action-title">Gestione Dipendenti</h3>
+            <p class="action-description">Aggiungi, modifica o rimuovi dipendenti dal sistema</p>
+            <button class="btn btn-primary">
+                <i class="fas fa-arrow-right me-1"></i> Vai
+            </button>
+        </a>
+        
+        <a href="{{ url_for('admin_products') }}" class="action-card text-decoration-none">
+            <div class="action-icon">
+                <i class="fas fa-tags"></i>
+            </div>
+            <h3 class="action-title">Gestione Prodotti</h3>
+            <p class="action-description">Gestisci i prodotti disponibili per l'acquisto</p>
+            <button class="btn btn-primary">
+                <i class="fas fa-arrow-right me-1"></i> Vai
+            </button>
+        </a>
+        
+        <a href="{{ url_for('admin_reports') }}" class="action-card text-decoration-none">
+            <div class="action-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h3 class="action-title">Report Giornaliero</h3>
+            <p class="action-description">Visualizza e stampa i report delle transazioni</p>
+            <button class="btn btn-primary">
+                <i class="fas fa-arrow-right me-1"></i> Vai
+            </button>
+        </a>
+    </div>
+    
+    <!-- Operators Section -->
+    <div class="operators-section">
+        <div class="operators-card">
+            <div class="operators-header">
+                <h3 class="operators-title">Operatori</h3>
+                <button class="btn btn-success" id="regeneratePasswordsBtn">
+                    <i class="fas fa-key me-1"></i> Rigenera Password
+                </button>
+            </div>
+            
+            <div class="operators-grid">
+                {% for operator in operators %}
+                <div class="operator-card">
+                    <div class="operator-avatar">
+                        {{ operator.username[0]|upper }}
+                    </div>
+                    <div class="operator-username">{{ operator.username }}</div>
+                    <div class="operator-password">{{ operator.password }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per le password rigenerate -->
+<div class="modal fade" id="passwordsModal" tabindex="-1" aria-labelledby="passwordsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordsModalLabel">
+                    <i class="fas fa-key me-2"></i> Password Rigenerate
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success mb-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Le password degli operatori sono state rigenerate con successo.
+                </div>
+                
+                <div class="password-modal-list" id="passwordsListModal">
+                    <!-- Popolato dinamicamente -->
+                </div>
+                
+                <!-- Area di stampa nascosta -->
+                <div id="passwordsPrintArea" style="display: none;">
+                    <h2 class="text-center mb-4">{{ app_name }} - Password Operatori</h2>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Operatore</th>
+                                <th>Password</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passwordsPrintTable">
+                            <!-- Popolato dinamicamente -->
+                        </tbody>
+                    </table>
+                    <p class="mt-3 text-center">
+                        <small>Generato il {{ now.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary" id="printPasswordsBtn">
+                    <i class="fas fa-print me-1"></i> Stampa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal per le password
+        const passwordsModal = new bootstrap.Modal(document.getElementById('passwordsModal'));
+        
+        // Pulsante di rigenerazione password
+        const regenerateBtn = document.getElementById('regeneratePasswordsBtn');
+        
+        // Gestione della rigenerazione delle password
+        regenerateBtn.addEventListener('click', function() {
+            // Disabilita il pulsante durante la richiesta
+            regenerateBtn.disabled = true;
+            regenerateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Rigenerazione...';
+            
+            // Richiesta al server
+            fetch("{{ url_for('admin_regenerate_passwords') }}", {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Aggiorna la lista delle password nel modal
+                    const passwordsListModal = document.getElementById('passwordsListModal');
+                    const passwordsPrintTable = document.getElementById('passwordsPrintTable');
+                    
+                    // Pulisci le liste
+                    passwordsListModal.innerHTML = '';
+                    passwordsPrintTable.innerHTML = '';
+                    
+                    // Popola con le nuove password
+                    Object.entries(data.passwords).forEach(([username, password]) => {
+                        // Aggiungi alla lista del modal
+                        const passwordItem = document.createElement('div');
+                        passwordItem.className = 'password-item';
+                        passwordItem.innerHTML = `
+                            <div class="password-username">${username}</div>
+                            <div class="password-value">${password}</div>
+                        `;
+                        passwordsListModal.appendChild(passwordItem);
+                        
+                        // Aggiungi alla tabella di stampa
+                        const printRow = document.createElement('tr');
+                        printRow.innerHTML = `
+                            <td>${username}</td>
+                            <td>${password}</td>
+                        `;
+                        passwordsPrintTable.appendChild(printRow);
+                    });
+                    
+                    // Aggiorna la UI nella pagina principale
+                    const operatorElements = document.querySelectorAll('.operator-card');
+                    operatorElements.forEach(element => {
+                        const usernameElement = element.querySelector('.operator-username');
+                        const passwordElement = element.querySelector('.operator-password');
+                        const username = usernameElement.textContent;
+                        if (data.passwords[username]) {
+                            passwordElement.textContent = data.passwords[username];
+                            
+                            // Aggiungi un effetto di evidenziazione
+                            passwordElement.classList.add('bg-warning');
+                            setTimeout(() => {
+                                passwordElement.classList.remove('bg-warning');
+                            }, 2000);
+                        }
+                    });
+                    
+                    // Mostra il modal
+                    passwordsModal.show();
+                    
+                    // Notifica
+                    showToast('Password rigenerate con successo!', 'success');
+                } else {
+                    showToast('Errore durante la rigenerazione delle password.', 'danger');
+                }
+                
+                // Riabilita il pulsante
+                regenerateBtn.disabled = false;
+                regenerateBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Password';
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                showToast('Errore di connessione.', 'danger');
+                
+                // Riabilita il pulsante
+                regenerateBtn.disabled = false;
+                regenerateBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Password';
+            });
+        });
+        
+        // Gestione della stampa
+        const printPasswordsBtn = document.getElementById('printPasswordsBtn');
+        printPasswordsBtn.addEventListener('click', function() {
+            window.print();
+        });
+    });
+</script>
+{% endblock %}

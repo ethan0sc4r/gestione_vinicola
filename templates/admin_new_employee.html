@@ -1,0 +1,359 @@
+<!-- admin_new_employee.html -->
+{% extends "base.html" %}
+
+{% block title %}Nuovo Dipendente - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .form-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .form-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .form-body {
+        padding: 1.5rem;
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .required-label::after {
+        content: ' *';
+        color: var(--danger-color);
+    }
+    
+    .scanner-area {
+        border: 2px dashed #ced4da;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        background-color: #f8f9fa;
+        margin-bottom: 1rem;
+    }
+    
+    .scanner-icon {
+        font-size: 2rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .scanner-pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .scanner-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .last-scan {
+        background-color: white;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 0.5rem;
+        margin-top: 1rem;
+        display: inline-block;
+        font-family: monospace;
+    }
+    
+    .code-preview {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    
+    .code-generate {
+        cursor: pointer;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Nuovo Dipendente</h1>
+        <div>
+            <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Torna all'Elenco
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab active">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="form-card">
+        <div class="form-header">
+            <h3 class="form-title">Inserisci i Dati del Nuovo Dipendente</h3>
+        </div>
+        
+        <div class="form-body">
+            <form id="newEmployeeForm" method="POST">
+                <!-- Informazioni Personali -->
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <i class="fas fa-user me-2"></i> Informazioni Personali
+                    </h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label required-label">Nome</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label required-label">Cognome</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="rank" class="form-label required-label">Grado/Ruolo</label>
+                            <input type="text" class="form-control" id="rank" name="rank" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informazioni Codice -->
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <i class="fas fa-barcode me-2"></i> Codice Identificativo
+                    </h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="code" class="form-label required-label">Codice Badge</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="code" name="code" required>
+                                <button class="btn btn-outline-secondary code-generate" type="button" id="generateCode">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Codice utilizzato per identificare il dipendente durante la scansione
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="scanner-area">
+                                <div class="scanner-icon scanner-pulse">
+                                    <i class="fas fa-barcode"></i>
+                                </div>
+                                <div class="scanner-text">
+                                    Scansiona il badge del dipendente per acquisire automaticamente il codice
+                                </div>
+                                
+                                <div id="lastScannedBadge" style="display: none;" class="last-scan">
+                                    <span id="lastScannedCode"></span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2" id="useScannedCode">
+                                        <i class="fas fa-check"></i> Usa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Limiti di Credito -->
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <i class="fas fa-euro-sign me-2"></i> Impostazioni Credito
+                    </h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="credit_limit" class="form-label">Limite di Credito Negativo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input type="number" class="form-control" id="credit_limit" name="credit_limit" value="0" min="0" step="0.01">
+                            </div>
+                            <div class="form-text">
+                                Massimo importo di credito negativo consentito (0 = nessun credito negativo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pulsanti di Azione -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Salva Dipendente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeInput = document.getElementById('code');
+        const generateCodeBtn = document.getElementById('generateCode');
+        const lastScannedBadge = document.getElementById('lastScannedBadge');
+        const lastScannedCode = document.getElementById('lastScannedCode');
+        const useScannedCodeBtn = document.getElementById('useScannedCode');
+        
+        // Polling per rilevare codici a barre letti
+        let pollTimer = null;
+        
+        function startBarcodePoll() {
+            // Poll every 2 seconds
+            pollTimer = setInterval(checkForBarcode, 2000);
+        }
+        
+        function stopBarcodePoll() {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+        }
+        
+        function checkForBarcode() {
+            fetch("{{ url_for('get_serial_barcode') }}")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.barcode) {
+                        // Mostra l'ultimo codice scansionato
+                        lastScannedCode.textContent = data.barcode;
+                        lastScannedBadge.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error("Errore durante il polling:", error);
+                });
+        }
+        
+        // Avvia il polling all'apertura della pagina
+        startBarcodePoll();
+        
+        // Usa il codice scansionato
+        useScannedCodeBtn.addEventListener('click', function() {
+            codeInput.value = lastScannedCode.textContent;
+        });
+        
+        // Genera un codice casuale
+        generateCodeBtn.addEventListener('click', function() {
+            // Genera un codice alfanumerico di 8 caratteri
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            codeInput.value = code;
+        });
+        
+        // Validazione del form prima dell'invio
+        document.getElementById('newEmployeeForm').addEventListener('submit', function(e) {
+            // Validazione base
+            const firstName = document.getElementById('first_name').value.trim();
+            const lastName = document.getElementById('last_name').value.trim();
+            const rank = document.getElementById('rank').value.trim();
+            const code = document.getElementById('code').value.trim();
+            
+            if (!firstName || !lastName || !rank || !code) {
+                e.preventDefault();
+                showToast('Tutti i campi obbligatori devono essere compilati', 'danger');
+                return;
+            }
+            
+            // Verifica che il codice non sia vuoto
+            if (code.length === 0) {
+                e.preventDefault();
+                showToast('Inserisci un codice valido', 'danger');
+                return;
+            }
+        });
+        
+        // Cleanup quando si lascia la pagina
+        window.addEventListener('beforeunload', function() {
+            stopBarcodePoll();
+        });
+    });
+</script>
+{% endblock %}

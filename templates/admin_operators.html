@@ -1,0 +1,571 @@
+<!-- admin_operators.html -->
+{% extends "base.html" %}
+
+{% block title %}Gestione Operatori - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .operators-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .operator-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .operator-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .operator-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .operator-avatar {
+        width: 80px;
+        height: 80px;
+        background-color: white;
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0 auto 1rem;
+    }
+    
+    .operator-username {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .operator-role {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .operator-body {
+        padding: 1.5rem;
+    }
+    
+    .operator-password-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .operator-password-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .operator-password {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px dashed #ced4da;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.25rem;
+        letter-spacing: 1px;
+    }
+    
+    .operator-actions {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .toggle-active {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 26px;
+    }
+    
+    .toggle-active input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 26px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: var(--success-color);
+    }
+    
+    input:focus + .slider {
+        box-shadow: 0 0 1px var(--success-color);
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    .activity-status {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .activity-label {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .activity-active {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .activity-inactive {
+        background-color: rgba(142, 142, 147, 0.1);
+        color: #6c757d;
+    }
+    
+    .regenerate-section {
+        margin-bottom: 2rem;
+    }
+    
+    .divider {
+        margin: 2rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Styles for password printing */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        
+        #printSection, #printSection * {
+            visibility: visible;
+        }
+        
+        #printSection {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+    
+    #printSection {
+        display: none;
+    }
+    
+    .print-title {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .print-table th, .print-table td {
+        border: 1px solid #dee2e6;
+        padding: 0.75rem;
+    }
+    
+    .print-table th {
+        background-color: #f8f9fa;
+    }
+    
+    .print-footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Gestione Operatori</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab active">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Regenerate Section -->
+    <div class="card regenerate-section">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-2">Password Operatori</h4>
+                    <p class="text-muted mb-0">Gli operatori possono aggiungere credito ai dipendenti utilizzando le loro password</p>
+                </div>
+                <div>
+                    <button id="regenerateAllBtn" class="btn btn-primary">
+                        <i class="fas fa-key me-1"></i> Rigenera Tutte le Password
+                    </button>
+                    <button id="printPasswordsBtn" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-print me-1"></i> Stampa Elenco
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Operators Grid -->
+    <div class="operators-grid">
+        {% for operator in operators %}
+        <div class="operator-card">
+            <div class="operator-header">
+                <div class="operator-avatar">{{ operator.username[0]|upper }}</div>
+                <h3 class="operator-username">{{ operator.username }}</h3>
+                <div class="operator-role">Operatore</div>
+            </div>
+            <div class="operator-body">
+                <div class="operator-password-section">
+                    <div class="operator-password-label">Password</div>
+                    <div class="operator-password">{{ operator.password }}</div>
+                </div>
+                
+                <div class="operator-actions">
+                    <button class="btn btn-outline-primary regenerate-single-btn" data-operator-id="{{ operator.id }}">
+                        <i class="fas fa-sync-alt me-1"></i> Rigenera
+                    </button>
+                    
+                    <div>
+                        <label class="toggle-active">
+                            <input type="checkbox" class="toggle-active-checkbox" data-operator-id="{{ operator.id }}" {% if operator.active %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="activity-status">
+                    <span class="activity-label {% if operator.active %}activity-active{% else %}activity-inactive{% endif %}">
+                        {% if operator.active %}
+                        <i class="fas fa-check-circle me-1"></i> Attivo
+                        {% else %}
+                        <i class="fas fa-times-circle me-1"></i> Inattivo
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Empty state -->
+    {% if not operators %}
+    <div class="text-center py-5">
+        <div class="mb-3" style="font-size: 3rem; color: #ced4da;">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h4>Nessun operatore trovato</h4>
+        <p class="text-muted">Gli operatori devono essere configurati per permettere la ricarica del credito</p>
+        <button id="createOperatorsBtn" class="btn btn-primary mt-2">
+            <i class="fas fa-plus me-1"></i> Crea Operatori Standard
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal for regenerated passwords -->
+<div class="modal fade" id="regenerateModal" tabindex="-1" aria-labelledby="regenerateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="regenerateModalLabel">Password Rigenerate</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success mb-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Le password sono state rigenerate con successo!
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Operatore</th>
+                                <th>Nuova Password</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passwordsTable">
+                            <!-- Will be filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary" id="modalPrintBtn">
+                    <i class="fas fa-print me-1"></i> Stampa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Section (hidden) -->
+<div id="printSection">
+    <h2 class="print-title">{{ app_name }} - Password Operatori</h2>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th>Operatore</th>
+                <th>Password</th>
+                <th>Stato</th>
+            </tr>
+        </thead>
+        <tbody id="printTable">
+            <!-- Will be filled dynamically -->
+        </tbody>
+    </table>
+    <div class="print-footer">
+        Stampato il {{ now.strftime('%d/%m/%Y %H:%M') }} da {{ app_name }}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elements
+        const regenerateAllBtn = document.getElementById('regenerateAllBtn');
+        const printPasswordsBtn = document.getElementById('printPasswordsBtn');
+        const createOperatorsBtn = document.getElementById('createOperatorsBtn');
+        const regenerateSingleBtns = document.querySelectorAll('.regenerate-single-btn');
+        const toggleActiveCheckboxes = document.querySelectorAll('.toggle-active-checkbox');
+        const modalPrintBtn = document.getElementById('modalPrintBtn');
+        const passwordsTable = document.getElementById('passwordsTable');
+        const printTable = document.getElementById('printTable');
+        
+        // Modal
+        const regenerateModal = new bootstrap.Modal(document.getElementById('regenerateModal'));
+        
+        // Function to regenerate all passwords
+        function regenerateAllPasswords() {
+            regenerateAllBtn.disabled = true;
+            regenerateAllBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Rigenerazione...';
+            
+            fetch("{{ url_for('admin_regenerate_passwords') }}", {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear password tables
+                    passwordsTable.innerHTML = '';
+                    
+                    // Add new passwords
+                    Object.entries(data.passwords).forEach(([username, password]) => {
+                        // Update password in UI
+                        document.querySelectorAll('.operator-card').forEach(card => {
+                            const usernameElement = card.querySelector('.operator-username');
+                            if (usernameElement.textContent === username) {
+                                card.querySelector('.operator-password').textContent = password;
+                            }
+                        });
+                        
+                        // Add to modal table
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${username}</td>
+                            <td><code>${password}</code></td>
+                        `;
+                        passwordsTable.appendChild(row);
+                    });
+                    
+                    // Show modal
+                    regenerateModal.show();
+                    
+                    // Update print table
+                    updatePrintTable();
+                } else {
+                    showToast('Errore durante la rigenerazione delle password.', 'danger');
+                }
+                
+                regenerateAllBtn.disabled = false;
+                regenerateAllBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Tutte le Password';
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showToast('Errore di connessione.', 'danger');
+                
+                regenerateAllBtn.disabled = false;
+                regenerateAllBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Tutte le Password';
+            });
+        }
+        
+        // Function to regenerate a single password
+        function regenerateSinglePassword(operatorId) {
+            // This would be implemented on the server side
+            showToast('Funzionalità non implementata.', 'warning');
+        }
+        
+        // Function to toggle operator active status
+        function toggleOperatorStatus(operatorId, active) {
+            // This would be implemented on the server side
+            showToast(`Operatore ${active ? 'attivato' : 'disattivato'}.`, 'success');
+            
+            // For demo purposes, update the UI
+            document.querySelectorAll('.operator-card').forEach(card => {
+                const regenerateBtn = card.querySelector('.regenerate-single-btn');
+                if (regenerateBtn && regenerateBtn.dataset.operatorId === operatorId) {
+                    const statusLabel = card.querySelector('.activity-label');
+                    
+                    if (active) {
+                        statusLabel.classList.remove('activity-inactive');
+                        statusLabel.classList.add('activity-active');
+                        statusLabel.innerHTML = '<i class="fas fa-check-circle me-1"></i> Attivo';
+                    } else {
+                        statusLabel.classList.remove('activity-active');
+                        statusLabel.classList.add('activity-inactive');
+                        statusLabel.innerHTML = '<i class="fas fa-times-circle me-1"></i> Inattivo';
+                    }
+                }
+            });
+        }
+        
+        // Function to update print table
+        function updatePrintTable() {
+            printTable.innerHTML = '';
+            
+            document.querySelectorAll('.operator-card').forEach(card => {
+                const username = card.querySelector('.operator-username').textContent;
+                const password = card.querySelector('.operator-password').textContent;
+                const isActive = card.querySelector('.activity-label').classList.contains('activity-active');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${username}</td>
+                    <td>${password}</td>
+                    <td>${isActive ? 'Attivo' : 'Inattivo'}</td>
+                `;
+                printTable.appendChild(row);
+            });
+        }
+        
+        // Function to create standard operators
+        function createStandardOperators() {
+            // This would be implemented on the server side
+            showToast('Funzionalità non implementata.', 'warning');
+        }
+        
+        // Event listeners
+        regenerateAllBtn.addEventListener('click', regenerateAllPasswords);
+        
+        regenerateSingleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                regenerateSinglePassword(this.dataset.operatorId);
+            });
+        });
+        
+        toggleActiveCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleOperatorStatus(this.dataset.operatorId, this.checked);
+            });
+        });
+        
+        if (createOperatorsBtn) {
+            createOperatorsBtn.addEventListener('click', createStandardOperators);
+        }
+        
+        printPasswordsBtn.addEventListener('click', function() {
+            updatePrintTable();
+            window.print();
+        });
+        
+        modalPrintBtn.addEventListener('click', function() {
+            updatePrintTable();
+            window.print();
+        });
+    });
+</script>
+{% endblock %}

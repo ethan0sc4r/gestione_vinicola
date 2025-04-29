@@ -1,0 +1,652 @@
+<!-- admin_reports.html -->
+{% extends "base.html" %}
+
+{% block title %}Report Giornalieri - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .report-header {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .report-form {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .report-date-control {
+        max-width: 200px;
+    }
+    
+    .date-nav-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.05);
+        border: none;
+        transition: all 0.2s;
+    }
+    
+    .date-nav-button:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgba(0, 122, 255, 0.1);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon-green {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .stat-icon-red {
+        background-color: rgba(255, 59, 48, 0.1);
+        color: var(--danger-color);
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .chart-container {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .chart-area {
+        height: 250px;
+        position: relative;
+    }
+    
+    .transactions-table-container {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .table-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .table-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .table-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .table-filter {
+        width: 200px;
+    }
+    
+    .transactions-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .transactions-table th {
+        padding: 0.75rem 1.25rem;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        text-align: left;
+        color: #6c757d;
+    }
+    
+    .transactions-table td {
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        vertical-align: middle;
+    }
+    
+    .transactions-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .transactions-table tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .transaction-time {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .transaction-type {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .transaction-type-credit {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .transaction-type-debit {
+        background-color: rgba(255, 59, 48, 0.1);
+        color: var(--danger-color);
+    }
+    
+    .transaction-amount {
+        font-weight: 600;
+    }
+    
+    .transaction-amount-positive {
+        color: var(--success-color);
+    }
+    
+    .transaction-amount-negative {
+        color: var(--danger-color);
+    }
+    
+    .transaction-employee {
+        display: flex;
+        align-items: center;
+    }
+    
+    .transaction-employee-avatar {
+        width: 30px;
+        height: 30px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-right: 0.75rem;
+    }
+    
+    .transaction-product {
+        font-weight: 500;
+    }
+    
+    .transaction-operator {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    .operators-summary {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .operators-summary-header {
+        margin-bottom: 1rem;
+    }
+    
+    .operators-summary-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .operators-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .operator-summary-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    
+    .operator-summary-name {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .operator-summary-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    
+    .operator-stat {
+        text-align: center;
+        padding: 0.5rem;
+        background-color: white;
+        border-radius: 6px;
+    }
+    
+    .operator-stat-value {
+        font-weight: 600;
+    }
+    
+    .operator-stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .operator-stat-credit {
+        color: var(--success-color);
+    }
+    
+    .operator-stat-debit {
+        color: var(--danger-color);
+    }
+    
+    /* Print styles */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        
+        .print-content, .print-content * {
+            visibility: visible;
+        }
+        
+        .print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .no-print {
+            display: none !important;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Report Giornalieri</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
+            </a>
+            <button type="button" class="btn btn-primary" id="printReportBtn">
+                <i class="fas fa-print me-1"></i> Stampa Report
+            </button>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs no-print">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab active">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Print Content -->
+    <div class="print-content">
+        <!-- Report Header -->
+        <div class="report-header no-print">
+            <div class="report-form">
+                <button class="date-nav-button" id="prevDayBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="form-group flex-grow-1">
+                    <label for="reportDate" class="form-label">Data Report</label>
+                    <input type="date" class="form-control report-date-control" id="reportDate" value="{{ report_date.strftime('%Y-%m-%d') }}">
+                </div>
+                
+                <button class="date-nav-button" id="nextDayBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <button class="btn btn-primary" id="updateReportBtn">
+                    <i class="fas fa-sync-alt me-1"></i> Aggiorna
+                </button>
+            </div>
+        </div>
+        
+        <!-- Print Header (visible only when printing) -->
+        <div style="display: none;" class="mb-4 text-center" id="printHeader">
+            <h2>{{ app_name }} - Report Giornaliero</h2>
+            <h3>{{ report_date.strftime('%d/%m/%Y') }}</h3>
+        </div>
+        
+        <!-- Stats Summary -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stat-value">{{ transactions|length }}</div>
+                <div class="stat-label">Transazioni Totali</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="stat-value">€ {{ "%.2f"|format(credit_sum) }}</div>
+                <div class="stat-label">Totale Ricariche</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-red">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="stat-value">€ {{ "%.2f"|format(debit_sum) }}</div>
+                <div class="stat-label">Totale Acquisti</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="stat-value">€ {{ "%.2f"|format(credit_sum - debit_sum) }}</div>
+                <div class="stat-label">Bilancio del Giorno</div>
+            </div>
+        </div>
+        
+        <!-- Operators Summary -->
+        {% if operator_stats %}
+        <div class="operators-summary">
+            <div class="operators-summary-header">
+                <h3 class="operators-summary-title">Riepilogo Operatori</h3>
+            </div>
+            
+            <div class="operators-grid">
+                {% for operator_name, stats in operator_stats.items() %}
+                <div class="operator-summary-card">
+                    <div class="operator-summary-name">{{ operator_name }}</div>
+                    <div class="operator-summary-stats">
+                        <div class="operator-stat">
+                            <div class="operator-stat-value operator-stat-credit">€ {{ "%.2f"|format(stats.credit) }}</div>
+                            <div class="operator-stat-label">Ricariche</div>
+                        </div>
+                        <div class="operator-stat">
+                            <div class="operator-stat-value operator-stat-debit">€ {{ "%.2f"|format(stats.debit) }}</div>
+                            <div class="operator-stat-label">Acquisti</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="page-break"></div>
+        
+        <!-- Transactions Table -->
+        <div class="transactions-table-container">
+            <div class="table-toolbar">
+                <h3 class="table-title">Transazioni del {{ report_date.strftime('%d/%m/%Y') }}</h3>
+                <div class="table-controls no-print">
+                    <select class="form-select table-filter" id="typeFilter">
+                        <option value="all">Tutte le transazioni</option>
+                        <option value="credit">Solo ricariche</option>
+                        <option value="debit">Solo acquisti</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% if transactions %}
+            <div class="table-responsive">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Ora</th>
+                            <th>Tipo</th>
+                            <th>Importo</th>
+                            <th>Dipendente</th>
+                            <th>Prodotto</th>
+                            <th>Operatore</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr data-type="{{ transaction.transaction_type }}">
+                            <td>
+                                <div>{{ transaction.timestamp.strftime('%d/%m/%Y') }}</div>
+                                <div class="transaction-time">{{ transaction.timestamp.strftime('%H:%M:%S') }}</div>
+                            </td>
+                            <td>
+                                <span class="transaction-type {% if transaction.transaction_type == 'credit' %}transaction-type-credit{% else %}transaction-type-debit{% endif %}">
+                                    {% if transaction.transaction_type == 'credit' %}
+                                        <i class="fas fa-plus-circle me-1"></i> Ricarica
+                                    {% else %}
+                                        <i class="fas fa-minus-circle me-1"></i> Acquisto
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="transaction-amount {% if transaction.transaction_type == 'credit' %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
+                                    {% if transaction.transaction_type == 'credit' %}
+                                        +€ {{ "%.2f"|format(transaction.amount) }}
+                                    {% else %}
+                                        -€ {{ "%.2f"|format(transaction.amount|abs) }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="transaction-employee">
+                                <div class="transaction-employee-avatar">
+                                    {{ transaction.employee_name[0] if transaction.employee_name else '?' }}
+                                </div>
+                                <div>{{ transaction.employee_name }}</div>
+                            </td>
+                            <td class="transaction-product">
+                                {{ transaction.product_name if transaction.product_name else '-' }}
+                            </td>
+                            <td class="transaction-operator">
+                                {{ transaction.operator_name if transaction.operator_name else '-' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center">
+                <div style="font-size: 3rem; color: #ced4da; margin-bottom: 1rem;">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <h4>Nessuna transazione in questa data</h4>
+                <p class="text-muted">Non ci sono transazioni registrate per il {{ report_date.strftime('%d/%m/%Y') }}.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportDateInput = document.getElementById('reportDate');
+        const updateReportBtn = document.getElementById('updateReportBtn');
+        const prevDayBtn = document.getElementById('prevDayBtn');
+        const nextDayBtn = document.getElementById('nextDayBtn');
+        const typeFilter = document.getElementById('typeFilter');
+        const printReportBtn = document.getElementById('printReportBtn');
+        const printHeader = document.getElementById('printHeader');
+        
+        // Filtro tipo transazione
+        typeFilter.addEventListener('change', function() {
+            const type = this.value;
+            const rows = document.querySelectorAll('.transactions-table tbody tr');
+            
+            rows.forEach(row => {
+                const rowType = row.getAttribute('data-type');
+                if (type === 'all' || type === rowType) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Navigazione date
+        function changeDate(days) {
+            const currentDate = new Date(reportDateInput.value);
+            currentDate.setDate(currentDate.getDate() + days);
+            reportDateInput.value = currentDate.toISOString().split('T')[0];
+            updateReport();
+        }
+        
+        prevDayBtn.addEventListener('click', function() {
+            changeDate(-1);
+        });
+        
+        nextDayBtn.addEventListener('click', function() {
+            changeDate(1);
+        });
+        
+        // Aggiornamento report
+        function updateReport() {
+            const date = reportDateInput.value;
+            window.location.href = "{{ url_for('admin_reports') }}?date=" + date;
+        }
+        
+        updateReportBtn.addEventListener('click', updateReport);
+        
+        // Formattazione data per la vista
+        reportDateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            if (!isNaN(selectedDate.getTime())) {
+                reportDateInput.value = selectedDate.toISOString().split('T')[0];
+            }
+        });
+        
+        // Stampa report
+        printReportBtn.addEventListener('click', function() {
+            // Mostra l'intestazione di stampa
+            printHeader.style.display = 'block';
+            
+            // Stampa
+            window.print();
+            
+            // Nascondi di nuovo l'intestazione di stampa
+            setTimeout(() => {
+                printHeader.style.display = 'none';
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

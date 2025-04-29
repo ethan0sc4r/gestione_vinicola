@@ -1,108 +1,121 @@
 <!-- add_credit.html -->
 {% extends "base.html" %}
 
-{% block title %}Aggiungi Credito - {{ app_name }}{% endblock %}
+{% block title %}Ricarica Credito - {{ app_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
+    .credit-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+    }
+    
     .credit-card {
-        background: linear-gradient(135deg, var(--primary-color), #0055b3);
-        color: white;
+        width: 100%;
+        max-width: 500px;
+        background: linear-gradient(to right, var(--primary-color), #0062cc);
         border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
+        color: white;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
     }
     
-    .credit-card::before {
-        content: '';
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-    
-    .credit-card-header {
+    .credit-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
-    .credit-card-title {
-        font-size: 1.5rem;
+    .credit-title {
+        font-size: 1.25rem;
         font-weight: 600;
     }
     
-    .credit-card-chip {
-        width: 50px;
-        height: 35px;
+    .credit-chip {
+        width: 48px;
+        height: 32px;
         background: linear-gradient(135deg, #ffd700, #ffcc00);
         border-radius: 6px;
         position: relative;
-        overflow: hidden;
     }
     
-    .credit-card-chip::before, .credit-card-chip::after {
+    .credit-chip::before, .credit-chip::after {
         content: '';
         position: absolute;
         background-color: rgba(0, 0, 0, 0.1);
     }
     
-    .credit-card-chip::before {
+    .credit-chip::before {
         width: 100%;
         height: 8px;
-        top: 13px;
+        top: 12px;
     }
     
-    .credit-card-chip::after {
+    .credit-chip::after {
         width: 8px;
         height: 100%;
-        left: 21px;
+        left: 20px;
     }
     
-    .credit-card-holder {
-        margin-bottom: 1rem;
+    .employee-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
     }
     
-    .credit-card-holder-label {
-        font-size: 0.8rem;
-        opacity: 0.8;
+    .employee-avatar {
+        width: 60px;
+        height: 60px;
+        background-color: white;
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+    
+    .employee-details {
+        flex: 1;
+    }
+    
+    .employee-name {
+        font-size: 1.5rem;
+        font-weight: 600;
         margin-bottom: 0.25rem;
     }
     
-    .credit-card-holder-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-        letter-spacing: 1px;
+    .employee-rank {
+        opacity: 0.8;
     }
     
-    .credit-card-balance {
+    .credit-amount {
         text-align: right;
     }
     
-    .credit-card-balance-label {
-        font-size: 0.8rem;
-        opacity: 0.8;
-        margin-bottom: 0.25rem;
-    }
-    
-    .credit-card-balance-amount {
-        font-size: 1.8rem;
+    .current-credit {
+        font-size: 2rem;
         font-weight: 700;
-        letter-spacing: 1px;
     }
     
-    .credit-form {
+    .credit-label {
+        opacity: 0.8;
+    }
+    
+    .credit-form-card {
+        width: 100%;
+        max-width: 500px;
         background-color: white;
         border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     }
     
     .credit-form-title {
@@ -112,203 +125,237 @@
         color: var(--primary-color);
     }
     
-    .btn-add-credit {
-        background: linear-gradient(135deg, var(--success-color), #28a745);
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
+    .presets-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .preset-button {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
         border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
-        transition: all 0.3s;
-    }
-    
-    .btn-add-credit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
-    }
-    
-    .btn-add-credit:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
-    }
-    
-    .form-floating > .form-control {
-        padding: 1rem 0.75rem;
-    }
-    
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label {
-        opacity: 0.8;
-        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
-    }
-    
-    .integrity-badge {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.4rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
+        padding: 0.75rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
         font-weight: 500;
+    }
+    
+    .preset-button:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+    }
+    
+    .preset-button.selected {
+        background-color: rgba(52, 199, 89, 0.1);
+        border-color: var(--success-color);
+        color: var(--success-color);
+    }
+    
+    .action-buttons {
         display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        z-index: 1;
+        justify-content: space-between;
+        margin-top: 1.5rem;
     }
     
-    .integrity-badge-verified {
-        background-color: rgba(52, 199, 89, 0.3);
+    .operator-info {
+        margin-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 1.5rem;
     }
     
-    .integrity-badge-failed {
-        background-color: rgba(255, 59, 48, 0.3);
-    }
-    
-    .credit-presets {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+    .operator-title {
+        font-size: 1rem;
+        font-weight: 500;
         margin-bottom: 1rem;
     }
     
-    .credit-preset-btn {
-        flex: 1;
-        min-width: 80px;
-        text-align: center;
-        padding: 0.5rem;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
+    .operator-help {
         background-color: #f8f9fa;
-        transition: all 0.2s;
-        cursor: pointer;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
     }
     
-    .credit-preset-btn:hover {
-        background-color: #e9ecef;
-        border-color: #ced4da;
+    .operator-list {
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: white;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        margin-top: 0.5rem;
     }
     
-    .credit-preset-btn.active {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
+    .operator-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .operator-item:last-child {
+        border-bottom: none;
+    }
+    
+    .operator-name {
+        font-weight: 500;
+    }
+    
+    .operator-password {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <a href="{{ url_for('employee_details', id=employee.id) }}" class="btn btn-outline-secondary me-2">
-            <i class="fas fa-arrow-left me-1"></i> Dettagli Dipendente
-        </a>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
-            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
-        </a>
+<div class="credit-container">
+    <!-- Credit Card -->
+    <div class="credit-card">
+        <div class="credit-header">
+            <div class="credit-title">{{ app_name }}</div>
+            <div class="credit-chip"></div>
+        </div>
+        
+        <div class="employee-info">
+            <div class="employee-avatar">{{ employee.first_name[0] }}{{ employee.last_name[0] }}</div>
+            <div class="employee-details">
+                <div class="employee-name">{{ employee.first_name }} {{ employee.last_name }}</div>
+                <div class="employee-rank">{{ employee.rank }}</div>
+            </div>
+        </div>
+        
+        <div class="credit-amount">
+            <div class="current-credit">€ {{ "%.2f"|format(employee.credit) }}</div>
+            <div class="credit-label">Credito Attuale</div>
+        </div>
     </div>
-    <h2 class="mb-0">Aggiungi Credito</h2>
-</div>
-
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <!-- Credit Card -->
-        <div class="credit-card">
-            {% if employee.verify_credit_integrity() %}
-            <div class="integrity-badge integrity-badge-verified">
-                <i class="fas fa-shield-alt"></i> 
-                <span>Verificato</span>
-            </div>
-            {% else %}
-            <div class="integrity-badge integrity-badge-failed">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Integrità Compromessa</span>
-            </div>
-            {% endif %}
-            
-            <div class="credit-card-header">
-                <div class="credit-card-title">Credito Dipendente</div>
-                <div class="credit-card-chip"></div>
-            </div>
-            
-            <div class="d-flex justify-content-between">
-                <div class="credit-card-holder">
-                    <div class="credit-card-holder-label">Intestatario</div>
-                    <div class="credit-card-holder-name">{{ employee.first_name }} {{ employee.last_name }}</div>
-                    <div class="mt-2">
-                        <span class="badge bg-light text-dark">{{ employee.code }}</span>
-                    </div>
-                </div>
-                
-                <div class="credit-card-balance">
-                    <div class="credit-card-balance-label">Saldo Attuale</div>
-                    <div class="credit-card-balance-amount">€ {{ "%.2f"|format(employee.credit) }}</div>
-                </div>
-            </div>
-        </div>
+    
+    <!-- Credit Form -->
+    <div class="credit-form-card">
+        <h3 class="credit-form-title">
+            <i class="fas fa-plus-circle me-2"></i> Ricarica Credito
+        </h3>
         
-        {% if not employee.verify_credit_integrity() %}
-        <div class="alert alert-danger mb-4">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
-                <div>
-                    <h5 class="alert-heading mb-1">Attenzione: Integrità Compromessa</h5>
-                    <p class="mb-0">È stata rilevata una possibile manipolazione del credito per questo dipendente. Si consiglia di verificare la situazione prima di procedere.</p>
-                </div>
-            </div>
-            <div class="mt-3">
-                <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-sm btn-outline-danger">
-                    <i class="fas fa-shield-alt me-1"></i> Ripristina Integrità
-                </a>
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Credit Form -->
-        <div class="credit-form">
-            <h3 class="credit-form-title">
-                <i class="fas fa-plus-circle me-2"></i> Aggiungi Credito
-            </h3>
+        <div>
+            <label class="form-label">Seleziona l'importo da ricaricare</label>
             
-            <form method="POST" id="addCreditForm">
-                <div class="mb-4">
-                    <label for="amount" class="form-label">Importo da aggiungere (€)</label>
-                    
-                    <div class="credit-presets mb-2">
-                        <div class="credit-preset-btn" data-amount="5">€ 5,00</div>
-                        <div class="credit-preset-btn" data-amount="10">€ 10,00</div>
-                        <div class="credit-preset-btn" data-amount="20">€ 20,00</div>
-                        <div class="credit-preset-btn" data-amount="50">€ 50,00</div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <span class="input-group-text">€</span>
-                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
-                    </div>
-                    <div class="form-text" id="newBalanceText">
-                        Nuovo saldo: <strong>€ {{ "%.2f"|format(employee.credit) }}</strong>
-                    </div>
+            <div class="presets-grid">
+                <div class="preset-button" data-amount="5">€ 5,00</div>
+                <div class="preset-button" data-amount="10">€ 10,00</div>
+                <div class="preset-button" data-amount="20">€ 20,00</div>
+                <div class="preset-button" data-amount="50">€ 50,00</div>
+                <div class="preset-button" data-amount="100">€ 100,00</div>
+                <div class="preset-button" data-amount="custom">Personalizzato</div>
+            </div>
+            
+            <div id="customAmountGroup" style="display: none;">
+                <label for="amount" class="form-label">Importo personalizzato</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">€</span>
+                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" placeholder="0.00">
+                </div>
+            </div>
+            
+            <div class="operator-info">
+                <div class="operator-title">
+                    <i class="fas fa-user-shield me-2"></i> Autorizzazione Operatore
                 </div>
                 
-                <div class="mb-4">
-                    <label for="password" class="form-label">Password del dipendente</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="form-text">
-                        La password è necessaria per autorizzare l'aggiunta di credito
-                    </div>
-                </div>
+                <label for="operator_password" class="form-label">Password Operatore</label>
+                <input type="password" class="form-control" id="operator_password" name="operator_password" placeholder="Inserisci la password dell'operatore">
                 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success btn-add-credit" id="submitButton">
-                        <i class="fas fa-plus-circle me-1"></i> Aggiungi € <span id="submitAmount">0.00</span>
+                <div class="operator-help">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Per aggiungere credito è necessaria la password di uno degli operatori autorizzati.
+                    <button class="btn btn-sm btn-outline-primary mt-2" type="button" id="showOperatorsBtn">
+                        <i class="fas fa-eye me-1"></i> Mostra Operatori
                     </button>
                 </div>
-            </form>
+                
+                <div id="operatorsList" class="operator-list" style="display: none;">
+                    {% for operator in operators %}
+                    <div class="operator-item">
+                        <span class="operator-name">{{ operator.username }}</span>
+                        <span class="operator-password">{{ operator.password }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Annulla
+            </a>
+            <button id="confirmButton" class="btn btn-success" disabled>
+                <i class="fas fa-check me-1"></i> Conferma Ricarica
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal di Conferma -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Conferma Ricarica</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Stai per ricaricare <strong id="confirmAmount">€ 0,00</strong> al dipendente:</p>
+                <div class="d-flex align-items-center mt-3 mb-3">
+                    <div style="width: 40px; height: 40px; background-color: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                        {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">{{ employee.first_name }} {{ employee.last_name }}</div>
+                        <div style="font-size: 0.875rem; color: #6c757d;">{{ employee.rank }}</div>
+                    </div>
+                </div>
+                <p>Confermi di voler procedere con la ricarica?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-success" id="processAddCredit">
+                    <i class="fas fa-check me-1"></i> Conferma
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal di Risultato -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="resultModalLabel">Ricarica Completata</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-4" style="font-size: 4rem; color: var(--success-color);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h4 id="resultMessage">Ricarica effettuata con successo!</h4>
+                <div class="mt-3 mb-3">
+                    <div id="newCreditValue" style="font-size: 1.5rem; font-weight: 600; color: var(--primary-color);">€ 0,00</div>
+                    <div style="color: #6c757d;">Nuovo credito disponibile</div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-1"></i> Torna alla Home
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -317,90 +364,138 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Elementi DOM
+        const presetButtons = document.querySelectorAll('.preset-button');
+        const customAmountGroup = document.getElementById('customAmountGroup');
         const amountInput = document.getElementById('amount');
-        const newBalanceText = document.getElementById('newBalanceText');
-        const currentBalance = {{ employee.credit }};
-        const submitButton = document.getElementById('submitButton');
-        const submitAmount = document.getElementById('submitAmount');
-        const presetButtons = document.querySelectorAll('.credit-preset-btn');
-        const passwordToggle = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
+        const operatorPasswordInput = document.getElementById('operator_password');
+        const confirmButton = document.getElementById('confirmButton');
+        const showOperatorsBtn = document.getElementById('showOperatorsBtn');
+        const operatorsList = document.getElementById('operatorsList');
         
-        // Funzione per formattare l'importo come valuta
-        function formatCurrency(amount) {
-            return amount.toLocaleString('it-IT', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+        // Modali
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        
+        // Variabili di stato
+        let selectedAmount = null;
+        
+        // Funzione per aggiornare lo stato del pulsante di conferma
+        function updateConfirmButton() {
+            // Verifica che sia stato selezionato un importo e inserita una password
+            const hasAmount = selectedAmount || (amountInput.value && parseFloat(amountInput.value) > 0);
+            const hasPassword = operatorPasswordInput.value.trim() !== '';
+            
+            confirmButton.disabled = !(hasAmount && hasPassword);
         }
         
-        // Funzione per aggiornare il testo del nuovo saldo
-        function updateNewBalance() {
-            const amount = parseFloat(amountInput.value) || 0;
-            const newBalance = currentBalance + amount;
-            newBalanceText.innerHTML = `Nuovo saldo: <strong>€ ${formatCurrency(newBalance)}</strong>`;
-            submitAmount.textContent = formatCurrency(amount);
-        }
-        
-        // Aggiorna il nuovo saldo quando cambia l'importo
-        amountInput.addEventListener('input', updateNewBalance);
-        
-        // Gestione pulsanti preset
+        // Gestisci la selezione dei preset
         presetButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const amount = parseFloat(this.getAttribute('data-amount'));
-                amountInput.value = amount.toFixed(2);
+                // Rimuovi la classe selected da tutti i pulsanti
+                presetButtons.forEach(btn => btn.classList.remove('selected'));
                 
-                // Rimuovi la classe active da tutti i pulsanti
-                presetButtons.forEach(btn => btn.classList.remove('active'));
+                // Aggiungi la classe selected a questo pulsante
+                button.classList.add('selected');
                 
-                // Aggiungi la classe active al pulsante cliccato
-                this.classList.add('active');
+                const amount = button.getAttribute('data-amount');
                 
-                updateNewBalance();
+                if (amount === 'custom') {
+                    // Mostra il campo per l'importo personalizzato
+                    customAmountGroup.style.display = 'block';
+                    selectedAmount = null;
+                    amountInput.focus();
+                } else {
+                    // Nascondi il campo per l'importo personalizzato
+                    customAmountGroup.style.display = 'none';
+                    // Salva l'importo selezionato
+                    selectedAmount = parseFloat(amount);
+                }
                 
-                // Focus sul campo password
-                passwordInput.focus();
+                // Aggiorna lo stato del pulsante di conferma
+                updateConfirmButton();
             });
         });
         
-        // Toggle per mostrare/nascondere la password
-        passwordToggle.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            // Cambia l'icona
-            const icon = this.querySelector('i');
-            if (type === 'password') {
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+        // Gestisci il cambiamento dell'importo personalizzato
+        amountInput.addEventListener('input', updateConfirmButton);
+        
+        // Gestisci il cambiamento della password dell'operatore
+        operatorPasswordInput.addEventListener('input', updateConfirmButton);
+        
+        // Mostra/nascondi la lista degli operatori
+        showOperatorsBtn.addEventListener('click', function() {
+            if (operatorsList.style.display === 'none') {
+                operatorsList.style.display = 'block';
+                showOperatorsBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Nascondi Operatori';
             } else {
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                operatorsList.style.display = 'none';
+                showOperatorsBtn.innerHTML = '<i class="fas fa-eye me-1"></i> Mostra Operatori';
             }
         });
         
-        // Gestione del form
-        document.getElementById('addCreditForm').addEventListener('submit', function(e) {
-            const amount = parseFloat(amountInput.value);
+        // Pulsante di conferma
+        confirmButton.addEventListener('click', function() {
+            // Determina l'importo finale
+            const finalAmount = selectedAmount || parseFloat(amountInput.value);
             
-            if (isNaN(amount) || amount <= 0) {
-                e.preventDefault();
-                showToast('Inserisci un importo valido', 'warning');
-                amountInput.focus();
-                return;
-            }
+            // Aggiorna il modal di conferma
+            document.getElementById('confirmAmount').textContent = `€ ${finalAmount.toFixed(2)}`;
             
-            // Disabilita il pulsante di invio per evitare doppi invii
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
+            // Mostra il modal di conferma
+            confirmModal.show();
         });
         
-        // Focus automatico sul campo importo
-        amountInput.focus();
+        // Pulsante per elaborare l'aggiunta di credito
+        document.getElementById('processAddCredit').addEventListener('click', function() {
+            // Nascondi il modal di conferma
+            confirmModal.hide();
+            
+            // Prepara i dati per la richiesta
+            const formData = new FormData();
+            formData.append('employee_id', '{{ employee.id }}');
+            formData.append('amount', selectedAmount || amountInput.value);
+            formData.append('operator_password', operatorPasswordInput.value);
+            
+            // Disabilita il pulsante durante l'elaborazione
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
+            
+            // Invia la richiesta
+            fetch("{{ url_for('add_credit') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Riabilita il pulsante
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-check me-1"></i> Conferma';
+                
+                if (data.success) {
+                    // Aggiorna il messaggio di risultato
+                    document.getElementById('resultMessage').textContent = data.message;
+                    document.getElementById('newCreditValue').textContent = `€ ${data.new_credit.toFixed(2)}`;
+                    
+                    // Mostra il modal di risultato
+                    resultModal.show();
+                } else {
+                    // Mostra un messaggio di errore
+                    showToast(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                // Riabilita il pulsante
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-check me-1"></i> Conferma';
+                // Mostra un messaggio di errore
+                showToast('Errore di connessione durante l\'elaborazione della ricarica.', 'danger');
+            });
+        });
         
-        // Inizializza il testo del nuovo saldo
-        updateNewBalance();
+        // Inizializzazione
+        updateConfirmButton();
     });
 </script>
 {% endblock %}

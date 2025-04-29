@@ -1,0 +1,386 @@
+<!-- admin_edit_employee.html -->
+{% extends "base.html" %}
+
+{% block title %}Modifica Dipendente - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .form-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .form-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .form-body {
+        padding: 1.5rem;
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .required-label::after {
+        content: ' *';
+        color: var(--danger-color);
+    }
+    
+    .employee-profile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .employee-avatar {
+        width: 80px;
+        height: 80px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-right: 1.5rem;
+    }
+    
+    .employee-details {
+        flex: 1;
+    }
+    
+    .employee-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .employee-rank {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+    
+    .employee-id {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    
+    .credit-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .credit-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .credit-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .integrity-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .integrity-ok {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .integrity-error {
+        background-color: rgba(255, 59, 48, 0.1);
+        color: var(--danger-color);
+    }
+    
+    .code-preview {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    
+    .code-generate {
+        cursor: pointer;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Modifica Dipendente</h1>
+        <div>
+            <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Torna all'Elenco
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab active">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="form-card">
+        <div class="form-header">
+            <h3 class="form-title">Modifica Dati Dipendente</h3>
+        </div>
+        
+        <div class="form-body">
+            <!-- Employee Profile -->
+            <div class="employee-profile">
+                <div class="employee-avatar">
+                    {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                </div>
+                <div class="employee-details">
+                    <h3 class="employee-name">{{ employee.first_name }} {{ employee.last_name }}</h3>
+                    <div class="employee-rank">{{ employee.rank }}</div>
+                    <div class="employee-id">ID: {{ employee.id }}</div>
+                </div>
+            </div>
+            
+            <!-- Credit Status -->
+            <div class="credit-info">
+                <div>
+                    <div class="credit-value">Credito: € {{ "%.2f"|format(employee.credit) }}</div>
+                    <div class="credit-label">Credito attuale del dipendente</div>
+                </div>
+                
+                <div>
+                    {% if employee.verify_credit_integrity() %}
+                    <span class="integrity-badge integrity-ok">
+                        <i class="fas fa-shield-alt"></i> Integrità OK
+                    </span>
+                    {% else %}
+                    <span class="integrity-badge integrity-error">
+                        <i class="fas fa-exclamation-triangle"></i> Integrità Compromessa
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <form id="editEmployeeForm" method="POST">
+                <!-- Informazioni Personali -->
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <i class="fas fa-user me-2"></i> Informazioni Personali
+                    </h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label required-label">Nome</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label required-label">Cognome</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ employee.last_name }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="rank" class="form-label required-label">Grado/Ruolo</label>
+                            <input type="text" class="form-control" id="rank" name="rank" value="{{ employee.rank }}" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informazioni Codice -->
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <i class="fas fa-barcode me-2"></i> Codice Identificativo
+                    </h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="code" class="form-label required-label">Codice Badge</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="code" name="code" value="{{ employee.code }}" required>
+                                <button class="btn btn-outline-secondary code-generate" type="button" id="generateCode">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Codice utilizzato per identificare il dipendente durante la scansione
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Limiti di Credito -->
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <i class="fas fa-euro-sign me-2"></i> Impostazioni Credito
+                    </h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="credit_limit" class="form-label">Limite di Credito Negativo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input type="number" class="form-control" id="credit_limit" name="credit_limit" value="{{ employee.credit_limit }}" min="0" step="0.01">
+                            </div>
+                            <div class="form-text">
+                                Massimo importo di credito negativo consentito (0 = nessun credito negativo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if not employee.verify_credit_integrity() %}
+                <div class="alert alert-warning">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">Integrità del credito compromessa</h5>
+                            <p class="mb-0">È stata rilevata una possibile manipolazione del credito di questo dipendente.</p>
+                        </div>
+                    </div>
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="restore_integrity" name="restore_integrity" checked>
+                        <label class="form-check-label" for="restore_integrity">
+                            Ripristina l'integrità del credito durante il salvataggio
+                        </label>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Pulsanti di Azione -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Salva Modifiche
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeInput = document.getElementById('code');
+        const generateCodeBtn = document.getElementById('generateCode');
+        
+        // Genera un codice casuale
+        generateCodeBtn.addEventListener('click', function() {
+            // Genera un codice alfanumerico di 8 caratteri
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            codeInput.value = code;
+        });
+        
+        // Validazione del form prima dell'invio
+        document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
+            // Validazione base
+            const firstName = document.getElementById('first_name').value.trim();
+            const lastName = document.getElementById('last_name').value.trim();
+            const rank = document.getElementById('rank').value.trim();
+            const code = document.getElementById('code').value.trim();
+            
+            if (!firstName || !lastName || !rank || !code) {
+                e.preventDefault();
+                showToast('Tutti i campi obbligatori devono essere compilati', 'danger');
+                return;
+            }
+            
+            // Verifica che il codice non sia vuoto
+            if (code.length === 0) {
+                e.preventDefault();
+                showToast('Inserisci un codice valido', 'danger');
+                return;
+            }
+        });
+    });
+</script>
+{% endblock %}

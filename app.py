@@ -799,57 +799,89 @@ def delete_employee(id):
     return redirect(url_for('dashboard'))
 
 
-@app.route('/employee/<int:id>/add_credit', methods=['GET', 'POST'])
-@login_required
-def add_credit(id):
-    """Aggiungi credito a un dipendente."""
-    employee = Employee.query.get_or_404(id)
-    
-    # Verifica l'integrità del credito
-    if not employee.verify_credit_integrity():
-        flash('ATTENZIONE: È stata rilevata una possibile manipolazione del credito. ' + 
-              'Il sistema ha ripristinato il valore precedente.', 'danger')
-        
-        # Registra l'incidente di sicurezza
-        logger.warning(f"SECURITY ALERT: Credit integrity check failed for employee {employee.id} " +
-                      f"({employee.first_name} {employee.last_name})")
-        
-        # Rigenera l'hash
-        employee.update_credit_hash()
-        db.session.commit()
-    
-    if request.method == 'POST':
-        password = request.form.get('password')
-        amount = request.form.get('amount')
-        
-        if employee.check_password(password):
-            try:
-                amount_decimal = Decimal(amount)
-                if amount_decimal <= 0:
-                    flash('L\'importo deve essere maggiore di zero.', 'danger')
-                    return redirect(url_for('add_credit', id=employee.id))
-                
-                # Aggiorna il credito usando il metodo sicuro con hash
-                new_credit = employee.credit + amount_decimal
-                employee.update_credit(new_credit)
-                
-                transaction = Transaction(
-                    employee_id=employee.id,
-                    amount=amount_decimal,
-                    transaction_type='credit'
-                )
-                
-                db.session.add(transaction)
-                db.session.commit()
-                flash('Credito aggiunto con successo.', 'success')
-                return redirect(url_for('employee_details', id=employee.id))
-            except (ValueError, TypeError, decimal.InvalidOperation) as e:
-                flash(f'Importo non valido: {str(e)}', 'danger')
-        else:
-            flash('Password non valida.', 'danger')
-    
-    return render_template('add_credit.html', employee=employee)
 
+@app.route('/add_credit', methods=['GET', 'POST'])
+def add_credit():
+    """
+    Aggiunge credito a un dipendente.
+    Richiede una password di operatore valida.
+    """
+    if request.method == 'GET':
+        # Se viene visitata direttamente, mostra la pagina con le istruzioni
+        employee_id = request.args.get('employee_id')
+        
+        if not employee_id:
+            flash('Dipendente non specificato.', 'danger')
+            return redirect(url_for('barcode_scanner'))
+        
+        employee = Employee.query.get_or_404(employee_id)
+        operators = Operator.query.filter_by(active=True).all()
+        
+        return render_template(
+            'add_credit.html', 
+            employee=employee,
+            operators=operators
+        )
+    
+    elif request.method == 'POST':
+        # Elabora la richiesta di aggiunta credito
+        employee_id = request.form.get('employee_id')
+        amount = request.form.get('amount')
+        operator_password = request.form.get('operator_password')
+        
+        if not employee_id or not amount or not operator_password:
+            return jsonify({
+                'success': False,
+                'message': 'Tutti i campi sono obbligatori.'
+            })
+        
+        # Trova il dipendente
+        employee = Employee.query.get_or_404(employee_id)
+        
+        # Verifica che la password dell'operatore sia valida
+        operator = Operator.query.filter_by(password=operator_password, active=True).first()
+        if not operator:
+            return jsonify({
+                'success': False,
+                'message': 'Password operatore non valida.'
+            })
+        
+        try:
+            amount_decimal = Decimal(amount)
+            if amount_decimal <= 0:
+                return jsonify({
+                    'success': False,
+                    'message': 'L\'importo deve essere maggiore di zero.'
+                })
+            
+            # Aggiorna il credito
+            new_credit = employee.credit + amount_decimal
+            employee.update_credit(new_credit)
+            
+            # Registra la transazione
+            transaction = Transaction(
+                employee_id=employee.id,
+                operator_id=operator.id,
+                amount=amount_decimal,
+                transaction_type='credit',
+                custom_product_name="Ricarica credito"
+            )
+            
+            db.session.add(transaction)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': f'Credito di €{float(amount_decimal):.2f} aggiunto con successo.',
+                'new_credit': float(employee.credit)
+            })
+            
+        except Exception as e:
+            logger.error(f"Error in add_credit: {str(e)}")
+            return jsonify({
+                'success': False,
+                'message': f'Errore: {str(e)}'
+            })
 
 @app.route('/barcode_scanner')
 def barcode_scanner():
@@ -1040,7 +1072,8 @@ def deduct_credit():
 @app.route('/admin')
 def admin_login():
     """Pagina di login per l'amministratore."""
-    return render_template('admin_login.html')   
+    return render_template('admin_login.html')
+
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login_post():
@@ -1061,7 +1094,9 @@ def admin_login_post():
     else:
         flash('Password non valida.', 'danger')
         return redirect(url_for('admin_login'))
-    
+
+
+
 @app.route('/admin/dashboard')
 def admin_dashboard():
     """Dashboard amministrativa."""
@@ -1085,6 +1120,7 @@ def admin_dashboard():
         transactions_today=transactions_today,
         operators=operators
     )
+
 
 @app.route('/admin/employees')
 def admin_employees():
