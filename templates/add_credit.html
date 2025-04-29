@@ -1,0 +1,406 @@
+<!-- add_credit.html -->
+{% extends "base.html" %}
+
+{% block title %}Aggiungi Credito - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .credit-card {
+        background: linear-gradient(135deg, var(--primary-color), #0055b3);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .credit-card::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .credit-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .credit-card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .credit-card-chip {
+        width: 50px;
+        height: 35px;
+        background: linear-gradient(135deg, #ffd700, #ffcc00);
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .credit-card-chip::before, .credit-card-chip::after {
+        content: '';
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    .credit-card-chip::before {
+        width: 100%;
+        height: 8px;
+        top: 13px;
+    }
+    
+    .credit-card-chip::after {
+        width: 8px;
+        height: 100%;
+        left: 21px;
+    }
+    
+    .credit-card-holder {
+        margin-bottom: 1rem;
+    }
+    
+    .credit-card-holder-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-bottom: 0.25rem;
+    }
+    
+    .credit-card-holder-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    
+    .credit-card-balance {
+        text-align: right;
+    }
+    
+    .credit-card-balance-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-bottom: 0.25rem;
+    }
+    
+    .credit-card-balance-amount {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    
+    .credit-form {
+        background-color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .credit-form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+    
+    .btn-add-credit {
+        background: linear-gradient(135deg, var(--success-color), #28a745);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        transition: all 0.3s;
+    }
+    
+    .btn-add-credit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-add-credit:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+    }
+    
+    .form-floating > .form-control {
+        padding: 1rem 0.75rem;
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        opacity: 0.8;
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+    
+    .integrity-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        z-index: 1;
+    }
+    
+    .integrity-badge-verified {
+        background-color: rgba(52, 199, 89, 0.3);
+    }
+    
+    .integrity-badge-failed {
+        background-color: rgba(255, 59, 48, 0.3);
+    }
+    
+    .credit-presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .credit-preset-btn {
+        flex: 1;
+        min-width: 80px;
+        text-align: center;
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background-color: #f8f9fa;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .credit-preset-btn:hover {
+        background-color: #e9ecef;
+        border-color: #ced4da;
+    }
+    
+    .credit-preset-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('employee_details', id=employee.id) }}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-1"></i> Dettagli Dipendente
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+        </a>
+    </div>
+    <h2 class="mb-0">Aggiungi Credito</h2>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Credit Card -->
+        <div class="credit-card">
+            {% if employee.verify_credit_integrity() %}
+            <div class="integrity-badge integrity-badge-verified">
+                <i class="fas fa-shield-alt"></i> 
+                <span>Verificato</span>
+            </div>
+            {% else %}
+            <div class="integrity-badge integrity-badge-failed">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Integrità Compromessa</span>
+            </div>
+            {% endif %}
+            
+            <div class="credit-card-header">
+                <div class="credit-card-title">Credito Dipendente</div>
+                <div class="credit-card-chip"></div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <div class="credit-card-holder">
+                    <div class="credit-card-holder-label">Intestatario</div>
+                    <div class="credit-card-holder-name">{{ employee.first_name }} {{ employee.last_name }}</div>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark">{{ employee.code }}</span>
+                    </div>
+                </div>
+                
+                <div class="credit-card-balance">
+                    <div class="credit-card-balance-label">Saldo Attuale</div>
+                    <div class="credit-card-balance-amount">€ {{ "%.2f"|format(employee.credit) }}</div>
+                </div>
+            </div>
+        </div>
+        
+        {% if not employee.verify_credit_integrity() %}
+        <div class="alert alert-danger mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h5 class="alert-heading mb-1">Attenzione: Integrità Compromessa</h5>
+                    <p class="mb-0">È stata rilevata una possibile manipolazione del credito per questo dipendente. Si consiglia di verificare la situazione prima di procedere.</p>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-shield-alt me-1"></i> Ripristina Integrità
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Credit Form -->
+        <div class="credit-form">
+            <h3 class="credit-form-title">
+                <i class="fas fa-plus-circle me-2"></i> Aggiungi Credito
+            </h3>
+            
+            <form method="POST" id="addCreditForm">
+                <div class="mb-4">
+                    <label for="amount" class="form-label">Importo da aggiungere (€)</label>
+                    
+                    <div class="credit-presets mb-2">
+                        <div class="credit-preset-btn" data-amount="5">€ 5,00</div>
+                        <div class="credit-preset-btn" data-amount="10">€ 10,00</div>
+                        <div class="credit-preset-btn" data-amount="20">€ 20,00</div>
+                        <div class="credit-preset-btn" data-amount="50">€ 50,00</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <span class="input-group-text">€</span>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="form-text" id="newBalanceText">
+                        Nuovo saldo: <strong>€ {{ "%.2f"|format(employee.credit) }}</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password del dipendente</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        La password è necessaria per autorizzare l'aggiunta di credito
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-add-credit" id="submitButton">
+                        <i class="fas fa-plus-circle me-1"></i> Aggiungi € <span id="submitAmount">0.00</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const amountInput = document.getElementById('amount');
+        const newBalanceText = document.getElementById('newBalanceText');
+        const currentBalance = {{ employee.credit }};
+        const submitButton = document.getElementById('submitButton');
+        const submitAmount = document.getElementById('submitAmount');
+        const presetButtons = document.querySelectorAll('.credit-preset-btn');
+        const passwordToggle = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        // Funzione per formattare l'importo come valuta
+        function formatCurrency(amount) {
+            return amount.toLocaleString('it-IT', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        // Funzione per aggiornare il testo del nuovo saldo
+        function updateNewBalance() {
+            const amount = parseFloat(amountInput.value) || 0;
+            const newBalance = currentBalance + amount;
+            newBalanceText.innerHTML = `Nuovo saldo: <strong>€ ${formatCurrency(newBalance)}</strong>`;
+            submitAmount.textContent = formatCurrency(amount);
+        }
+        
+        // Aggiorna il nuovo saldo quando cambia l'importo
+        amountInput.addEventListener('input', updateNewBalance);
+        
+        // Gestione pulsanti preset
+        presetButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const amount = parseFloat(this.getAttribute('data-amount'));
+                amountInput.value = amount.toFixed(2);
+                
+                // Rimuovi la classe active da tutti i pulsanti
+                presetButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Aggiungi la classe active al pulsante cliccato
+                this.classList.add('active');
+                
+                updateNewBalance();
+                
+                // Focus sul campo password
+                passwordInput.focus();
+            });
+        });
+        
+        // Toggle per mostrare/nascondere la password
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Cambia l'icona
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
+        
+        // Gestione del form
+        document.getElementById('addCreditForm').addEventListener('submit', function(e) {
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                e.preventDefault();
+                showToast('Inserisci un importo valido', 'warning');
+                amountInput.focus();
+                return;
+            }
+            
+            // Disabilita il pulsante di invio per evitare doppi invii
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
+        });
+        
+        // Focus automatico sul campo importo
+        amountInput.focus();
+        
+        // Inizializza il testo del nuovo saldo
+        updateNewBalance();
+    });
+</script>
+{% endblock %}

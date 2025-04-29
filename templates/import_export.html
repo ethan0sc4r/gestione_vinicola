@@ -1,0 +1,647 @@
+<!-- import_export.html -->
+{% extends "base.html" %}
+
+{% block title %}Import/Export - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .import-export-card {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+    
+    .import-export-card .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .import-export-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        background-color: #f8f9fa;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s;
+        position: relative;
+    }
+    
+    .upload-area:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 122, 255, 0.05);
+    }
+    
+    .upload-area.dragover {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 122, 255, 0.1);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-text {
+        margin-bottom: 1rem;
+    }
+    
+    .upload-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .format-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .format-badge i {
+        margin-right: 0.25rem;
+    }
+    
+    .format-csv {
+        background-color: rgba(52, 199, 89, 0.15);
+        color: var(--success-color);
+    }
+    
+    .format-excel {
+        background-color: rgba(0, 122, 255, 0.15);
+        color: var(--primary-color);
+    }
+    
+    .export-btn {
+        border-radius: 10px;
+        padding: 1.25rem;
+        text-align: center;
+        height: 100%;
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .export-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .export-text {
+        font-weight: 500;
+    }
+    
+    .export-btn-csv {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(52, 199, 89, 0.2);
+    }
+    
+    .export-btn-csv:hover {
+        background-color: rgba(52, 199, 89, 0.2);
+    }
+    
+    .export-btn-excel {
+        background-color: rgba(0, 122, 255, 0.1);
+        color: var(--primary-color);
+        border: 1px solid rgba(0, 122, 255, 0.2);
+    }
+    
+    .export-btn-excel:hover {
+        background-color: rgba(0, 122, 255, 0.2);
+    }
+    
+    .template-download {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    
+    .import-steps {
+        counter-reset: steps;
+        margin-bottom: 1.5rem;
+    }
+    
+    .import-step {
+        margin-bottom: 1rem;
+        padding-left: 2.5rem;
+        position: relative;
+    }
+    
+    .import-step::before {
+        counter-increment: steps;
+        content: counter(steps);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1.75rem;
+        height: 1.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    
+    .column-info {
+        margin-top: 1rem;
+    }
+    
+    .column-badge {
+        display: inline-block;
+        padding: 0.35rem 0.65rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        background-color: #f1f3f5;
+        border: 1px solid #dee2e6;
+    }
+    
+    .column-required {
+        background-color: rgba(255, 59, 48, 0.1);
+        border-color: rgba(255, 59, 48, 0.2);
+        color: var(--danger-color);
+    }
+    
+    .column-optional {
+        background-color: rgba(142, 142, 147, 0.1);
+        border-color: rgba(142, 142, 147, 0.2);
+        color: #6c757d;
+    }
+    
+    .selected-file {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(52, 199, 89, 0.2);
+    }
+    
+    .selected-file-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .selected-file-name {
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .selected-file-size {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .selected-file-remove {
+        margin-left: auto;
+        cursor: pointer;
+        color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Import/Export</h2>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Import Card -->
+        <div class="import-export-card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-file-import me-2"></i> Importa Dipendenti
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="import-steps">
+                    <div class="import-step">
+                        <h5>Prepara il file</h5>
+                        <p>Crea un file CSV o Excel con le colonne richieste. Puoi anche scaricare un template.</p>
+                        <div class="column-info">
+                            <span class="column-badge column-required">Code</span>
+                            <span class="column-badge column-required">First Name</span>
+                            <span class="column-badge column-required">Last Name</span>
+                            <span class="column-badge column-required">Rank</span>
+                            <span class="column-badge column-optional">Credit</span>
+                        </div>
+                        <div class="template-download">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-download me-2 text-primary"></i>
+                                <div>
+                                    <strong>Scarica un template:</strong>
+                                    <div class="mt-1">
+                                        <a href="#" class="btn btn-sm btn-outline-success me-2">
+                                            <i class="fas fa-file-csv me-1"></i> CSV Template
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-excel me-1"></i> Excel Template
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="import-step">
+                        <h5>Carica il file</h5>
+                        <p>Seleziona il file da importare. Supportiamo i formati CSV e Excel (XLSX).</p>
+                        
+                        <form method="POST" action="{{ url_for('import_csv') }}" enctype="multipart/form-data" id="importForm">
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <div class="upload-text">
+                                    <strong>Trascina qui il tuo file</strong> o <span class="text-primary">clicca per selezionare</span>
+                                </div>
+                                <div>
+                                    <span class="format-badge format-csv"><i class="fas fa-file-csv"></i> CSV</span>
+                                    <span class="format-badge format-excel"><i class="fas fa-file-excel"></i> XLSX</span>
+                                </div>
+                                <input type="file" class="upload-input" id="file" name="file" accept=".csv, .xlsx">
+                            </div>
+                            
+                            <div class="selected-file" id="selectedFile">
+                                <div class="selected-file-info">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    <span class="selected-file-name" id="selectedFileName"></span>
+                                    <span class="selected-file-size" id="selectedFileSize"></span>
+                                    <i class="fas fa-times-circle selected-file-remove" id="removeFile"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Nota:</strong> 
+                                <ul class="mb-0">
+                                    <li>I dipendenti esistenti verranno aggiornati in base al codice</li>
+                                    <li>I nuovi dipendenti avranno come password predefinita il loro codice</li>
+                                    <li>La colonna Credit è opzionale; se non specificata verrà impostata a 0</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="submit" class="btn btn-primary" id="importButton" disabled>
+                                    <i class="fas fa-file-import me-1"></i> Importa File
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="import-step">
+                        <h5>Verifica i risultati</h5>
+                        <p>Dopo l'importazione, controlla che tutti i dati siano stati importati correttamente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <!-- Export Card -->
+        <div class="import-export-card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-file-export me-2"></i> Esporta Dipendenti
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Esporta l'elenco completo dei dipendenti in uno dei seguenti formati:</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{{ url_for('export_csv') }}" class="text-decoration-none">
+                            <div class="export-btn export-btn-csv">
+                                <i class="fas fa-file-csv export-icon"></i>
+                                <span class="export-text">Esporta come CSV</span>
+                                <small class="text-muted">File di testo con valori separati da virgola</small>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <a href="{{ url_for('export_excel') }}" class="text-decoration-none">
+                            <div class="export-btn export-btn-excel">
+                                <i class="fas fa-file-excel export-icon"></i>
+                                <span class="export-text">Esporta come Excel</span>
+                                <small class="text-muted">File Excel compatibile con Microsoft Office</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Cosa include l'esportazione?</h5>
+                    <p>Il file esportato conterrà i seguenti dati per ogni dipendente:</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Colonna</th>
+                                    <th>Descrizione</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Code</td>
+                                    <td>Codice identificativo del dipendente</td>
+                                </tr>
+                                <tr>
+                                    <td>First Name</td>
+                                    <td>Nome del dipendente</td>
+                                </tr>
+                                <tr>
+                                    <td>Last Name</td>
+                                    <td>Cognome del dipendente</td>
+                                </tr>
+                                <tr>
+                                    <td>Rank</td>
+                                    <td>Grado/posizione del dipendente</td>
+                                </tr>
+                                <tr>
+                                    <td>Credit</td>
+                                    <td>Credito attuale del dipendente</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Nota:</strong> Le password dei dipendenti non vengono esportate per motivi di sicurezza.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advanced Options -->
+        <div class="import-export-card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-sliders-h me-2"></i> Opzioni Avanzate
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Backup Database</label>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary" id="backupButton">
+                            <i class="fas fa-database me-1"></i> Esegui Backup Database
+                        </button>
+                    </div>
+                    <small class="text-muted">Crea un backup completo del database per sicurezza</small>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-0">
+                    <label class="form-label">Verifica Integrità</label>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-success" id="integrityCheckButton">
+                            <i class="fas fa-shield-alt me-1"></i> Verifica Integrità Crediti
+                        </button>
+                    </div>
+                    <small class="text-muted">Controlla e ripristina l'integrità dei crediti di tutti i dipendenti</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backup Modal -->
+<div class="modal fade" id="backupModal" tabindex="-1" aria-labelledby="backupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="backupModalLabel">Backup Database</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-database" style="font-size: 3rem; color: var(--primary-color);"></i>
+                </div>
+                <p>Vuoi eseguire un backup completo del database?</p>
+                <p>Questa operazione creerà una copia di sicurezza di tutti i dati attuali.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" id="confirmBackup">
+                    <i class="fas fa-download me-1"></i> Esegui Backup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Integrity Check Modal -->
+<div class="modal fade" id="integrityModal" tabindex="-1" aria-labelledby="integrityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="integrityModalLabel">Verifica Integrità Crediti</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--success-color);"></i>
+                </div>
+                <p>Vuoi verificare e ripristinare l'integrità dei crediti di tutti i dipendenti?</p>
+                <p>Questa operazione controllerà che non ci siano state manipolazioni nei dati e rigenerarà gli hash di sicurezza.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-success" id="confirmIntegrityCheck">
+                    <i class="fas fa-check-circle me-1"></i> Verifica Integrità
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('file');
+        const selectedFile = document.getElementById('selectedFile');
+        const selectedFileName = document.getElementById('selectedFileName');
+        const selectedFileSize = document.getElementById('selectedFileSize');
+        const removeFile = document.getElementById('removeFile');
+        const importButton = document.getElementById('importButton');
+        const importForm = document.getElementById('importForm');
+        const backupButton = document.getElementById('backupButton');
+        const confirmBackup = document.getElementById('confirmBackup');
+        const integrityCheckButton = document.getElementById('integrityCheckButton');
+        const confirmIntegrityCheck = document.getElementById('confirmIntegrityCheck');
+        
+        // Inizializza i modali
+        const backupModal = new bootstrap.Modal(document.getElementById('backupModal'));
+        const integrityModal = new bootstrap.Modal(document.getElementById('integrityModal'));
+        
+        // Formatta la dimensione del file
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Gestione del drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.add('dragover');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.remove('dragover');
+            }, false);
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        }, false);
+        
+        // Gestione della selezione del file
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        function handleFileSelect() {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                
+                // Verifica l'estensione del file
+                const extension = file.name.split('.').pop().toLowerCase();
+                if (extension !== 'csv' && extension !== 'xlsx') {
+                    showToast('Formato file non supportato. Utilizzare CSV o XLSX.', 'danger');
+                    resetFileInput();
+                    return;
+                }
+                
+                selectedFileName.textContent = file.name;
+                selectedFileSize.textContent = formatFileSize(file.size);
+                selectedFile.style.display = 'block';
+                importButton.disabled = false;
+                
+                // Cambia l'icona in base al tipo di file
+                const fileIcon = selectedFile.querySelector('i.fas');
+                if (extension === 'csv') {
+                    fileIcon.className = 'fas fa-file-csv me-2';
+                } else {
+                    fileIcon.className = 'fas fa-file-excel me-2';
+                }
+            }
+        }
+        
+        // Rimuovi file selezionato
+        removeFile.addEventListener('click', function() {
+            resetFileInput();
+        });
+        
+        function resetFileInput() {
+            fileInput.value = '';
+            selectedFile.style.display = 'none';
+            importButton.disabled = true;
+        }
+        
+        // Gestione del form import
+        importForm.addEventListener('submit', function(e) {
+            if (!fileInput.files.length) {
+                e.preventDefault();
+                showToast('Seleziona un file da importare', 'warning');
+                return;
+            }
+            
+            importButton.disabled = true;
+            importButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Importazione in corso...';
+        });
+        
+        // Gestione del backup
+        backupButton.addEventListener('click', function() {
+            backupModal.show();
+        });
+        
+        confirmBackup.addEventListener('click', function() {
+            // Qui implementerai la logica per il backup
+            backupModal.hide();
+            
+            // Simulazione dell'operazione
+            confirmBackup.disabled = true;
+            confirmBackup.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Backup in corso...';
+            
+            setTimeout(() => {
+                confirmBackup.disabled = false;
+                confirmBackup.innerHTML = '<i class="fas fa-download me-1"></i> Esegui Backup';
+                showToast('Backup completato con successo!', 'success');
+            }, 2000);
+        });
+        
+        // Gestione verifica integrità
+        integrityCheckButton.addEventListener('click', function() {
+            integrityModal.show();
+        });
+        
+        confirmIntegrityCheck.addEventListener('click', function() {
+            // Qui implementerai la logica per la verifica di integrità
+            integrityModal.hide();
+            
+            // Simulazione dell'operazione
+            confirmIntegrityCheck.disabled = true;
+            confirmIntegrityCheck.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Verifica in corso...';
+            
+            setTimeout(() => {
+                confirmIntegrityCheck.disabled = false;
+                confirmIntegrityCheck.innerHTML = '<i class="fas fa-check-circle me-1"></i> Verifica Integrità';
+                showToast('Verifica integrità completata. Tutti i record sono stati verificati e ripristinati.', 'success');
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %}  

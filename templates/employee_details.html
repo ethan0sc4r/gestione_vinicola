@@ -1,0 +1,601 @@
+<!-- employee_details.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ employee.first_name }} {{ employee.last_name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-card {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border: none;
+    }
+    
+    .profile-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2rem;
+        position: relative;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background-color: white;
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 600;
+        margin: 0 auto 1.5rem;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-name {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    
+    .profile-rank {
+        display: inline-block;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-credit {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .credit-badge-large {
+        font-size: 1.5rem;
+        padding: 0.5rem 1.5rem;
+        border-radius: 10px;
+        background-color: white;
+        color: var(--primary-color);
+    }
+    
+    .profile-info-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .profile-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .profile-info-label {
+        font-weight: 500;
+        color: #6c757d;
+    }
+    
+    .profile-info-value {
+        font-weight: 600;
+    }
+    
+    .profile-action-btn {
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .profile-action-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .transaction-card {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border: none;
+    }
+    
+    .transaction-item {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: background-color 0.2s;
+    }
+    
+    .transaction-item:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .transaction-item:last-child {
+        border-bottom: none;
+    }
+    
+    .transaction-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .transaction-amount-positive {
+        color: var(--success-color);
+        font-weight: 600;
+    }
+    
+    .transaction-amount-negative {
+        color: var(--danger-color);
+        font-weight: 600;
+    }
+    
+    .transaction-type {
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .transaction-type-credit {
+        background-color: rgba(52, 199, 89, 0.15);
+        color: var(--success-color);
+    }
+    
+    .transaction-type-debit {
+        background-color: rgba(255, 59, 48, 0.15);
+        color: var(--danger-color);
+    }
+    
+    .integrity-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .integrity-badge-verified {
+        background-color: rgba(52, 199, 89, 0.2);
+        color: white;
+    }
+    
+    .integrity-badge-failed {
+        background-color: rgba(255, 59, 48, 0.3);
+        color: white;
+    }
+    
+    .stat-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .credit-chart-container {
+        position: relative;
+        height: 250px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-1"></i> Dashboard
+        </a>
+        <a href="{{ url_for('barcode_scanner') }}" class="btn btn-outline-primary">
+            <i class="fas fa-barcode me-1"></i> Scanner
+        </a>
+    </div>
+    <div>
+        <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-primary">
+            <i class="fas fa-edit me-1"></i> Modifica
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <!-- Profilo Dipendente -->
+        <div class="profile-card mb-4">
+            <div class="profile-header">
+                {% if employee.verify_credit_integrity() %}
+                <div class="integrity-badge integrity-badge-verified">
+                    <i class="fas fa-shield-alt"></i> 
+                    <span>Verificato</span>
+                </div>
+                {% else %}
+                <div class="integrity-badge integrity-badge-failed">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Integrità Compromessa</span>
+                </div>
+                {% endif %}
+                
+                <div class="profile-avatar">
+                    {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                </div>
+                
+                <h1 class="profile-name">{{ employee.first_name }} {{ employee.last_name }}</h1>
+                
+                <div class="text-center">
+                    <span class="profile-rank">{{ employee.rank }}</span>
+                </div>
+                
+                <div class="profile-credit">
+                    <span class="credit-badge-large">€ {{ "%.2f"|format(employee.credit) }}</span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="profile-info-item">
+                    <span class="profile-info-label">Codice</span>
+                    <span class="profile-info-value">
+                        <span class="badge bg-light text-dark">{{ employee.code }}</span>
+                    </span>
+                </div>
+                
+                <div class="profile-info-item">
+                    <span class="profile-info-label">ID</span>
+                    <span class="profile-info-value text-muted">{{ employee.id }}</span>
+                </div>
+                
+                <div class="profile-info-item">
+                    <span class="profile-info-label">Transazioni Totali</span>
+                    <span class="profile-info-value">{{ transactions|length }}</span>
+                </div>
+                
+                <div class="profile-info-item">
+                    <span class="profile-info-label">Ultima Transazione</span>
+                    <span class="profile-info-value">
+                        {% if transactions|length > 0 %}
+                            {{ transactions[0].date.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </div>
+                
+                {% if not employee.verify_credit_integrity() %}
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attenzione:</strong> Rilevata potenziale manipolazione del credito.
+                    <a href="{{ url_for('edit_employee', id=employee.id) }}" class="alert-link">Ripristina l'integrità</a>.
+                </div>
+                {% endif %}
+                
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ url_for('add_credit', id=employee.id) }}" class="btn btn-success profile-action-btn">
+                        <i class="fas fa-plus-circle me-1"></i> Aggiungi Credito
+                    </a>
+                    <button type="button" class="btn btn-danger profile-action-btn" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash-alt me-1"></i> Elimina Dipendente
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistiche -->
+        <div class="row">
+            <div class="col-6">
+                <div class="stat-card">
+                    <i class="fas fa-arrow-up text-success mb-2" style="font-size: 1.5rem;"></i>
+                    <div class="stat-value">{{ credit_stats.total_added|default(0)|round(2) }}</div>
+                    <div class="stat-label">Credito Aggiunto (€)</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="stat-card">
+                    <i class="fas fa-arrow-down text-danger mb-2" style="font-size: 1.5rem;"></i>
+                    <div class="stat-value">{{ credit_stats.total_spent|default(0)|round(2) }}</div>
+                    <div class="stat-label">Credito Speso (€)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <!-- Grafico Credito -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Storico Credito</h5>
+            </div>
+            <div class="card-body">
+                <div class="credit-chart-container">
+                    <canvas id="creditChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transazioni -->
+        <div class="card transaction-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Storico Transazioni</h5>
+                
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary" id="filterAll">Tutte</button>
+                    <button type="button" class="btn btn-outline-success" id="filterCredit">Ricariche</button>
+                    <button type="button" class="btn btn-outline-danger" id="filterDebit">Addebiti</button>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="list-group transaction-list">
+                    {% if transactions|length > 0 %}
+                        {% for transaction in transactions %}
+                        <div class="transaction-item" data-type="{{ transaction.transaction_type }}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="transaction-date">
+                                        <i class="fas fa-calendar-alt me-1"></i> {{ transaction.date.strftime('%d/%m/%Y') }}
+                                        <i class="fas fa-clock ms-2 me-1"></i> {{ transaction.date.strftime('%H:%M') }}
+                                    </div>
+                                    
+                                    <div class="mt-1">
+                                        <span class="transaction-type {% if transaction.transaction_type == 'credit' %}transaction-type-credit{% else %}transaction-type-debit{% endif %}">
+                                            {% if transaction.transaction_type == 'credit' %}
+                                                <i class="fas fa-plus-circle me-1"></i> Ricarica
+                                            {% else %}
+                                                <i class="fas fa-minus-circle me-1"></i> Addebito
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="{% if transaction.transaction_type == 'credit' %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
+                                    {% if transaction.transaction_type == 'credit' %}
+                                        +€ {{ "%.2f"|format(transaction.amount) }}
+                                    {% else %}
+                                        -€ {{ "%.2f"|format(transaction.amount|abs) }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 text-center">
+                            <i class="fas fa-exclamation-circle mb-2" style="font-size: 2rem; color: #ccc;"></i>
+                            <p class="text-muted">Nessuna transazione registrata.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div id="noTransactionsMessage" class="p-4 text-center" style="display: none;">
+                    <i class="fas fa-filter mb-2" style="font-size: 1.5rem; color: #ccc;"></i>
+                    <p class="text-muted">Nessuna transazione corrisponde al filtro selezionato.</p>
+                    <button class="btn btn-sm btn-outline-secondary" id="resetFilter">Mostra tutte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sei sicuro di voler eliminare il dipendente <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>?</p>
+                {% if employee.credit > 0 %}
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Attenzione: questo dipendente ha un credito residuo di <strong>€ {{ "%.2f"|format(employee.credit) }}</strong> che andrà perso.
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <form action="{{ url_for('delete_employee', id=employee.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Elimina</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Grafico del credito
+        const ctx = document.getElementById('creditChart').getContext('2d');
+        
+        // Preparazione dati per il grafico
+        // In un'applicazione reale, questi dati potrebbero provenire dal server
+        const creditHistory = prepareChartData();
+        
+        const creditChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: creditHistory.labels,
+                datasets: [{
+                    label: 'Credito (€)',
+                    data: creditHistory.data,
+                    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                    borderColor: 'rgba(0, 122, 255, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: 'rgba(0, 122, 255, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += new Intl.NumberFormat('it-IT', { 
+                                    style: 'currency', 
+                                    currency: 'EUR' 
+                                }).format(context.parsed.y);
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '€ ' + value.toFixed(2);
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Funzione per preparare i dati del grafico dalle transazioni
+        function prepareChartData() {
+            const transactions = [];
+            const labels = [];
+            const data = [];
+            
+            {% for transaction in transactions %}
+            transactions.push({
+                date: '{{ transaction.date.strftime("%Y-%m-%d %H:%M") }}',
+                amount: {% if transaction.transaction_type == 'credit' %}{{ transaction.amount }}{% else %}-{{ transaction.amount|abs }}{% endif %},
+                type: '{{ transaction.transaction_type }}'
+            });
+            {% endfor %}
+            
+            // Ordina le transazioni per data (dalla più vecchia alla più recente)
+            transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Calcola il saldo cumulativo e prepara i dati per il grafico
+            let balance = {{ employee.credit }};
+            
+            // Sottrai tutte le transazioni dal saldo corrente per ottenere il saldo iniziale
+            for (let i = transactions.length - 1; i >= 0; i--) {
+                balance -= transactions[i].amount;
+            }
+            
+            // Saldo iniziale
+            let initialBalance = balance;
+            labels.push('Iniziale');
+            data.push(parseFloat(initialBalance.toFixed(2)));
+            
+            // Aggiungi ogni transazione
+            for (const transaction of transactions) {
+                const date = new Date(transaction.date);
+                labels.push(date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }));
+                
+                balance += parseFloat(transaction.amount);
+                data.push(parseFloat(balance.toFixed(2)));
+            }
+            
+            return { labels, data };
+        }
+        
+        // Filtri per le transazioni
+        const filterAll = document.getElementById('filterAll');
+        const filterCredit = document.getElementById('filterCredit');
+        const filterDebit = document.getElementById('filterDebit');
+        const transactionItems = document.querySelectorAll('.transaction-item');
+        const noTransactionsMessage = document.getElementById('noTransactionsMessage');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        function applyFilter(type) {
+            // Rimuovi la classe active da tutti i pulsanti
+            filterAll.classList.remove('active', 'btn-secondary');
+            filterAll.classList.add('btn-outline-secondary');
+            filterCredit.classList.remove('active', 'btn-success');
+            filterCredit.classList.add('btn-outline-success');
+            filterDebit.classList.remove('active', 'btn-danger');
+            filterDebit.classList.add('btn-outline-danger');
+            
+            // Aggiungi la classe active al pulsante selezionato
+            if (type === 'all') {
+                filterAll.classList.remove('btn-outline-secondary');
+                filterAll.classList.add('active', 'btn-secondary');
+            } else if (type === 'credit') {
+                filterCredit.classList.remove('btn-outline-success');
+                filterCredit.classList.add('active', 'btn-success');
+            } else if (type === 'debit') {
+                filterDebit.classList.remove('btn-outline-danger');
+                filterDebit.classList.add('active', 'btn-danger');
+            }
+            
+            // Filtra le transazioni
+            let visibleCount = 0;
+            
+            transactionItems.forEach(item => {
+                if (type === 'all' || item.getAttribute('data-type') === type) {
+                    item.style.display = '';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Mostra/nascondi il messaggio "nessuna transazione"
+            if (visibleCount === 0 && transactionItems.length > 0) {
+                noTransactionsMessage.style.display = 'block';
+            } else {
+                noTransactionsMessage.style.display = 'none';
+            }
+        }
+        
+        filterAll.addEventListener('click', () => applyFilter('all'));
+        filterCredit.addEventListener('click', () => applyFilter('credit'));
+        filterDebit.addEventListener('click', () => applyFilter('debit'));
+        resetFilter.addEventListener('click', () => applyFilter('all'));
+        
+        // Imposta il filtro "Tutte" come predefinito
+        applyFilter('all');
+    });
+</script>
+{% endblock %}

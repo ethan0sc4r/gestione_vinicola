@@ -1,0 +1,1049 @@
+<!-- settings.html -->
+{% extends "base.html" %}
+
+{% block title %}Impostazioni - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-card {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+    
+    .settings-card .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background-color: white;
+    }
+    
+    .settings-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+    
+    .settings-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .settings-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .settings-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .settings-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .settings-item-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 122, 255, 0.1);
+        color: var(--primary-color);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+    
+    .settings-item-content {
+        flex: 1;
+    }
+    
+    .settings-item-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .settings-item-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .settings-item-control {
+        margin-left: 1rem;
+    }
+    
+    .btn-settings {
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .form-switch .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+    }
+    
+    .settings-nav {
+        position: sticky;
+        top: 1rem;
+    }
+    
+    .settings-nav .nav-link {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        color: #1d1d1f;
+        transition: all 0.2s;
+    }
+    
+    .settings-nav .nav-link:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .settings-nav .nav-link.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .settings-nav .nav-link i {
+        margin-right: 0.75rem;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .system-info-table th {
+        width: 40%;
+        font-weight: 500;
+        color: #6c757d;
+    }
+    
+    .system-info-table td {
+        font-weight: 500;
+    }
+    
+    .system-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .system-status-ok {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .system-status-warning {
+        background-color: rgba(255, 204, 0, 0.1);
+        color: var(--warning-color);
+    }
+    
+    .system-status-error {
+        background-color: rgba(255, 59, 48, 0.1);
+        color: var(--danger-color);
+    }
+    
+    .logo-preview {
+        width: 80px;
+        height: 80px;
+        background-color: white;
+        border-radius: 12px;
+        padding: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .logo-preview img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    
+    .app-name-preview {
+        background-color: white;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        font-weight: 600;
+        color: var(--primary-color);
+        display: inline-block;
+    }
+    
+    .password-strength {
+        height: 5px;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .password-weak {
+        background-color: var(--danger-color);
+        width: 30%;
+    }
+    
+    .password-medium {
+        background-color: var(--warning-color);
+        width: 60%;
+    }
+    
+    .password-strong {
+        background-color: var(--success-color);
+        width: 100%;
+    }
+    
+    .password-feedback {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Impostazioni</h2>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-3">
+        <!-- Settings Navigation -->
+        <div class="settings-nav">
+            <div class="card mb-3">
+                <div class="card-body p-2">
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#account-section">
+                            <i class="fas fa-user-shield"></i> Account Amministratore
+                        </a>
+                        <a class="nav-link" href="#app-section">
+                            <i class="fas fa-cog"></i> Impostazioni Applicazione
+                        </a>
+                        <a class="nav-link" href="#system-section">
+                            <i class="fas fa-server"></i> Informazioni di Sistema
+                        </a>
+                        <a class="nav-link" href="#barcode-section">
+                            <i class="fas fa-barcode"></i> Lettore Codice a Barre
+                        </a>
+                        <a class="nav-link" href="#security-section">
+                            <i class="fas fa-shield-alt"></i> Sicurezza
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="mb-2">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" width="50" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2250%22%20height%3D%2250%22%20viewBox%3D%220%200%2050%2050%22%3E%3Crect%20width%3D%2250%22%20height%3D%2250%22%20fill%3D%22%23007aff%22%2F%3E%3Ctext%20x%3D%2225%22%20y%3D%2225%22%20font-family%3D%22-apple-system%2C%20BlinkMacSystemFont%2C%20sans-serif%22%20font-size%3D%2225%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%3EV%3C%2Ftext%3E%3C%2Fsvg%3E'">
+                        </div>
+                        <h6 class="mb-1">{{ app_name }}</h6>
+                        <small class="text-muted">v{{ app_version }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-9">
+        <!-- Account Section -->
+        <div class="settings-card" id="account-section">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-shield me-2"></i> Account Amministratore
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Cambio Password</h5>
+                    
+                    <form action="{{ url_for('change_admin_password') }}" method="POST" id="passwordForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="current_password" class="form-label">Password Attuale</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6"></div>
+                            
+                            <div class="col-md-6">
+                                <label for="new_password" class="form-label">Nuova Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="toggleNewPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength" id="passwordStrength"></div>
+                                <div class="password-feedback text-muted" id="passwordFeedback"></div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="confirm_password" class="form-label">Conferma Nuova Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                </div>
+                                <div id="passwordMatchFeedback" class="password-feedback"></div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mt-3" id="submitButton">
+                            <i class="fas fa-save me-1"></i> Salva Password
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Sessione Corrente</h5>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">{{ current_user.username }}</div>
+                            <div class="settings-item-description">Amministratore</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-settings">
+                                <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- App Settings Section -->
+        <div class="settings-card" id="app-section">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-cog me-2"></i> Impostazioni Applicazione
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Personalizzazione</h5>
+                    
+                    <form id="appSettingsForm">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="app_name" class="form-label">Nome Applicazione</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-font"></i></span>
+                                    <input type="text" class="form-control" id="app_name" name="app_name" value="{{ app_name }}">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="app_logo" class="form-label">Logo Applicazione</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="app_logo" name="app_logo" accept="image/*">
+                                    <label class="input-group-text" for="app_logo"><i class="fas fa-upload"></i></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="logo-preview">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" id="logoPreview" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2250%22%20height%3D%2250%22%20viewBox%3D%220%200%2050%2050%22%3E%3Crect%20width%3D%2250%22%20height%3D%2250%22%20fill%3D%22%23007aff%22%2F%3E%3Ctext%20x%3D%2225%22%20y%3D%2225%22%20font-family%3D%22-apple-system%2C%20BlinkMacSystemFont%2C%20sans-serif%22%20font-size%3D%2225%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%3EV%3C%2Ftext%3E%3C%2Fsvg%3E'">
+                            </div>
+                            <div>
+                                <div class="app-name-preview" id="appNamePreview">{{ app_name }}</div>
+                                <div class="form-text">Anteprima</div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Salva Impostazioni
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Interfaccia</h5>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Tema Scuro</div>
+                            <div class="settings-item-description">Attiva il tema scuro per l'interfaccia</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                                <label class="form-check-label" for="darkModeSwitch"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Valore Unità</div>
+                            <div class="settings-item-description">Valore di ogni unità in Euro</div>
+                        </div>
+                        <div class="settings-item-control" style="width: 120px;">
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input type="number" class="form-control" id="unitValue" value="0.20" step="0.01" min="0.01">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Info Section -->
+        <div class="settings-card" id="system-section">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-server me-2"></i> Informazioni di Sistema
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Stato del Sistema</h5>
+                    
+                    <table class="table system-info-table">
+                        <tbody>
+                            <tr>
+                                <th>Versione App</th>
+                                <td>{{ app_version }}</td>
+                            </tr>
+                            <tr>
+                                <th>Versione Python</th>
+                                <td>3.10.x</td>
+                            </tr>
+                            <tr>
+                                <th>Database</th>
+                                <td>
+                                    <span class="system-status system-status-ok">
+                                        <i class="fas fa-check-circle me-1"></i> Online
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Spazio Disco</th>
+                                <td>
+                                    <span class="system-status system-status-ok">
+                                        <i class="fas fa-check-circle me-1"></i> 85% Libero
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ultimo Backup</th>
+                                <td>2025-04-28 10:30:15</td>
+                            </tr>
+                            <tr>
+                                <th>Numero Dipendenti</th>
+                                <td>{{ total_employees }}</td>
+                            </tr>
+                            <tr>
+                                <th>Numero Transazioni</th>
+                                <td>124</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-outline-primary btn-settings">
+                            <i class="fas fa-redo-alt me-1"></i> Riavvia Applicazione
+                        </button>
+                        <button class="btn btn-outline-success btn-settings">
+                            <i class="fas fa-database me-1"></i> Backup Database
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Barcode Scanner Section -->
+        <div class="settings-card" id="barcode-section">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-barcode me-2"></i> Lettore Codice a Barre
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Configurazione Lettore Seriale</h5>
+                    
+                    <form id="barcodeSettingsForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="serial_port" class="form-label">Porta Seriale</label>
+                                <select class="form-select" id="serial_port" name="serial_port">
+                                    <option value="/dev/ttyUSB0" selected>/dev/ttyUSB0 (Linux)</option>
+                                    <option value="/dev/ttyACM0">/dev/ttyACM0 (Linux)</option>
+                                    <option value="COM1">COM1 (Windows)</option>
+                                    <option value="COM2">COM2 (Windows)</option>
+                                    <option value="COM3">COM3 (Windows)</option>
+                                    <option value="COM4">COM4 (Windows)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="baud_rate" class="form-label">Baud Rate</label>
+                                <select class="form-select" id="baud_rate" name="baud_rate">
+                                    <option value="9600" selected>9600</option>
+                                    <option value="19200">19200</option>
+                                    <option value="38400">38400</option>
+                                    <option value="57600">57600</option>
+                                    <option value="115200">115200</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="data_bits" class="form-label">Data Bits</label>
+                                <select class="form-select" id="data_bits" name="data_bits">
+                                    <option value="7">7</option>
+                                    <option value="8" selected>8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="parity" class="form-label">Parità</label>
+                                <select class="form-select" id="parity" name="parity">
+                                    <option value="N" selected>Nessuna (N)</option>
+                                    <option value="E">Pari (E)</option>
+                                    <option value="O">Dispari (O)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="stop_bits" class="form-label">Stop Bits</label>
+                                <select class="form-select" id="stop_bits" name="stop_bits">
+                                    <option value="1" selected>1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="terminators" class="form-label">Caratteri di Terminazione</label>
+                                <select class="form-select" id="terminators" name="terminators">
+                                    <option value="\r" selected>CR (\r)</option>
+                                    <option value="\n">LF (\n)</option>
+                                    <option value="\r\n">CR+LF (\r\n)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-item mt-4">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-redo-alt"></i>
+                            </div>
+                            <div class="settings-item-content">
+                                <div class="settings-item-title">Riconnessione Automatica</div>
+                                <div class="settings-item-description">Riconnetti automaticamente se la connessione al lettore viene persa</div>
+                            </div>
+                            <div class="settings-item-control">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="autoReconnectSwitch" checked>
+                                    <label class="form-check-label" for="autoReconnectSwitch"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mt-3">
+                            <i class="fas fa-save me-1"></i> Salva Configurazione
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary mt-3" id="testConnection">
+                            <i class="fas fa-plug me-1"></i> Testa Connessione
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Stato Lettore</h5>
+                    
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">Lettore Seriale Attivo</h5>
+                                <p class="mb-0">Il lettore di codici a barre è attualmente configurato sulla porta <strong>/dev/ttyUSB0</strong> a <strong>9600</strong> baud.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h6>Ultimo Codice Letto:</h6>
+                        <div class="p-2 bg-light rounded">
+                            <code id="lastBarcodeRead">ABC12345DEF</code>
+                            <span class="text-muted ms-2">(28 aprile 2025, 15:42:30)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Section -->
+        <div class="settings-card" id="security-section">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-shield-alt me-2"></i> Sicurezza
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Verifica di Integrità</h5>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Verifica integrità automatica</div>
+                            <div class="settings-item-description">Verifica periodicamente l'integrità dei crediti</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoIntegritySwitch" checked>
+                                <label class="form-check-label" for="autoIntegritySwitch"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Log delle transazioni</div>
+                            <div class="settings-item-description">Mantieni un registro dettagliato di tutte le transazioni</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="transactionLogSwitch" checked>
+                                <label class="form-check-label" for="transactionLogSwitch"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Notifiche di sicurezza</div>
+                            <div class="settings-item-description">Invia email di notifica in caso di problemi di integrità</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="securityNotificationsSwitch">
+                                <label class="form-check-label" for="securityNotificationsSwitch"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-success" id="runIntegrityCheck">
+                            <i class="fas fa-shield-alt me-1"></i> Esegui Verifica Integrità
+                        </button>
+                        <button class="btn btn-outline-secondary" id="viewSecurityLog">
+                            <i class="fas fa-list-alt me-1"></i> Visualizza Log di Sicurezza
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h5 class="settings-section-title">Impostazioni Avanzate</h5>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attenzione:</strong> La modifica di queste impostazioni avanzate può influire sulla sicurezza e sul funzionamento dell'applicazione.
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon" style="background-color: rgba(255, 59, 48, 0.1); color: var(--danger-color);">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Rigenera Chiave Segreta</div>
+                            <div class="settings-item-description">Rigenera la chiave segreta utilizzata per la protezione dell'integrità</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <button class="btn btn-outline-danger btn-settings" id="regenerateSecretKey">
+                                <i class="fas fa-sync-alt me-1"></i> Rigenera
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="settings-item-icon" style="background-color: rgba(255, 59, 48, 0.1); color: var(--danger-color);">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">Ripristina Tutti gli Hash</div>
+                            <div class="settings-item-description">Ricalcola e ripristina tutti gli hash di integrità dei crediti</div>
+                        </div>
+                        <div class="settings-item-control">
+                            <button class="btn btn-outline-danger btn-settings" id="resetAllHashes">
+                                <i class="fas fa-redo-alt me-1"></i> Ripristina
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Test Connection Modal -->
+<div class="modal fade" id="testConnectionModal" tabindex="-1" aria-labelledby="testConnectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testConnectionModalLabel">Test Connessione Lettore</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-4">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-color);"></i>
+                </div>
+                <h5>Connessione in corso...</h5>
+                <p>Connessione al lettore di codici a barre in corso. Attendere prego.</p>
+                <div class="alert alert-info mt-3" id="connectionStatus">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Tentativo di connessione alla porta <strong id="portName">/dev/ttyUSB0</strong>...
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Regenerate Secret Key Modal -->
+<div class="modal fade" id="regenerateKeyModal" tabindex="-1" aria-labelledby="regenerateKeyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="regenerateKeyModalLabel">Rigenera Chiave Segreta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-key" style="font-size: 3rem; color: var(--danger-color);"></i>
+                </div>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attenzione!</strong> La rigenerazione della chiave segreta invaliderà tutti gli hash di integrità esistenti. Sarà necessario ricalcolare tutti gli hash.
+                </div>
+                <p>Sei sicuro di voler procedere con la rigenerazione della chiave segreta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmRegenerateKey">
+                    <i class="fas fa-key me-1"></i> Rigenera Chiave
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset All Hashes Modal -->
+<div class="modal fade" id="resetHashesModal" tabindex="-1" aria-labelledby="resetHashesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetHashesModalLabel">Ripristina Tutti gli Hash</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-database" style="font-size: 3rem; color: var(--danger-color);"></i>
+                </div>
+                <p>Questa operazione ricalcolerà e ripristinerà tutti gli hash di integrità dei crediti dei dipendenti.</p>
+                <p>Utilizzala solo se hai problemi di integrità o dopo aver rigenerato la chiave segreta.</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Verranno modificati solo gli hash, non i valori dei crediti.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmResetHashes">
+                    <i class="fas fa-redo-alt me-1"></i> Ripristina Hash
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Integrity Check Modal -->
+<div class="modal fade" id="integrityCheckModal" tabindex="-1" aria-labelledby="integrityCheckModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="integrityCheckModalLabel">Verifica Integrità</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--success-color);"></i>
+                    <h5 class="mt-3">Verifica integrità completata</h5>
+                </div>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Tutto a posto!</strong> Il sistema ha verificato l'integrità di tutti i crediti dei dipendenti.
+                </div>
+                
+                <div class="table-responsive mt-4">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Elemento</th>
+                                <th>Stato</th>
+                                <th>Dettagli</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Integrità Crediti</td>
+                                <td><span class="badge bg-success">OK</span></td>
+                                <td>28/28 verificati</td>
+                            </tr>
+                            <tr>
+                                <td>Integrità Database</td>
+                                <td><span class="badge bg-success">OK</span></td>
+                                <td>Nessun problema rilevato</td>
+                            </tr>
+                            <tr>
+                                <td>Chiave Segreta</td>
+                                <td><span class="badge bg-success">OK</span></td>
+                                <td>Valida e sicura</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-download me-1"></i> Scarica Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        const togglePasswordBtn = document.getElementById('toggleNewPassword');
+        const passwordInput = document.getElementById('new_password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const passwordFeedback = document.getElementById('passwordFeedback');
+        const passwordMatchFeedback = document.getElementById('passwordMatchFeedback');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const appNameInput = document.getElementById('app_name');
+        const appNamePreview = document.getElementById('appNamePreview');
+        const logoInput = document.getElementById('app_logo');
+        const logoPreview = document.getElementById('logoPreview');
+        
+        // Inizializza i modali
+        const testConnectionModal = new bootstrap.Modal(document.getElementById('testConnectionModal'));
+        const regenerateKeyModal = new bootstrap.Modal(document.getElementById('regenerateKeyModal'));
+        const resetHashesModal = new bootstrap.Modal(document.getElementById('resetHashesModal'));
+        const integrityCheckModal = new bootstrap.Modal(document.getElementById('integrityCheckModal'));
+        
+        // Toggle password visibility
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Cambia l'icona
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
+        
+        // Valutazione della forza della password
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            // Rimuovi le classi esistenti
+            passwordStrength.classList.remove('password-weak', 'password-medium', 'password-strong');
+            
+            if (password.length === 0) {
+                passwordStrength.style.width = '0';
+                passwordFeedback.textContent = '';
+                passwordFeedback.className = 'password-feedback text-muted';
+            } else if (password.length < 6) {
+                passwordStrength.classList.add('password-weak');
+                passwordFeedback.textContent = 'Password troppo debole. Usa almeno 6 caratteri.';
+                passwordFeedback.className = 'password-feedback text-danger';
+            } else if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+                passwordStrength.classList.add('password-medium');
+                passwordFeedback.textContent = 'Password di media sicurezza. Idealmente usa lettere maiuscole e numeri.';
+                passwordFeedback.className = 'password-feedback text-warning';
+            } else {
+                passwordStrength.classList.add('password-strong');
+                passwordFeedback.textContent = 'Password forte!';
+                passwordFeedback.className = 'password-feedback text-success';
+            }
+            
+            // Verifica corrispondenza password
+            checkPasswordMatch();
+        });
+        
+        // Verifica corrispondenza password
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        
+        function checkPasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (confirmPassword.length === 0) {
+                passwordMatchFeedback.textContent = '';
+                passwordMatchFeedback.className = 'password-feedback';
+            } else if (password === confirmPassword) {
+                passwordMatchFeedback.textContent = 'Le password corrispondono!';
+                passwordMatchFeedback.className = 'password-feedback text-success';
+            } else {
+                passwordMatchFeedback.textContent = 'Le password non corrispondono';
+                passwordMatchFeedback.className = 'password-feedback text-danger';
+            }
+        }
+        
+        // Validazione del form prima dell'invio
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showToast('Le password non corrispondono', 'danger');
+                confirmPasswordInput.focus();
+                return;
+            }
+        });
+        
+        // Preview applicazione
+        appNameInput.addEventListener('input', function() {
+            appNamePreview.textContent = this.value || 'Gestione Vinicola';
+        });
+        
+        // Preview logo
+        logoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Navigation scroll
+        document.querySelectorAll('.settings-nav .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Rimuovi la classe active da tutti i link
+                document.querySelectorAll('.settings-nav .nav-link').forEach(l => {
+                    l.classList.remove('active');
+                });
+                
+                // Aggiungi la classe active al link cliccato
+                this.classList.add('active');
+                
+                // Scroll to section
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Test connection button
+        document.getElementById('testConnection').addEventListener('click', function() {
+            const port = document.getElementById('serial_port').value;
+            document.getElementById('portName').textContent = port;
+            testConnectionModal.show();
+            
+            // Simula un test di connessione
+            setTimeout(() => {
+                document.getElementById('connectionStatus').className = 'alert alert-success mt-3';
+                document.getElementById('connectionStatus').innerHTML = '<i class="fas fa-check-circle me-2"></i>Connessione riuscita! Il lettore è raggiungibile e funzionante.';
+            }, 2000);
+        });
+        
+        // Regenerate key button
+        document.getElementById('regenerateSecretKey').addEventListener('click', function() {
+            regenerateKeyModal.show();
+        });
+        
+        // Reset hashes button
+        document.getElementById('resetAllHashes').addEventListener('click', function() {
+            resetHashesModal.show();
+        });
+        
+        // Run integrity check button
+        document.getElementById('runIntegrityCheck').addEventListener('click', function() {
+            // Simula un controllo di integrità
+            showToast('Verifica integrità in corso...', 'info');
+            
+            setTimeout(() => {
+                integrityCheckModal.show();
+            }, 1500);
+        });
+        
+        // Confirm buttons for modals
+        document.getElementById('confirmRegenerateKey').addEventListener('click', function() {
+            regenerateKeyModal.hide();
+            showToast('Chiave segreta rigenerata con successo. Tutti gli hash sono stati aggiornati.', 'success');
+        });
+        
+        document.getElementById('confirmResetHashes').addEventListener('click', function() {
+            resetHashesModal.hide();
+            showToast('Tutti gli hash sono stati ripristinati con successo.', 'success');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,667 @@
+<!-- dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .employee-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 1rem;
+    }
+    
+    .employee-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .employee-avatar {
+        width: 45px;
+        height: 45px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-right: 1rem;
+    }
+    
+    .employee-info {
+        flex: 1;
+    }
+    
+    .employee-name {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+    
+    .employee-rank {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .employee-code {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+    
+    .employee-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .dashboard-stats {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .dashboard-stat-item {
+        padding: 1.5rem;
+        text-align: center;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .dashboard-stat-item:last-child {
+        border-right: none;
+    }
+    
+    .dashboard-stat-value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+    
+    .dashboard-stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .dashboard-stat-icon {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .table-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-label {
+        margin-right: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .toolbar-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .integrity-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    
+    .integrity-verified {
+        background-color: var(--success-color);
+    }
+    
+    .integrity-failed {
+        background-color: var(--danger-color);
+    }
+    
+    .td-actions {
+        width: 150px;
+    }
+    
+    .td-credit {
+        width: 120px;
+    }
+    
+    @media (max-width: 767.98px) {
+        .dashboard-stat-item {
+            border-right: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-controls {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        
+        .search-bar {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Gestione Personale</h2>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('barcode_scanner') }}" class="btn btn-outline-primary">
+            <i class="fas fa-barcode me-1"></i> Scanner
+        </a>
+        <a href="{{ url_for('new_employee') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Nuovo Dipendente
+        </a>
+    </div>
+</div>
+
+<!-- Dashboard Stats -->
+<div class="row dashboard-stats mb-4">
+    <div class="col-md-3">
+        <div class="dashboard-stat-item">
+            <i class="fas fa-users dashboard-stat-icon"></i>
+            <div class="dashboard-stat-value">{{ total_employees }}</div>
+            <div class="dashboard-stat-label">Dipendenti</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat-item">
+            <i class="fas fa-euro-sign dashboard-stat-icon"></i>
+            <div class="dashboard-stat-value">{{ "%.2f"|format(total_credit) }}</div>
+            <div class="dashboard-stat-label">Credito Totale (€)</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat-item">
+            <i class="fas fa-money-bill-wave dashboard-stat-icon"></i>
+            <div class="dashboard-stat-value">
+                {% if total_employees > 0 %}
+                    {{ "%.2f"|format(total_credit / total_employees) }}
+                {% else %}
+                    0.00
+                {% endif %}
+            </div>
+            <div class="dashboard-stat-label">Media Credito (€)</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat-item">
+            <i class="fas fa-exchange-alt dashboard-stat-icon"></i>
+            <div class="dashboard-stat-value" id="transazioni-recenti">--</div>
+            <div class="dashboard-stat-label">Transazioni Recenti</div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Controls -->
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Elenco Dipendenti</h5>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-controls">
+            <div class="search-bar">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cerca...">
+                </div>
+            </div>
+            
+            <div class="toolbar-buttons">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-filter me-1"></i> Filtra
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item filter-item" href="#" data-filter="all">Tutti</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Grado</h6></li>
+                        {% set ranks = [] %}
+                        {% for employee in employees %}
+                            {% if employee.rank not in ranks %}
+                                {% set ranks = ranks + [employee.rank] %}
+                                <li><a class="dropdown-item filter-item" href="#" data-filter="rank" data-value="{{ employee.rank }}">{{ employee.rank }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Credito</h6></li>
+                        <li><a class="dropdown-item filter-item" href="#" data-filter="credit-empty">Credito esaurito</a></li>
+                        <li><a class="dropdown-item filter-item" href="#" data-filter="credit-low">Credito basso (< 5€)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sort me-1"></i> Ordina
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="name-asc">Nome (A-Z)</a></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="name-desc">Nome (Z-A)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="rank-asc">Grado (A-Z)</a></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="rank-desc">Grado (Z-A)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="credit-asc">Credito (crescente)</a></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="credit-desc">Credito (decrescente)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="code-asc">Codice (crescente)</a></li>
+                        <li><a class="dropdown-item sort-item" href="#" data-sort="code-desc">Codice (decrescente)</a></li>
+                    </ul>
+                </div>
+                
+                <button id="view-toggle" class="btn btn-outline-secondary" data-view="table">
+                    <i class="fas fa-th-list"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Table View -->
+        <div id="table-view" class="table-responsive">
+            <table class="table table-hover" id="employeesTable">
+                <thead>
+                    <tr>
+                        <th>Codice</th>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Grado</th>
+                        <th class="td-credit">Credito</th>
+                        <th>Integrità</th>
+                        <th class="td-actions">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr data-employee-id="{{ employee.id }}" data-employee-code="{{ employee.code }}" data-employee-rank="{{ employee.rank }}" data-employee-credit="{{ employee.credit }}">
+                        <td><span class="employee-code">{{ employee.code }}</span></td>
+                        <td>{{ employee.first_name }}</td>
+                        <td>{{ employee.last_name }}</td>
+                        <td>{{ employee.rank }}</td>
+                        <td><span class="credit-badge">€ {{ "%.2f"|format(employee.credit) }}</span></td>
+                        <td>
+                            <span class="integrity-indicator {% if employee.verify_credit_integrity() %}integrity-verified{% else %}integrity-failed{% endif %}" 
+                                  title="{% if employee.verify_credit_integrity() %}Integrità verificata{% else %}ATTENZIONE: Possibile manipolazione{% endif %}"></span>
+                            
+                            {% if not employee.verify_credit_integrity() %}
+                                <span class="text-danger"><i class="fas fa-exclamation-triangle"></i></span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('employee_details', id=employee.id) }}" class="btn btn-outline-primary" title="Visualizza">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('add_credit', id=employee.id) }}" class="btn btn-outline-success" title="Aggiungi credito">
+                                    <i class="fas fa-plus-circle"></i>
+                                </a>
+                                <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-outline-secondary" title="Modifica">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ employee.id }}" title="Elimina">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ employee.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ employee.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ employee.id }}">Conferma Eliminazione</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sei sicuro di voler eliminare il dipendente <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>?
+                                            {% if employee.credit > 0 %}
+                                            <div class="alert alert-warning mt-3">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Attenzione: questo dipendente ha un credito residuo di <strong>€ {{ "%.2f"|format(employee.credit) }}</strong> che andrà perso.
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                                            <form action="{{ url_for('delete_employee', id=employee.id) }}" method="POST" style="display: inline;">
+                                                <button type="submit" class="btn btn-danger">Elimina</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Nessun dipendente trovato.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Cards View -->
+        <div id="cards-view" class="row" style="display: none;">
+            {% for employee in employees %}
+            <div class="col-md-6 col-lg-4" data-employee-id="{{ employee.id }}" data-employee-code="{{ employee.code }}" data-employee-rank="{{ employee.rank }}" data-employee-credit="{{ employee.credit }}">
+                <div class="card employee-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="employee-avatar">
+                                {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                            </div>
+                            <div class="employee-info">
+                                <div class="employee-name">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                <div class="employee-rank">{{ employee.rank }}</div>
+                                <div class="mt-1">
+                                    <span class="employee-code me-2">{{ employee.code }}</span>
+                                    <span class="credit-badge">€ {{ "%.2f"|format(employee.credit) }}</span>
+                                    
+                                    <span class="integrity-indicator {% if employee.verify_credit_integrity() %}integrity-verified{% else %}integrity-failed{% endif %} ms-1" 
+                                      title="{% if employee.verify_credit_integrity() %}Integrità verificata{% else %}ATTENZIONE: Possibile manipolazione{% endif %}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('employee_details', id=employee.id) }}" class="btn btn-outline-primary" title="Visualizza">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('add_credit', id=employee.id) }}" class="btn btn-outline-success" title="Aggiungi credito">
+                                    <i class="fas fa-plus-circle"></i>
+                                </a>
+                                <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-outline-secondary" title="Modifica">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ employee.id }}" title="Elimina">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center">
+                <div class="alert alert-info">Nessun dipendente trovato.</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div id="no-results" style="display: none;">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-search me-2"></i> Nessun risultato trovato con i criteri di ricerca.
+                <button id="reset-search" class="btn btn-sm btn-outline-primary ms-3">
+                    <i class="fas fa-undo me-1"></i> Reimposta ricerca
+                </button>
+            </div>
+        </div>
+
+        <!-- Pagination (in caso di molti dipendenti) -->
+        <nav id="pagination-container" class="mt-3" aria-label="Paginazione" style="display: none;">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Precedente</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Prossima</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Conteggio delle transazioni recenti (simulato per ora)
+    // In una versione reale, questi dati verrebbero dal server
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simula il caricamento del conteggio transazioni
+        setTimeout(() => {
+            document.getElementById('transazioni-recenti').textContent = "{{ transactions_count|default('24') }}";
+        }, 800);
+    });
+
+    // Funzione di ricerca
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', filterEmployees);
+    
+    // Reset della ricerca
+    document.getElementById('reset-search').addEventListener('click', function() {
+        searchInput.value = '';
+        filterEmployees();
+    });
+    
+    // Toggle della visualizzazione (tabella/schede)
+    const viewToggle = document.getElementById('view-toggle');
+    const tableView = document.getElementById('table-view');
+    const cardsView = document.getElementById('cards-view');
+    
+    viewToggle.addEventListener('click', function() {
+        const currentView = this.getAttribute('data-view');
+        
+        if (currentView === 'table') {
+            // Passa alla visualizzazione a schede
+            tableView.style.display = 'none';
+            cardsView.style.display = 'flex';
+            this.setAttribute('data-view', 'cards');
+            this.innerHTML = '<i class="fas fa-table"></i>';
+        } else {
+            // Passa alla visualizzazione a tabella
+            tableView.style.display = 'block';
+            cardsView.style.display = 'none';
+            this.setAttribute('data-view', 'table');
+            this.innerHTML = '<i class="fas fa-th-list"></i>';
+        }
+        
+        // Applica nuovamente i filtri
+        filterEmployees();
+    });
+    
+    // Ordinamento
+    const sortItems = document.querySelectorAll('.sort-item');
+    sortItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortType = this.getAttribute('data-sort');
+            sortEmployees(sortType);
+        });
+    });
+    
+    // Filtri
+    const filterItems = document.querySelectorAll('.filter-item');
+    filterItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filterType = this.getAttribute('data-filter');
+            const filterValue = this.getAttribute('data-value');
+            
+            // Resetta la ricerca testuale
+            searchInput.value = '';
+            
+            // Applica il filtro
+            applyFilter(filterType, filterValue);
+        });
+    });
+    
+    function filterEmployees() {
+        const searchQuery = searchInput.value.toLowerCase();
+        const currentView = viewToggle.getAttribute('data-view');
+        
+        // Seleziona gli elementi da filtrare in base alla vista corrente
+        const items = currentView === 'table' 
+            ? document.querySelectorAll('#employeesTable tbody tr')
+            : document.querySelectorAll('#cards-view > div');
+        
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            if (item.classList.contains('no-results-row')) return;
+            
+            const code = item.getAttribute('data-employee-code').toLowerCase();
+            const rank = item.getAttribute('data-employee-rank').toLowerCase();
+            
+            let firstName, lastName;
+            
+            if (currentView === 'table') {
+                firstName = item.children[1].textContent.toLowerCase();
+                lastName = item.children[2].textContent.toLowerCase();
+            } else {
+                const nameElement = item.querySelector('.employee-name');
+                const fullName = nameElement.textContent.toLowerCase();
+                [firstName, lastName] = fullName.split(' ');
+            }
+            
+            // Verifica se l'elemento corrisponde alla ricerca
+            const matchesSearch = code.includes(searchQuery) || 
+                                  rank.includes(searchQuery) || 
+                                  firstName.includes(searchQuery) || 
+                                  lastName.includes(searchQuery);
+            
+            if (matchesSearch) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Mostra/nascondi il messaggio "nessun risultato"
+        const noResults = document.getElementById('no-results');
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+    
+    function applyFilter(filterType, filterValue) {
+        const currentView = viewToggle.getAttribute('data-view');
+        
+        // Seleziona gli elementi da filtrare in base alla vista corrente
+        const items = currentView === 'table' 
+            ? document.querySelectorAll('#employeesTable tbody tr')
+            : document.querySelectorAll('#cards-view > div');
+        
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            if (item.classList.contains('no-results-row')) return;
+            
+            const rank = item.getAttribute('data-employee-rank');
+            const credit = parseFloat(item.getAttribute('data-employee-credit'));
+            
+            let shouldShow = false;
+            
+            if (filterType === 'all') {
+                shouldShow = true;
+            } else if (filterType === 'rank' && rank === filterValue) {
+                shouldShow = true;
+            } else if (filterType === 'credit-empty' && credit <= 0) {
+                shouldShow = true;
+            } else if (filterType === 'credit-low' && credit > 0 && credit < 5) {
+                shouldShow = true;
+            }
+            
+            item.style.display = shouldShow ? '' : 'none';
+            
+            if (shouldShow) visibleCount++;
+        });
+        
+        // Mostra/nascondi il messaggio "nessun risultato"
+        const noResults = document.getElementById('no-results');
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+    
+    function sortEmployees(sortType) {
+        const currentView = viewToggle.getAttribute('data-view');
+        
+        // Elemento container in base alla vista corrente
+        const container = currentView === 'table' 
+            ? document.querySelector('#employeesTable tbody')
+            : document.getElementById('cards-view');
+        
+        // Seleziona gli elementi da ordinare
+        const items = currentView === 'table' 
+            ? Array.from(container.querySelectorAll('tr:not(.no-results-row)'))
+            : Array.from(container.querySelectorAll('> div'));
+        
+        // Funzione di comparazione in base al tipo di ordinamento
+        const compare = (a, b) => {
+            if (sortType === 'name-asc' || sortType === 'name-desc') {
+                let aName, bName;
+                
+                if (currentView === 'table') {
+                    aName = a.children[1].textContent + ' ' + a.children[2].textContent;
+                    bName = b.children[1].textContent + ' ' + b.children[2].textContent;
+                } else {
+                    aName = a.querySelector('.employee-name').textContent;
+                    bName = b.querySelector('.employee-name').textContent;
+                }
+                
+                return sortType === 'name-asc' 
+                    ? aName.localeCompare(bName)
+                    : bName.localeCompare(aName);
+            } 
+            else if (sortType === 'rank-asc' || sortType === 'rank-desc') {
+                const aRank = a.getAttribute('data-employee-rank');
+                const bRank = b.getAttribute('data-employee-rank');
+                
+                return sortType === 'rank-asc' 
+                    ? aRank.localeCompare(bRank)
+                    : bRank.localeCompare(aRank);
+            }
+            else if (sortType === 'credit-asc' || sortType === 'credit-desc') {
+                const aCredit = parseFloat(a.getAttribute('data-employee-credit'));
+                const bCredit = parseFloat(b.getAttribute('data-employee-credit'));
+                
+                return sortType === 'credit-asc' 
+                    ? aCredit - bCredit
+                    : bCredit - aCredit;
+            }
+            else if (sortType === 'code-asc' || sortType === 'code-desc') {
+                const aCode = a.getAttribute('data-employee-code');
+                const bCode = b.getAttribute('data-employee-code');
+                
+                return sortType === 'code-asc' 
+                    ? aCode.localeCompare(bCode)
+                    : bCode.localeCompare(aCode);
+            }
+            
+            return 0;
+        };
+        
+        // Ordina gli elementi
+        items.sort(compare);
+        
+        // Aggiungi gli elementi ordinati al container
+        items.forEach(item => {
+            container.appendChild(item);
+        });
+    }
+    
+    // Gestione eventi di integrità
+    document.addEventListener('DOMContentLoaded', function() {
+        // Controlla tutti gli indicatori di integrità
+        const integrityIndicators = document.querySelectorAll('.integrity-indicator.integrity-failed');
+        
+        if (integrityIndicators.length > 0) {
+            // Aggiungi avviso se ci sono problemi di integrità
+            showToast(`Attenzione: rilevati ${integrityIndicators.length} potenziali problemi di integrità del credito.`, 'warning');
+        }
+    });
+</script>
+{% endblock %}

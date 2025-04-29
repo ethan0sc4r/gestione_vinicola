@@ -1,0 +1,440 @@
+<!-- edit_employee.html -->
+{% extends "base.html" %}
+
+{% block title %}Modifica Dipendente - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-section-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 122, 255, 0.25);
+    }
+    
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        height: calc(3.5rem + 2px);
+        border-radius: 8px;
+    }
+    
+    .btn-action {
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .password-strength {
+        height: 5px;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .password-weak {
+        background-color: var(--danger-color);
+        width: 30%;
+    }
+    
+    .password-medium {
+        background-color: var(--warning-color);
+        width: 60%;
+    }
+    
+    .password-strong {
+        background-color: var(--success-color);
+        width: 100%;
+    }
+    
+    .password-feedback {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+    
+    .required-field::after {
+        content: ' *';
+        color: var(--danger-color);
+    }
+    
+    .employee-avatar-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .employee-avatar {
+        width: 100px;
+        height: 100px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 500;
+    }
+    
+    .credit-info {
+        background-color: rgba(0, 122, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .credit-badge-large {
+        font-size: 1.2rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .integrity-indicator-large {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="fas fa-user-edit me-2"></i> Modifica Dipendente
+    </h2>
+    <div>
+        <a href="{{ url_for('employee_details', id=employee.id) }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-eye me-1"></i> Visualizza
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="employee-avatar-container">
+                    <div class="employee-avatar">
+                        {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h4>{{ employee.first_name }} {{ employee.last_name }}</h4>
+                    <span class="badge bg-secondary">{{ employee.rank }}</span>
+                    
+                    <div class="credit-info mt-3">
+                        <span class="credit-badge credit-badge-large">Credito: € {{ "%.2f"|format(employee.credit) }}</span>
+                        
+                        <span class="integrity-indicator-large {% if employee.verify_credit_integrity() %}integrity-verified{% else %}integrity-failed{% endif %}" 
+                              title="{% if employee.verify_credit_integrity() %}Integrità verificata{% else %}ATTENZIONE: Possibile manipolazione{% endif %}"></span>
+                              
+                        {% if not employee.verify_credit_integrity() %}
+                        <span class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Potenziale manipolazione
+                        </span>
+                        {% else %}
+                        <span class="text-success">
+                            <i class="fas fa-shield-alt"></i> Verificato
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <form method="POST" id="editEmployeeForm">
+                    <!-- Sezione Informazioni Personali -->
+                    <div class="form-section">
+                        <h5 class="form-section-header">
+                            <i class="fas fa-user me-2"></i> Informazioni Personali
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label required-field">Nome</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label required-field">Cognome</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ employee.last_name }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="rank" class="form-label required-field">Grado</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                    <input type="text" class="form-control" id="rank" name="rank" value="{{ employee.rank }}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sezione Identificazione -->
+                    <div class="form-section">
+                        <h5 class="form-section-header">
+                            <i class="fas fa-id-card me-2"></i> Identificazione
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="code" class="form-label required-field">Codice</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                    <input type="text" class="form-control" id="code" name="code" value="{{ employee.code }}" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="generateCode">
+                                        <i class="fas fa-random"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Questo codice viene utilizzato per la scansione e l'identificazione del dipendente</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sezione Sicurezza -->
+                    <div class="form-section">
+                        <h5 class="form-section-header">
+                            <i class="fas fa-shield-alt me-2"></i> Sicurezza
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Nuova Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" name="password">
+                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength" id="passwordStrength"></div>
+                                <div class="password-feedback text-muted" id="passwordFeedback">
+                                    Lasciare vuoto per mantenere la password attuale
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="password_confirm" class="form-label">Conferma Nuova Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password_confirm" name="password_confirm">
+                                </div>
+                                <div id="passwordMatchFeedback" class="password-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if not employee.verify_credit_integrity() %}
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attenzione:</strong> È stata rilevata una possibile manipolazione del credito.
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="restoreIntegrity" name="restore_integrity" value="1" checked>
+                            <label class="form-check-label" for="restoreIntegrity">
+                                Ripristina l'integrità del credito durante il salvataggio
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary btn-action" onclick="window.location.href='{{ url_for('employee_details', id=employee.id) }}'">
+                            <i class="fas fa-times me-1"></i> Annulla
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-action" id="submitButton">
+                            <i class="fas fa-save me-1"></i> Salva Modifiche
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Operazioni Rapide</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('add_credit', id=employee.id) }}" class="btn btn-success">
+                        <i class="fas fa-plus-circle me-1"></i> Aggiungi Credito
+                    </a>
+                    
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash-alt me-1"></i> Elimina Dipendente
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informazioni</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>ID:</span>
+                        <span class="text-muted">{{ employee.id }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Transazioni:</span>
+                        <span class="badge bg-primary rounded-pill">{{ employee.transactions|length }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Ultima attività:</span>
+                        <span class="text-muted">
+                            {% if employee.transactions|length > 0 %}
+                                {{ employee.transactions[0].date.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sei sicuro di voler eliminare il dipendente <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>?</p>
+                {% if employee.credit > 0 %}
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Attenzione: questo dipendente ha un credito residuo di <strong>€ {{ "%.2f"|format(employee.credit) }}</strong> che andrà perso.
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <form action="{{ url_for('delete_employee', id=employee.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Elimina</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Generazione automatica di un codice casuale
+    document.getElementById('generateCode').addEventListener('click', function() {
+        // Genera un codice alfanumerico di 8 caratteri
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 8; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        document.getElementById('code').value = code;
+    });
+    
+    // Toggle per mostrare/nascondere la password
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+    
+    // Valutazione della forza della password
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = document.getElementById('passwordStrength');
+        const feedback = document.getElementById('passwordFeedback');
+        
+        // Rimuovi le classi esistenti
+        strengthBar.classList.remove('password-weak', 'password-medium', 'password-strong');
+        
+        if (password.length === 0) {
+            strengthBar.style.width = '0';
+            feedback.textContent = 'Lasciare vuoto per mantenere la password attuale';
+            feedback.className = 'password-feedback text-muted';
+        } else if (password.length < 6) {
+            strengthBar.classList.add('password-weak');
+            feedback.textContent = 'Password troppo debole. Usa almeno 6 caratteri.';
+            feedback.className = 'password-feedback text-danger';
+        } else if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+            strengthBar.classList.add('password-medium');
+            feedback.textContent = 'Password di media sicurezza. Idealmente usa lettere maiuscole e numeri.';
+            feedback.className = 'password-feedback text-warning';
+        } else {
+            strengthBar.classList.add('password-strong');
+            feedback.textContent = 'Password forte!';
+            feedback.className = 'password-feedback text-success';
+        }
+    });
+    
+    // Verifica corrispondenza password
+    document.getElementById('password_confirm').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        const feedback = document.getElementById('passwordMatchFeedback');
+        
+        if (confirmPassword.length === 0) {
+            feedback.textContent = '';
+            feedback.className = 'password-feedback';
+        } else if (password === confirmPassword) {
+            feedback.textContent = 'Le password corrispondono!';
+            feedback.className = 'password-feedback text-success';
+        } else {
+            feedback.textContent = 'Le password non corrispondono';
+            feedback.className = 'password-feedback text-danger';
+        }
+    });
+    
+    // Validazione del form prima dell'invio
+    document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
+        // Se è stata inserita una nuova password, verifica che corrisponda
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('password_confirm').value;
+        
+        if (password && password !== confirmPassword) {
+            e.preventDefault();
+            showToast('Le password non corrispondono', 'danger');
+            document.getElementById('password_confirm').focus();
+            return;
+        }
+        
+        // Disabilita il pulsante di invio per evitare doppi invii
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvataggio...';
+    });
+</script>
+{% endblock %}

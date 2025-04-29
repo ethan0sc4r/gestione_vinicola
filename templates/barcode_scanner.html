@@ -1,0 +1,375 @@
+<!-- barcode_scanner.html -->
+{% extends "base.html" %}
+
+{% block title %}Scanner Codice - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Scanner Codice a Barre</h4>
+                <div>
+                    <span id="serial-status" class="badge bg-secondary">
+                        <i class="fas fa-plug"></i> Verifica connessione...
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4" id="serial-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Questa applicazione utilizza un lettore di codice a barre seriale. È possibile utilizzare l'input manuale come alternativa.
+                </div>
+                
+                <div class="serial-scanner-area mb-4">
+                    <div class="text-center p-4">
+                        <i class="fas fa-barcode scanning-animation" style="font-size: 3rem; color: #007aff;"></i>
+                        <h5 class="mt-3">Lettura codice da dispositivo seriale</h5>
+                        <p class="text-muted">Il sistema è in ascolto dal lettore seriale. Scansiona il codice a barre con il lettore.</p>
+                        
+                        {% if last_barcode %}
+                        <div class="alert alert-success mt-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Ultimo codice letto: <strong>{{ last_barcode }}</strong>
+                            <button id="use-last-barcode" class="btn btn-sm btn-primary ms-2">Usa questo codice</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div id="manual-input" class="mb-4">
+                    <h5 class="mb-3">Input manuale</h5>
+                    <div class="input-group">
+                        <input type="text" id="barcode-input" class="form-control" placeholder="Inserisci il codice manualmente..." autofocus>
+                        <button class="btn btn-primary" type="button" id="submit-barcode">
+                            <i class="fas fa-search me-1"></i> Cerca
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="result-container" style="display: none;">
+                    <div class="alert alert-info">
+                        <div id="result-message"></div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h4 id="employee-name"></h4>
+                                <span class="badge bg-secondary" id="employee-rank"></span>
+                                <div class="mt-3">
+                                    <span class="credit-badge" id="employee-credit"></span>
+                                </div>
+                                <div class="mt-2" id="credit-integrity-status">
+                                    <span class="badge bg-success"><i class="fas fa-shield-alt me-1"></i> Integrità verificata</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Scala Credito</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="deduct-form">
+                                <input type="hidden" id="employee-id">
+                                <div class="mb-3">
+                                    <label for="units" class="form-label">Unità da scalare (0.20€ per unità)</label>
+                                    <input type="number" class="form-control" id="units" min="1" value="1" required>
+                                    <div class="form-text">Costo totale: <span id="total-cost">0.20</span>€</div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Scala Credito</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per avvisi di integrità -->
+<div class="modal fade" id="integrityModal" tabindex="-1" aria-labelledby="integrityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="integrityModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Allarme Sicurezza
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-shield-alt text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <p class="text-center fs-5 fw-bold">Rilevata possibile manipolazione del credito!</p>
+                <p id="integrity-message" class="text-center">È stata rilevata un'anomalia nell'integrità del credito.</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Questa operazione è stata bloccata per motivi di sicurezza. Contattare l'amministratore di sistema.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Riferimenti agli elementi del DOM
+    const serialStatus = document.getElementById('serial-status');
+    const barcodeBadge = document.getElementById('last-barcode-badge');
+    const barcodeInput = document.getElementById('barcode-input');
+    const submitButton = document.getElementById('submit-barcode');
+    const resultContainer = document.getElementById('result-container');
+    const useBarcodeButton = document.getElementById('use-last-barcode');
+
+    // Modali
+    const integrityModal = new bootstrap.Modal(document.getElementById('integrityModal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
+    
+    // Variabili globali
+    let lastCheckTime = 0;
+    let lastReadBarcode = '';
+    
+    // Funzione per verificare lo stato del lettore seriale
+    function checkSerialStatus() {
+        const now = Date.now();
+        // Limita il polling a una volta ogni 1.5 secondi per evitare sovraccarichi
+        if (now - lastCheckTime < 1500) return;
+        lastCheckTime = now;
+        
+        fetch("{{ url_for('get_serial_barcode') }}")
+            .then(response => response.json())
+            .then(data => {
+                // Aggiorna lo stato visivo del lettore
+                if (data.barcode) {
+                    // Lettore connesso e codice ricevuto
+                    serialStatus.className = 'badge bg-success';
+                    serialStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i> Lettore connesso';
+                    
+                    // Se c'è un nuovo codice ed è diverso dall'ultimo processato
+                    if (data.barcode !== lastReadBarcode) {
+                        lastReadBarcode = data.barcode;
+                        console.log('Nuovo codice rilevato:', data.barcode);
+                        
+                        // Avvisa con un "beep" o una notifica visiva
+                        const barcodeSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBhxQo97nsXQrChs2e6rM089nPhZLZX+PpNf4ulQOHnGers67aUA2iLOkdRwJLpLXx4FFFhJXwu3oj0smIWiVn3XA8dB8TkZcY2l2tOzZfzgYLoCo1tiNUDZEbIqVgWukxOXOgk1QTVpojpOk6PbprVscBxFEl8XqypdlRkFiZmLB/9mldD8nHUyU0ejchlAhJHO1ueKpbBQNMX6/z8t5PAwaLHit2uDYjmBCXWZphcLq1ndFNEU/WpS74sJ9YjBAYnqHmrHa5sF2WE1hbH6Lk6DK8vLAfCcRIFiTt8nCk3ZfWFRQjN3z4YxVPEak3d6oYEMxOWOXoIq44OKmaDwYIlifu9zMhWI9H0SXrLfWz5lnTTIuXJOq5/O2Y0sdEFCqx9jNpINlRzdTmrvnxoFMMzFgeMfWll4fDjOPy9yQVDI0NFB0wfLnoVQ0MEFqoLLO1bJ6UT5HQWqNmdHs36FRPURPYnN+qfD6vmw5ICdHhOD/mVkXC03NzqJF/CV9nl8qCyS89cuCOCJ3u9+URC4sXqXLpGA3MEVjg5O29fn0pFQq/zE9XYmStdXrxIZzSzU6RWuZyeS2cVVCHUCQp8ffwHVCLzNUf6DB6cZ+WEgpFEqA2OvtjlM4O1eWuMG8kHBYNRpMi7Tv3Z5rTkFMW2N3ttDqy3FOHCkzerj4+Z5UFw8te6PYz6RqPT5IVF+Dqdn24rVkKuP/XLvh3blGIkNcmrDZx3pPNk1miq/Yz5JZQEMlQ47T6qxXJSNLi87qtFgpMWOw1/ngeU7dJ8uYSjWH3+qsYiYgNHeq1eKHRBYyYqLM4Zg9IECmu52JJhlDu+PidzxTV2mFt9brpoQOBFusyNuNRSZMjKXF9eSXUBH3qsRy5/3Eh1k1Ro3O4Nh/SXRyYG96nc32+bdBFCNIq+vdukkNDnTH6t2MTRwEIpPn+osOwTdV0PunjA7Q7uKDSyZxqLvZ+xJRZVZwb3yo1eXlpWwhIit7mc3stV43IzIoW5nE7vOKTx4ULovj95BMFxZsrcrfxZESRp1mOjF0n7nwt24zQFljg6Ti7u+gTDodc6K9z+rLbiEWM1qDnrnj8tt8QzhLX3KFptH/8rxSDQwtjeHozYMzEjlgl78nNZLhuSoKKHm12v3Ldgt3aO1jKQwu3/TtlVQ2H1uy8OV/OxHBjuFuQDh21+O3aSM0V32JnaK2VSI5lbrEqXRMAAAsdpvG5uC0ZBoqRIrBzKeRThUHJF2t4u2dSi1JcJOzyr1/PCcrSWuEoMnl1YtgOSckUXSk1enEeEcwJiliiqPJymItKP/tgPbSiU0rBBFZoNPrr1c1JEdwpL7O1oZZJiQrP1d4oNDYj1wj//9n0vb0gUnF/H6m4Mybb09CXbP3zmEPKHutz79pJR5DjrXe7r5OMjdbfIyt2d7IlmtWLh0varmfMoXR1wJKlWBJO5z86iooNYfP77EuDUCbxtFy7dvJzjj/lPD5pU81KmiXyudcFReP7/akJRdPv/vrtDYeQZXF1WsEMunwzNB+1yP8JYPSyrdeSUWTyM1qCzy9Ts9uLhoLKMsAAOVZLAg4lrzPxn1MRnCVvOF8MwU9fqTQyqVrRkJkjazHfFQnm8G9mFmM0OXmLCMPr2nB3aovDlDj+uQqCTXW+Kx1JzSv6fW4QSGZx8iET0E4VX+i1v+7SyCrwq+syjsUF4LN1GUYKoPO0pM9B03j9/NKRSKIwMKPWFI2PnOWvPP/bB/e+LTkXTMYVZbN6O9yIA1MrNTkpiMiRJm9zKZ1ViQ+cJR/HGZ+ttPtvk0NE2mow9V2JkGDsAoKC7gCl8rzojQY');
+                        barcodeSound.play().catch(() => {
+                            // Gestione errore audio (alcuni browser richiedono interazione utente)
+                            console.log('Impossibile riprodurre suono');
+                        });
+                        
+                        // Se il dipendente è stato trovato e non ci sono problemi di integrità
+                        if (data.success) {
+                            processEmployeeData(data.employee);
+                            // Focus sul campo unità per velocizzare la transazione
+                            document.getElementById('units').focus();
+                        } else if (data.credit_integrity_failed) {
+                            // Problema di integrità rilevato
+                            document.getElementById('integrity-message').textContent = data.message;
+                            integrityModal.show();
+                        } else {
+                            // Codice letto ma dipendente non trovato
+                            showToast(`Codice letto (${data.barcode}) ma dipendente non trovato.`, 'warning');
+                        }
+                    }
+                } else if (data.message.includes('Nessun codice letto')) {
+                    // Lettore connesso ma nessun codice
+                    serialStatus.className = 'badge bg-warning';
+                    serialStatus.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> In attesa di codice';
+                } else {
+                    // Problemi di connessione
+                    serialStatus.className = 'badge bg-danger';
+                    serialStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Errore connessione';
+                }
+            })
+            .catch(error => {
+                console.error("Errore durante il polling:", error);
+                serialStatus.className = 'badge bg-danger';
+                serialStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Connessione persa';
+            });
+    }
+    
+    // Controlla periodicamente lo stato del lettore e i nuovi codici
+    setInterval(checkSerialStatus, 1000);
+    
+    // Chiamata iniziale
+    checkSerialStatus();
+    
+    function processEmployeeData(employee) {
+        document.getElementById('employee-id').value = employee.id;
+        document.getElementById('employee-name').textContent = employee.first_name + " " + employee.last_name;
+        document.getElementById('employee-rank').textContent = employee.rank;
+        document.getElementById('employee-credit').textContent = "Credito: € " + employee.credit.toFixed(2);
+        
+        // Verifica l'integrità del credito
+        const integrityStatus = document.getElementById('credit-integrity-status');
+        if (employee.credit_integrity) {
+            integrityStatus.innerHTML = '<span class="badge bg-success"><i class="fas fa-shield-alt me-1"></i> Integrità verificata</span>';
+        } else {
+            integrityStatus.innerHTML = '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> ATTENZIONE: Integrità compromessa</span>';
+        }
+        
+        document.getElementById('result-message').textContent = "Dipendente trovato!";
+        document.getElementById('result-container').style.display = 'block';
+        
+        // Scorre fino al risultato
+        document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function processBarcode(code) {
+        fetch("{{ url_for('scan_barcode') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCookie("csrf_token")
+            },
+            body: "barcode=" + encodeURIComponent(code)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                processEmployeeData(data.employee);
+            } else if (data.credit_integrity_failed) {
+                // Problema di integrità del credito
+                document.getElementById('integrity-message').textContent = data.message;
+                integrityModal.show();
+                document.getElementById('result-container').style.display = 'none';
+            } else {
+                showToast("Errore: " + data.message, "danger");
+            }
+        })
+        .catch(error => {
+            console.error("Errore:", error);
+            showToast("Errore durante la ricerca del dipendente.", "danger");
+        });
+    }
+    
+    // Gestore per l'ultimo codice letto dal lettore seriale
+    if (useBarcodeButton) {
+        useBarcodeButton.addEventListener('click', function() {
+            const lastBarcode = "{{ last_barcode }}";
+            if (lastBarcode) {
+                processBarcode(lastBarcode);
+            }
+        });
+    }
+    
+    submitButton.addEventListener('click', function() {
+        const code = barcodeInput.value.trim();
+        if (code) {
+            processBarcode(code);
+        } else {
+            showToast("Inserisci un codice valido", "warning");
+        }
+    });
+    
+    barcodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const code = this.value.trim();
+            if (code) {
+                processBarcode(code);
+            } else {
+                showToast("Inserisci un codice valido", "warning");
+            }
+        }
+    });
+    
+    document.getElementById('units').addEventListener('input', function() {
+        const units = parseInt(this.value) || 0;
+        const cost = (units * 0.20).toFixed(2);
+        document.getElementById('total-cost').textContent = cost;
+    });
+    
+    document.getElementById('deduct-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const employeeId = document.getElementById('employee-id').value;
+        const units = document.getElementById('units').value;
+        
+        if (!employeeId) {
+            showToast("Nessun dipendente selezionato", "warning");
+            return;
+        }
+        
+        if (parseInt(units) < 1) {
+            showToast("Inserisci un numero valido di unità", "warning");
+            return;
+        }
+        
+        // Disabilita il pulsante durante l'elaborazione per evitare doppi clic
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
+        
+        fetch("{{ url_for('deduct_credit') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCookie("csrf_token")
+            },
+            body: "employee_id=" + encodeURIComponent(employeeId) + "&units=" + encodeURIComponent(units)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Riattiva il pulsante
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Scala Credito';
+            
+            if (data.success) {
+                document.getElementById('employee-credit').textContent = "Credito: € " + data.new_credit.toFixed(2);
+                
+                // Effetto visivo di conferma
+                const creditBadge = document.getElementById('employee-credit');
+                creditBadge.classList.add('animate__animated', 'animate__pulse');
+                setTimeout(() => {
+                    creditBadge.classList.remove('animate__animated', 'animate__pulse');
+                }, 1000);
+                
+                // Suono di conferma
+                const successSound = new Audio('data:audio/wav;base64,UklGRmYEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YUIEAACAgICAgICAgICAgICAgICAgICAgICBgYGBgYGBgYGBgYGBgYGBgYGBgYGAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgH9/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f39/f39/f39/f4CAgICAgICAgICAgICAgICAgICAgH9/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/gICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA');
+                successSound.play().catch(() => {
+                    console.log('Impossibile riprodurre suono di successo');
+                });
+                
+                showToast(data.message, "success");
+                
+                // Resetta il campo unità al valore di default
+                document.getElementById('units').value = 1;
+                document.getElementById('total-cost').textContent = '0.20';
+                
+                // Posiziona il focus sul campo unità per la prossima operazione
+                document.getElementById('units').focus();
+                
+            } else if (data.credit_integrity_failed) {
+                // Problema di integrità del credito
+                document.getElementById('integrity-message').textContent = data.message;
+                integrityModal.show();
+                document.getElementById('result-container').style.display = 'none';
+            } else {
+                showToast("Errore: " + data.message, "danger");
+            }
+        })
+        .catch(error => {
+            console.error("Errore:", error);
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Scala Credito';
+            showToast("Errore durante l'operazione.", "danger");
+        });
+    });
+    
+    // Focalizzati sul campo di input al caricamento della pagina
+    window.addEventListener('DOMContentLoaded', () => {
+        barcodeInput.focus();
+    });
+</script>
+{% endblock %}
