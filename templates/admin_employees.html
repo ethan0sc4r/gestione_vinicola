@@ -205,6 +205,11 @@
         <a href="{{ url_for('admin_operators') }}" class="admin-tab">
             <i class="fas fa-user-shield"></i> Operatori
         </a>
+        {% if session.is_super_admin %}
+        <a href="{{ url_for('admin_admins') }}" class="admin-tab">
+            <i class="fas fa-user-cog"></i> Amministratori
+        </a>
+        {% endif %}
         <a href="{{ url_for('admin_reports') }}" class="admin-tab">
             <i class="fas fa-chart-bar"></i> Report
         </a>

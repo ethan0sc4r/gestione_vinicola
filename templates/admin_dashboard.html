@@ -270,6 +270,11 @@
         <a href="{{ url_for('admin_operators') }}" class="admin-tab">
             <i class="fas fa-user-shield"></i> Operatori
         </a>
+        {% if is_super_admin %}
+        <a href="{{ url_for('admin_admins') }}" class="admin-tab">
+            <i class="fas fa-user-cog"></i> Amministratori
+        </a>
+        {% endif %}
         <a href="{{ url_for('admin_reports') }}" class="admin-tab">
             <i class="fas fa-chart-bar"></i> Report
         </a>
@@ -299,6 +304,17 @@
             </div>
             <div class="stat-value">{{ transactions_today }}</div>
             <div class="stat-label">Transazioni Oggi</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background-color: rgba(255, 59, 48, 0.1); color: var(--danger-color);">
+                <i class="fas fa-cash-register"></i>
+            </div>
+            <div class="stat-value">€ {{ "%.2f"|format(cash_balance) }}</div>
+            <div class="stat-label">Saldo Cassa</div>
+            <button class="btn btn-danger btn-sm mt-2" id="withdrawCashBtn" {% if cash_balance <= 0 %}disabled{% endif %}>
+                <i class="fas fa-money-bill-wave me-1"></i> Ritira
+            </button>
         </div>
     </div>
     
@@ -363,6 +379,40 @@
     </div>
 </div>
 
+<!-- Modal per il prelievo dalla cassa -->
+<div class="modal fade" id="withdrawCashModal" tabindex="-1" aria-labelledby="withdrawCashModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="withdrawCashModalLabel">
+                    <i class="fas fa-money-bill-wave me-2"></i> Prelievo dalla Cassa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Stai per prelevare <strong>€ {{ "%.2f"|format(cash_balance) }}</strong> dalla cassa.
+                    Questa operazione azzererà il saldo della cassa.
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="confirmWithdraw">
+                    <label class="form-check-label" for="confirmWithdraw">
+                        Confermo di aver prelevato fisicamente l'importo dalla cassa
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmWithdrawBtn" disabled>
+                    <i class="fas fa-check me-1"></i> Conferma Prelievo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal per le password rigenerate -->
 <div class="modal fade" id="passwordsModal" tabindex="-1" aria-labelledby="passwordsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -416,11 +466,85 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Modal per le password
+        // Modals
         const passwordsModal = new bootstrap.Modal(document.getElementById('passwordsModal'));
+        const withdrawCashModal = new bootstrap.Modal(document.getElementById('withdrawCashModal'));
         
-        // Pulsante di rigenerazione password
+        // Pulsanti
         const regenerateBtn = document.getElementById('regeneratePasswordsBtn');
+        const withdrawCashBtn = document.getElementById('withdrawCashBtn');
+        const confirmWithdrawCheckbox = document.getElementById('confirmWithdraw');
+        const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
+        
+        // Gestione del prelievo dalla cassa
+        withdrawCashBtn.addEventListener('click', function() {
+            withdrawCashModal.show();
+        });
+        
+        // Abilita/disabilita il pulsante di conferma prelievo in base alla checkbox
+        confirmWithdrawCheckbox.addEventListener('change', function() {
+            confirmWithdrawBtn.disabled = !this.checked;
+        });
+        
+        // Gestione della conferma del prelievo
+        confirmWithdrawBtn.addEventListener('click', function() {
+            // Disabilita il pulsante durante la richiesta
+            confirmWithdrawBtn.disabled = true;
+            confirmWithdrawBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Elaborazione...';
+            
+            // Richiesta al server
+            fetch("{{ url_for('admin_withdraw_cash') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore nella risposta del server: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Chiudi il modal
+                withdrawCashModal.hide();
+                
+                if (data.success) {
+                    // Aggiorna il saldo visualizzato
+                    const cashBalanceElement = document.querySelector('.stat-card:nth-child(4) .stat-value');
+                    cashBalanceElement.textContent = '€ 0.00';
+                    
+                    // Disabilita il pulsante di prelievo
+                    withdrawCashBtn.disabled = true;
+                    
+                    // Notifica
+                    showToast('Prelievo effettuato con successo!', 'success');
+                } else {
+                    // Notifica errore
+                    showToast('Errore durante il prelievo: ' + data.message, 'danger');
+                }
+                
+                // Ricarica la pagina dopo un breve ritardo in ogni caso
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                
+                // Chiudi il modal
+                withdrawCashModal.hide();
+                
+                // Notifica errore
+                showToast('Errore di connessione. Il prelievo potrebbe essere stato comunque effettuato.', 'warning');
+                
+                // Ricarica la pagina dopo un breve ritardo
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            });
+        });
         
         // Gestione della rigenerazione delle password
         regenerateBtn.addEventListener('click', function() {
@@ -508,6 +632,55 @@
         printPasswordsBtn.addEventListener('click', function() {
             window.print();
         });
+        
+        // Funzione per mostrare i toast
+        function showToast(message, type = 'info') {
+            // Crea un elemento toast se non esiste
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+                toastContainer.style.zIndex = 1050;
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Crea il toast
+            const toastId = 'toast-' + Date.now();
+            const toastElement = document.createElement('div');
+            toastElement.id = toastId;
+            toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+            toastElement.role = 'alert';
+            toastElement.setAttribute('aria-live', 'assertive');
+            toastElement.setAttribute('aria-atomic', 'true');
+            
+            // Imposta il contenuto del toast
+            toastElement.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Aggiungi il toast al container
+            toastContainer.appendChild(toastElement);
+            
+            // Inizializza il toast con Bootstrap
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: true,
+                delay: 5000
+            });
+            
+            // Mostra il toast
+            toast.show();
+            
+            // Rimuovi il toast dal DOM quando è stato nascosto
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
     });
 </script>
 {% endblock %}

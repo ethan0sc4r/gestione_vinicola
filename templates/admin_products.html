@@ -209,6 +209,11 @@
         <a href="{{ url_for('admin_operators') }}" class="admin-tab">
             <i class="fas fa-user-shield"></i> Operatori
         </a>
+        {% if session.is_super_admin %}
+        <a href="{{ url_for('admin_admins') }}" class="admin-tab">
+            <i class="fas fa-user-cog"></i> Amministratori
+        </a>
+        {% endif %}
         <a href="{{ url_for('admin_reports') }}" class="admin-tab">
             <i class="fas fa-chart-bar"></i> Report
         </a>
@@ -216,6 +221,18 @@
     
     <!-- Products Grid -->
     {% if products %}
+    <div class="mb-4">
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control" id="searchProduct" placeholder="Cerca prodotto...">
+            <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn">
+                <i class="fas fa-times"></i> Pulisci
+            </button>
+        </div>
+    </div>
+    
     <div class="products-container">
         {% for product in products %}
         <div class="product-card">
@@ -227,8 +244,16 @@
             </div>
             <div class="product-body">
                 <div class="product-price">€ {{ "%.2f"|format(product.price) }}</div>
+                <div class="product-inventory mb-3">
+                    <span class="badge {% if product.inventory > 0 %}bg-success{% elif product.inventory == 0 %}bg-warning{% else %}bg-danger{% endif %} me-2">
+                        <i class="fas fa-boxes me-1"></i> Giacenza: {{ product.inventory }}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-success restock-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-inventory="{{ product.inventory }}">
+                        <i class="fas fa-plus-circle"></i> Ricarica
+                    </button>
+                </div>
                 <div class="product-actions">
-                    <button type="button" class="btn btn-outline-primary edit-product-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}" data-product-active="{{ '1' if product.active else '0' }}">
+                    <button type="button" class="btn btn-outline-primary edit-product-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}" data-product-active="{{ '1' if product.active else '0' }}" data-product-inventory="{{ product.inventory }}">
                         <i class="fas fa-edit"></i>
                     </button>
                     <button type="button" class="btn btn-outline-danger delete-product-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">
@@ -284,6 +309,11 @@
                             <input type="number" class="form-control" id="price" name="price" step="0.01" min="0.01" required>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label for="inventory" class="form-label">Giacenza Iniziale</label>
+                        <input type="number" class="form-control" id="inventory" name="inventory" value="0">
+                        <div class="form-text">Quantità iniziale disponibile in magazzino (può essere negativa)</div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -318,6 +348,11 @@
                             <input type="number" class="form-control" id="edit_price" name="price" step="0.01" min="0.01" required>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label for="edit_inventory" class="form-label">Giacenza</label>
+                        <input type="number" class="form-control" id="edit_inventory" name="inventory" value="0">
+                        <div class="form-text">Quantità attualmente disponibile in magazzino (può essere negativa)</div>
+                    </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="edit_active" name="active">
                         <label class="form-check-label" for="edit_active">Prodotto attivo</label>
@@ -329,6 +364,42 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
                 <button type="button" class="btn btn-primary" id="saveEditProductBtn">
                     <i class="fas fa-save me-1"></i> Salva Modifiche
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per Ricarica Giacenza -->
+<div class="modal fade" id="restockModal" tabindex="-1" aria-labelledby="restockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="restockModalLabel">Ricarica Giacenza</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="restockForm" action="" method="POST">
+                    <input type="hidden" id="restock_product_id" name="id">
+                    <div class="mb-3">
+                        <label for="restock_product_name" class="form-label">Prodotto</label>
+                        <input type="text" class="form-control" id="restock_product_name" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="current_inventory" class="form-label">Giacenza Attuale</label>
+                        <input type="text" class="form-control" id="current_inventory" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="restock_quantity" class="form-label">Quantità da Aggiungere</label>
+                        <input type="number" class="form-control" id="restock_quantity" name="quantity" min="1" value="1" required>
+                        <div class="form-text">Inserisci la quantità da aggiungere alla giacenza attuale</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-success" id="saveRestockBtn">
+                    <i class="fas fa-plus-circle me-1"></i> Aggiungi
                 </button>
             </div>
         </div>
@@ -366,16 +437,54 @@
         // Modali
         const newProductModal = new bootstrap.Modal(document.getElementById('newProductModal'));
         const editProductModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        const restockModal = new bootstrap.Modal(document.getElementById('restockModal'));
         const deleteProductModal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
+        
+        // Ricerca prodotti
+        const searchProductInput = document.getElementById('searchProduct');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const productCards = document.querySelectorAll('.product-card');
+        
+        // Funzione per filtrare i prodotti
+        function filterProducts() {
+            const searchTerm = searchProductInput.value.toLowerCase().trim();
+            
+            productCards.forEach(card => {
+                // Escludi la card "Aggiungi Prodotto"
+                if (card.classList.contains('add-product-card')) {
+                    return;
+                }
+                
+                const productName = card.querySelector('.product-title').textContent.toLowerCase().trim();
+                
+                if (searchTerm === '' || productName.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Event listener per la ricerca
+        searchProductInput.addEventListener('input', filterProducts);
+        
+        // Event listener per il pulsante di pulizia
+        clearSearchBtn.addEventListener('click', function() {
+            searchProductInput.value = '';
+            filterProducts();
+            searchProductInput.focus();
+        });
         
         // Forms
         const newProductForm = document.getElementById('newProductForm');
         const editProductForm = document.getElementById('editProductForm');
+        const restockForm = document.getElementById('restockForm');
         const deleteProductForm = document.getElementById('deleteProductForm');
         
         // Pulsanti
         const saveNewProductBtn = document.getElementById('saveNewProductBtn');
         const saveEditProductBtn = document.getElementById('saveEditProductBtn');
+        const saveRestockBtn = document.getElementById('saveRestockBtn');
         
         // Gestione del pulsante "Salva" per nuovo prodotto
         saveNewProductBtn.addEventListener('click', function() {
@@ -429,6 +538,82 @@
             } else {
                 // Trigger validazione nativa del browser
                 editProductForm.reportValidity();
+            }
+        });
+        
+        // Gestione del pulsante "Ricarica"
+        const restockButtons = document.querySelectorAll('.restock-btn');
+        restockButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+                const productInventory = this.getAttribute('data-product-inventory');
+                
+                // Imposta l'action del form
+                restockForm.action = "{{ url_for('admin_restock_product', id=0) }}".replace('0', productId);
+                
+                // Compila il form
+                document.getElementById('restock_product_id').value = productId;
+                document.getElementById('restock_product_name').value = productName;
+                document.getElementById('current_inventory').value = productInventory;
+                document.getElementById('restock_quantity').value = 1;
+                
+                // Mostra il modal
+                restockModal.show();
+            });
+        });
+        
+        // Gestione del pulsante "Aggiungi" per la ricarica
+        saveRestockBtn.addEventListener('click', function() {
+            // Validazione form
+            if (restockForm.checkValidity()) {
+                // Disabilita il pulsante durante l'invio
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Aggiunta in corso...';
+                
+                // Ottieni i dati dal form
+                const productId = document.getElementById('restock_product_id').value;
+                const quantity = document.getElementById('restock_quantity').value;
+                
+                // Invia la richiesta AJAX
+                fetch("{{ url_for('admin_restock_product', id=0) }}".replace('0', productId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `quantity=${quantity}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Riabilita il pulsante
+                    saveRestockBtn.disabled = false;
+                    saveRestockBtn.innerHTML = '<i class="fas fa-plus-circle me-1"></i> Aggiungi';
+                    
+                    // Chiudi il modal
+                    restockModal.hide();
+                    
+                    if (data.success) {
+                        // Mostra messaggio di successo
+                        alert(data.message);
+                        
+                        // Ricarica la pagina per mostrare la giacenza aggiornata
+                        window.location.reload();
+                    } else {
+                        // Mostra messaggio di errore
+                        alert('Errore: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Si è verificato un errore durante la ricarica della giacenza.');
+                    
+                    // Riabilita il pulsante
+                    saveRestockBtn.disabled = false;
+                    saveRestockBtn.innerHTML = '<i class="fas fa-plus-circle me-1"></i> Aggiungi';
+                });
+            } else {
+                // Trigger validazione nativa del browser
+                restockForm.reportValidity();
             }
         });
         

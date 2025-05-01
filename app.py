@@ -18,6 +18,7 @@ import threading
 import time
 import io
 import logging
+import re
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Dict, List, Any, Union
@@ -56,6 +57,7 @@ except (ValueError, ModuleNotFoundError) as e:
         raise
 
 # Resto delle importazioni
+import pytz
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -111,12 +113,15 @@ SERIAL_CONFIG = {
 
 class Admin(db.Model, UserMixin):
     """
-    Modello per l'amministratore principale del sistema.
-    Ha accesso a tutte le funzionalità amministrative.
+    Modello per gli amministratori del sistema.
+    Hanno accesso a tutte le funzionalità amministrative.
     """
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, default="admin")
+    username = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(200))
+    email = db.Column(db.String(100), nullable=True)
+    is_super_admin = db.Column(db.Boolean, default=False)  # Super admin ha privilegi speciali
+    active = db.Column(db.Boolean, default=True)
     
     def set_password(self, password):
         """Imposta la password criptata."""
@@ -223,13 +228,15 @@ class Product(db.Model):
     name = db.Column(db.String(100))
     price = db.Column(db.Numeric(10, 2))
     active = db.Column(db.Boolean, default=True)
+    inventory = db.Column(db.Integer, default=0)  # Giacenza del prodotto
     
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'price': float(self.price) if self.price else 0,
-            'active': self.active
+            'active': self.active,
+            'inventory': self.inventory
         }
     
 
@@ -278,6 +285,7 @@ class Transaction(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)  # Prodotto acquistato (se applicabile)
     custom_product_name = db.Column(db.String(100), nullable=True)  # Nome prodotto personalizzato
     transaction_type = db.Column(db.String(20))  # "credit" (ricarica) o "debit" (consumo)
+    quantity = db.Column(db.Integer, default=1)  # Quantità del prodotto acquistato
     
     # Relazioni
     employee = db.relationship('Employee', backref=db.backref('transactions', lazy=True, order_by="desc(Transaction.timestamp)"))
@@ -483,7 +491,7 @@ def get_system_stats():
     
     # Transazioni recenti (ultime 24 ore)
     yesterday = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    recent_transactions = Transaction.query.filter(Transaction.date >= yesterday).count()
+    recent_transactions = Transaction.query.filter(Transaction.timestamp >= yesterday).count()
     
     return {
         'total_employees': total_employees,
@@ -789,7 +797,7 @@ def new_employee():
 def employee_details(id):
     """Visualizza dettagli dipendente."""
     employee = Employee.query.get_or_404(id)
-    transactions = Transaction.query.filter_by(employee_id=id).order_by(Transaction.date.desc()).all()
+    transactions = Transaction.query.filter_by(employee_id=id).order_by(Transaction.timestamp.desc()).all()
     
     # Calcola statistiche credito
     credit_stats = get_credit_stats(id)
@@ -922,6 +930,11 @@ def add_credit():
                 transaction_type='credit',
                 custom_product_name="Ricarica credito"
             )
+            
+            # Aggiorna anche il saldo della cassa
+            cash_register = Employee.query.filter_by(code='CASSA').first()
+            if cash_register:
+                cash_register.update_credit(cash_register.credit + amount_decimal)
             
             db.session.add(transaction)
             db.session.commit()
@@ -1099,9 +1112,14 @@ def deduct_credit():
                     employee_id=employee.id,
                     amount=-product_total,  # Negativo perché stiamo sottraendo
                     transaction_type='debit',
-                    product_id=product_id
+                    product_id=product_id,
+                    quantity=quantity  # Salva la quantità
                 )
                 db.session.add(transaction)
+                
+                # Aggiorna la giacenza del prodotto
+                if product.inventory is not None:
+                    product.inventory -= quantity
             
             product_description = ", ".join(product_descriptions)
             
@@ -1150,8 +1168,14 @@ def deduct_credit():
         new_credit = employee.credit - total_amount
         employee.update_credit(new_credit)
         
-        db.session.commit()
+        # Se l'acquisto è stato fatto dall'utente "cassa", aggiorna il saldo della cassa
+        if employee.code == 'CASSA':
+            # Aggiungi l'importo alla cassa (l'importo è già negativo, quindi lo sottraiamo)
+            cash_register = ensure_cash_register_exists()
+            cash_register.update_credit(cash_register.credit + total_amount)
         
+        db.session.commit()
+            
         return jsonify({
             'success': True,
             'message': f'Scalati €{float(total_amount):.2f} dal credito per {product_description}.',
@@ -1177,21 +1201,33 @@ def admin_login():
 @app.route('/admin/login', methods=['POST'])
 def admin_login_post():
     """Gestisce il login dell'amministratore."""
+    username = request.form.get('username')
     password = request.form.get('password')
     
-    admin = Admin.query.first()
-    if not admin:
-        # Crea l'admin se non esiste
-        admin = Admin(username='admin')
+    # Verifica se esiste almeno un admin
+    if Admin.query.count() == 0:
+        # Crea l'admin predefinito se non esiste nessun admin
+        admin = Admin(
+            username='admin',
+            is_super_admin=True,
+            active=True
+        )
         admin.set_password('admin')  # Password predefinita
         db.session.add(admin)
         db.session.commit()
+        flash('Account amministratore predefinito creato. Username: admin, Password: admin', 'warning')
     
-    if admin.check_password(password):
+    # Cerca l'admin con lo username fornito
+    admin = Admin.query.filter_by(username=username, active=True).first()
+    
+    if admin and admin.check_password(password):
         session['admin_logged_in'] = True
+        session['admin_id'] = admin.id
+        session['admin_username'] = admin.username
+        session['is_super_admin'] = admin.is_super_admin
         return redirect(url_for('admin_dashboard'))
     else:
-        flash('Password non valida.', 'danger')
+        flash('Username o password non validi.', 'danger')
         return redirect(url_for('admin_login'))
 
 
@@ -1212,13 +1248,246 @@ def admin_dashboard():
     # Elenco operatori
     operators = Operator.query.all()
     
+    # Ottieni il saldo della cassa
+    cash_register = Employee.query.filter_by(code='CASSA').first()
+    cash_balance = float(cash_register.credit) if cash_register else 0.0
+    
+    # Aggiungi il tab per gli amministratori se l'utente è un super admin
+    is_super_admin = session.get('is_super_admin', False)
+    
     return render_template(
         'admin_dashboard.html',
         employees_count=employees_count,
         total_credit=float(total_credit),
         transactions_today=transactions_today,
-        operators=operators
+        operators=operators,
+        is_super_admin=is_super_admin,
+        cash_balance=cash_balance
     )
+
+
+@app.route('/admin/withdraw_cash', methods=['POST'])
+def admin_withdraw_cash():
+    """Preleva il denaro dalla cassa e azzera il saldo."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Non sei autorizzato a eseguire questa operazione.'
+        })
+    
+    try:
+        # Trova l'utente "cassa"
+        cash_register = Employee.query.filter_by(code='CASSA').first()
+        
+        if not cash_register:
+            return jsonify({
+                'success': False,
+                'message': 'Utente cassa non trovato.'
+            })
+        
+        # Ottieni il saldo attuale
+        current_balance = float(cash_register.credit)
+        
+        if current_balance <= 0:
+            return jsonify({
+                'success': False,
+                'message': 'Il saldo della cassa è già zero o negativo.'
+            })
+        
+        # Crea una transazione per il prelievo
+        transaction = Transaction(
+            employee_id=cash_register.id,
+            amount=-current_balance,  # Negativo perché stiamo sottraendo
+            transaction_type='debit',
+            custom_product_name="Prelievo cassa da amministratore"
+        )
+        
+        # Aggiorna il saldo della cassa a zero
+        cash_register.update_credit(Decimal('0'))
+        
+        # Salva la transazione
+        db.session.add(transaction)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Prelievo di €{current_balance:.2f} effettuato con successo.',
+            'amount': current_balance
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in admin_withdraw_cash: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante il prelievo: {str(e)}'
+        })
+
+
+@app.route('/admin/admins')
+def admin_admins():
+    """Gestione amministratori."""
+    if session.get('admin_logged_in') != True:
+        return redirect(url_for('admin_login'))
+    
+    # Solo i super admin possono gestire gli amministratori
+    if not session.get('is_super_admin', False):
+        flash('Non hai i permessi per accedere a questa pagina.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    # Ottieni tutti gli amministratori
+    admins = Admin.query.all()
+    
+    return render_template('admin_admins.html', admins=admins)
+
+
+@app.route('/admin/admins/add', methods=['POST'])
+def admin_add_admin():
+    """Aggiunge un nuovo amministratore."""
+    if session.get('admin_logged_in') != True or not session.get('is_super_admin', False):
+        return redirect(url_for('admin_login'))
+    
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+    is_super_admin = 'is_super_admin' in request.form
+    
+    # Verifica che le password corrispondano
+    if password != confirm_password:
+        flash('Le password non corrispondono.', 'danger')
+        return redirect(url_for('admin_admins'))
+    
+    # Verifica che lo username non sia già in uso
+    existing_admin = Admin.query.filter_by(username=username).first()
+    if existing_admin:
+        flash('Nome utente già in uso.', 'danger')
+        return redirect(url_for('admin_admins'))
+    
+    # Crea il nuovo amministratore
+    admin = Admin(
+        username=username,
+        email=email,
+        is_super_admin=is_super_admin,
+        active=True
+    )
+    admin.set_password(password)
+    
+    db.session.add(admin)
+    db.session.commit()
+    
+    flash('Amministratore aggiunto con successo.', 'success')
+    return redirect(url_for('admin_admins'))
+
+
+@app.route('/admin/admins/edit', methods=['POST'])
+def admin_edit_admin():
+    """Modifica un amministratore esistente."""
+    if session.get('admin_logged_in') != True or not session.get('is_super_admin', False):
+        return redirect(url_for('admin_login'))
+    
+    admin_id = request.form.get('admin_id')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+    is_super_admin = 'is_super_admin' in request.form
+    
+    # Trova l'amministratore
+    admin = Admin.query.get_or_404(admin_id)
+    
+    # Non permettere di modificare se stessi
+    if int(admin_id) == session.get('admin_id'):
+        flash('Non puoi modificare il tuo account da questa pagina.', 'danger')
+        return redirect(url_for('admin_admins'))
+    
+    # Verifica che le password corrispondano se fornite
+    if password:
+        if password != confirm_password:
+            flash('Le password non corrispondono.', 'danger')
+            return redirect(url_for('admin_admins'))
+        admin.set_password(password)
+    
+    # Verifica che lo username non sia già in uso da un altro admin
+    existing_admin = Admin.query.filter_by(username=username).first()
+    if existing_admin and existing_admin.id != int(admin_id):
+        flash('Nome utente già in uso.', 'danger')
+        return redirect(url_for('admin_admins'))
+    
+    # Aggiorna i dati
+    admin.username = username
+    admin.email = email
+    admin.is_super_admin = is_super_admin
+    
+    db.session.commit()
+    
+    flash('Amministratore aggiornato con successo.', 'success')
+    return redirect(url_for('admin_admins'))
+
+
+@app.route('/admin/admins/toggle_status', methods=['POST'])
+def admin_toggle_admin_status():
+    """Attiva/disattiva un amministratore."""
+    if session.get('admin_logged_in') != True or not session.get('is_super_admin', False):
+        return jsonify({
+            'success': False,
+            'message': 'Non hai i permessi per eseguire questa azione.'
+        })
+    
+    data = request.json
+    admin_id = data.get('admin_id')
+    active = data.get('active')
+    
+    # Trova l'amministratore
+    admin = Admin.query.get_or_404(admin_id)
+    
+    # Non permettere di disattivare se stessi o un super admin
+    if int(admin_id) == session.get('admin_id'):
+        return jsonify({
+            'success': False,
+            'message': 'Non puoi disattivare il tuo account.'
+        })
+    
+    if admin.is_super_admin:
+        return jsonify({
+            'success': False,
+            'message': 'Non puoi disattivare un Super Admin.'
+        })
+    
+    # Aggiorna lo stato
+    admin.active = active
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': f'Amministratore {"attivato" if active else "disattivato"} con successo.'
+    })
+
+
+@app.route('/admin/admins/get_data')
+def admin_get_admin_data():
+    """Ottiene i dati di un amministratore per la modifica."""
+    if session.get('admin_logged_in') != True or not session.get('is_super_admin', False):
+        return jsonify({
+            'success': False,
+            'message': 'Non hai i permessi per eseguire questa azione.'
+        })
+    
+    admin_id = request.args.get('admin_id')
+    
+    # Trova l'amministratore
+    admin = Admin.query.get_or_404(admin_id)
+    
+    return jsonify({
+        'success': True,
+        'admin': {
+            'id': admin.id,
+            'username': admin.username,
+            'email': admin.email,
+            'is_super_admin': admin.is_super_admin,
+            'active': admin.active
+        }
+    })
 
 
 @app.route('/admin/employees')
@@ -1264,27 +1533,58 @@ def admin_delete_product(id):
 
 @app.route('/admin/reports')
 def admin_reports():
-    """Reports giornalieri per l'amministratore."""
+    """Reports giornalieri o per periodo per l'amministratore."""
     if session.get('admin_logged_in') != True:
         return redirect(url_for('admin_login'))
     
-    # Data di default = oggi
-    date_str = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
-    
     try:
-        # Converte la stringa in data
-        report_date = datetime.strptime(date_str, '%Y-%m-%d')
+        # Determina se è un report giornaliero o per periodo
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+        date_str = request.args.get('date')
         
-        # Filtra le transazioni del giorno (usando la data locale)
-        start_date = report_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = report_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+        # Imposta il fuso orario locale (Europe/Rome)
+        local_tz = pytz.timezone('Europe/Rome')
         
-        logger.info(f"Filtering transactions between {start_date} and {end_date}")
+        if start_date_str and end_date_str:
+            # Report per periodo
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            
+            # Imposta l'ora di inizio e fine
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+            
+            # Converti in UTC per il filtro sul database
+            start_date_utc = local_tz.localize(start_date).astimezone(pytz.UTC)
+            end_date_utc = local_tz.localize(end_date).astimezone(pytz.UTC)
+            
+            report_title = f"Report dal {start_date.strftime('%d/%m/%Y')} al {end_date.strftime('%d/%m/%Y')}"
+            report_date = end_date  # Usa la data di fine come data di riferimento
+        else:
+            # Report giornaliero
+            if date_str:
+                report_date = datetime.strptime(date_str, '%Y-%m-%d')
+            else:
+                # Data di default = oggi
+                report_date = datetime.now()
+            
+            # Imposta l'ora di inizio e fine
+            start_date = report_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = report_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+            
+            # Converti in UTC per il filtro sul database
+            start_date_utc = local_tz.localize(start_date).astimezone(pytz.UTC)
+            end_date_utc = local_tz.localize(end_date).astimezone(pytz.UTC)
+            
+            report_title = f"Report del {report_date.strftime('%d/%m/%Y')}"
+        
+        logger.info(f"Filtering transactions between {start_date_utc} and {end_date_utc}")
         
         # Carica le transazioni con le relazioni
         transactions = Transaction.query.filter(
-            Transaction.timestamp >= start_date,
-            Transaction.timestamp <= end_date
+            Transaction.timestamp >= start_date_utc,
+            Transaction.timestamp <= end_date_utc
         ).order_by(Transaction.timestamp.desc()).all()
         
         logger.info(f"Found {len(transactions)} transactions")
@@ -1304,18 +1604,22 @@ def admin_reports():
             # Ottieni i dati dell'operatore
             operator_name = t.operator.username if t.operator else "N/A"
             
+            # Converti il timestamp UTC in ora locale
+            local_timestamp = t.timestamp.replace(tzinfo=pytz.UTC).astimezone(local_tz)
+            
             # Aggiungi i dati alla lista
             transaction_data.append({
                 'id': t.id,
-                'timestamp': t.timestamp,
+                'timestamp': local_timestamp,
                 'amount': float(t.amount),
                 'transaction_type': t.transaction_type,
                 'employee_name': employee_name,
                 'product_name': product_name,
-                'operator_name': operator_name
+                'operator_name': operator_name,
+                'quantity': t.quantity if t.quantity else 1
             })
         
-        # Statistiche del giorno
+        # Statistiche del periodo
         credit_sum = sum([t.amount for t in transactions if t.transaction_type == 'credit'])
         debit_sum = sum([abs(t.amount) for t in transactions if t.transaction_type == 'debit'])
         
@@ -1332,13 +1636,69 @@ def admin_reports():
                 else:
                     operator_stats[operator_name]['debit'] += float(abs(t.amount))
         
+        # Raggruppa per prodotto
+        product_stats = {}
+        product_total_quantity = 0
+        product_total_amount = 0
+        
+        for t in transactions:
+            if t.transaction_type == 'debit':
+                # Determina il nome del prodotto e la quantità
+                product_name = None
+                quantity = t.quantity if t.quantity else 1  # Usa la quantità salvata nella transazione
+                
+                if t.product:
+                    product_name = t.product.name
+                elif t.custom_product_name:
+                    # Controlla se c'è una quantità nel nome del prodotto personalizzato
+                    # Formato: "Nome prodotto (x2)"
+                    product_name = t.custom_product_name
+                    quantity_match = re.search(r'\(x(\d+)\)', product_name)
+                    if quantity_match:
+                        try:
+                            quantity = int(quantity_match.group(1))
+                            # Rimuovi la parte della quantità dal nome
+                            product_name = re.sub(r'\s*\(x\d+\)', '', product_name)
+                        except ValueError:
+                            quantity = 1
+                
+                # Escludi i prelievi cassa da amministratore dal riepilogo prodotti
+                if product_name and product_name != "Prelievo cassa da amministratore":
+                    # Aggiungi o aggiorna le statistiche del prodotto
+                    if product_name not in product_stats:
+                        # Cerca il prodotto nel database per ottenere la giacenza attuale
+                        current_inventory = 0
+                        if t.product:
+                            current_inventory = t.product.inventory
+                        
+                        product_stats[product_name] = {
+                            'quantity': 0, 
+                            'total': 0,
+                            'inventory': current_inventory,
+                            'product_id': t.product_id if t.product else None
+                        }
+                    
+                    product_stats[product_name]['quantity'] += quantity
+                    product_stats[product_name]['total'] += float(abs(t.amount))
+                    
+                    # Aggiorna i totali
+                    product_total_quantity += quantity
+                    product_total_amount += float(abs(t.amount))
+        
         return render_template(
             'admin_reports.html',
             transactions=transaction_data,
             report_date=report_date,
+            report_title=report_title,
+            is_period_report=bool(start_date_str and end_date_str),
+            start_date=start_date if start_date_str else None,
+            end_date=end_date if end_date_str else None,
             credit_sum=float(credit_sum),
             debit_sum=float(debit_sum),
-            operator_stats=operator_stats
+            operator_stats=operator_stats,
+            product_stats=product_stats,
+            product_total_quantity=product_total_quantity,
+            product_total_amount=product_total_amount
         )
     
     except Exception as e:
@@ -1447,11 +1807,13 @@ def admin_new_product():
     if request.method == 'POST':
         name = request.form.get('name')
         price = request.form.get('price')
+        inventory = request.form.get('inventory', '0')
         
         try:
             product = Product(
                 name=name,
                 price=Decimal(price),
+                inventory=int(inventory),
                 active=True
             )
             
@@ -1480,17 +1842,69 @@ def admin_edit_product(id):
         product.price = Decimal(request.form.get('price'))
         product.active = 'active' in request.form
         
+        # Aggiorna la giacenza se fornita
+        if 'inventory' in request.form:
+            try:
+                product.inventory = int(request.form.get('inventory'))
+            except ValueError:
+                flash('Valore di giacenza non valido.', 'danger')
+                return redirect(url_for('admin_edit_product', id=id))
+        
         db.session.commit()
         flash('Prodotto aggiornato con successo.', 'success')
         return redirect(url_for('admin_products'))
     
     return render_template('admin_edit_product.html', product=product)
 
+
+@app.route('/admin/product/<int:id>/restock', methods=['POST'])
+def admin_restock_product(id):
+    """Ricarica la giacenza di un prodotto."""
+    if session.get('admin_logged_in') != True:
+        return redirect(url_for('admin_login'))
+    
+    product = Product.query.get_or_404(id)
+    
+    try:
+        quantity = int(request.form.get('quantity', 0))
+        
+        if quantity <= 0:
+            return jsonify({
+                'success': False,
+                'message': 'La quantità deve essere maggiore di zero.'
+            })
+        
+        # Aggiorna la giacenza
+        product.inventory += quantity
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Giacenza aggiornata con successo. Nuova giacenza: {product.inventory}',
+            'new_inventory': product.inventory
+        })
+        
+    except ValueError:
+        return jsonify({
+            'success': False,
+            'message': 'Valore di quantità non valido.'
+        })
+    except Exception as e:
+        logger.error(f"Error in admin_restock_product: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore: {str(e)}'
+        })
+
     
 @app.route('/admin/logout')
 def admin_logout():
     """Gestisce il logout dell'amministratore."""
     session.pop('admin_logged_in', None)
+    session.pop('admin_id', None)
+    session.pop('admin_username', None)
+    session.pop('is_super_admin', None)
     return redirect(url_for('barcode_scanner'))
 
 @app.route('/import_export')
@@ -1715,11 +2129,15 @@ if __name__ == '__main__':
         
         # Crea l'admin se non esiste
         if not Admin.query.first():
-            admin = Admin(username='admin')
+            admin = Admin(
+                username='admin',
+                is_super_admin=True,
+                active=True
+            )
             admin.set_password('admin')
             db.session.add(admin)
             db.session.commit()
-            logger.info("Admin account created")
+            logger.info("Super admin account created")
         
         # Crea gli operatori standard
         ensure_operators_exist()

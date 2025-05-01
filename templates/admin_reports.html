@@ -1,7 +1,7 @@
 <!-- admin_reports.html -->
 {% extends "base.html" %}
 
-{% block title %}Report Giornalieri - {{ app_name }}{% endblock %}
+{% block title %}Report - {{ app_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -370,7 +370,7 @@
 <div class="admin-container">
     <!-- Page Header -->
     <div class="admin-header">
-        <h1 class="admin-title">Report Giornalieri</h1>
+        <h1 class="admin-title">Report</h1>
         <div>
             <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
                 <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
@@ -395,6 +395,11 @@
         <a href="{{ url_for('admin_operators') }}" class="admin-tab">
             <i class="fas fa-user-shield"></i> Operatori
         </a>
+        {% if session.is_super_admin %}
+        <a href="{{ url_for('admin_admins') }}" class="admin-tab">
+            <i class="fas fa-user-cog"></i> Amministratori
+        </a>
+        {% endif %}
         <a href="{{ url_for('admin_reports') }}" class="admin-tab active">
             <i class="fas fa-chart-bar"></i> Report
         </a>
@@ -405,21 +410,48 @@
         <!-- Report Header -->
         <div class="report-header no-print">
             <div class="report-form">
-                <button class="date-nav-button" id="prevDayBtn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                
-                <div class="form-group flex-grow-1">
-                    <label for="reportDate" class="form-label">Data Report</label>
-                    <input type="date" class="form-control report-date-control" id="reportDate" value="{{ report_date.strftime('%Y-%m-%d') }}">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="form-check form-check-inline me-3">
+                        <input class="form-check-input" type="radio" name="reportType" id="dailyReport" value="daily" checked>
+                        <label class="form-check-label" for="dailyReport">Report Giornaliero</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="reportType" id="periodReport" value="period">
+                        <label class="form-check-label" for="periodReport">Report Periodo</label>
+                    </div>
                 </div>
                 
-                <button class="date-nav-button" id="nextDayBtn">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+                <!-- Controlli per report giornaliero -->
+                <div id="dailyControls" class="d-flex align-items-center">
+                    <button class="date-nav-button" id="prevDayBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="form-group flex-grow-1">
+                        <label for="reportDate" class="form-label">Data Report</label>
+                        <input type="date" class="form-control report-date-control" id="reportDate" value="{{ report_date.strftime('%Y-%m-%d') }}">
+                    </div>
+                    
+                    <button class="date-nav-button" id="nextDayBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
                 
-                <button class="btn btn-primary" id="updateReportBtn">
-                    <i class="fas fa-sync-alt me-1"></i> Aggiorna
+                <!-- Controlli per report periodo -->
+                <div id="periodControls" class="d-flex align-items-center" style="display: none;">
+                    <div class="form-group me-3">
+                        <label for="startDate" class="form-label">Data Inizio</label>
+                        <input type="date" class="form-control report-date-control" id="startDate" value="{{ report_date.replace(day=1).strftime('%Y-%m-%d') }}">
+                    </div>
+                    
+                    <div class="form-group me-3">
+                        <label for="endDate" class="form-label">Data Fine</label>
+                        <input type="date" class="form-control report-date-control" id="endDate" value="{{ report_date.strftime('%Y-%m-%d') }}">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary mt-3" id="updateReportBtn">
+                    <i class="fas fa-sync-alt me-1"></i> Aggiorna Report
                 </button>
             </div>
         </div>
@@ -461,7 +493,7 @@
                     <i class="fas fa-balance-scale"></i>
                 </div>
                 <div class="stat-value">€ {{ "%.2f"|format(credit_sum - debit_sum) }}</div>
-                <div class="stat-label">Bilancio del Giorno</div>
+                <div class="stat-label">Bilancio Totale</div>
             </div>
         </div>
         
@@ -492,12 +524,67 @@
         </div>
         {% endif %}
         
+        <!-- Products Summary -->
+        {% if product_stats %}
+        <div class="operators-summary">
+            <div class="operators-summary-header">
+                <h3 class="operators-summary-title">Riepilogo Prodotti Venduti</h3>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Prodotto</th>
+                            <th>Quantità Venduta</th>
+                            <th>Giacenza Attuale</th>
+                            <th>Differenza</th>
+                            <th>Totale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product_name, stats in product_stats.items() %}
+                        <tr>
+                            <td>{{ product_name }}</td>
+                            <td>{{ stats.quantity }}</td>
+                            <td>
+                                {% if stats.product_id %}
+                                    {{ stats.inventory }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if stats.product_id %}
+                                    {{ stats.inventory + stats.quantity }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>€ {{ "%.2f"|format(stats.total) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Totale</th>
+                            <th>{{ product_total_quantity }}</th>
+                            <th>-</th>
+                            <th>-</th>
+                            <th>€ {{ "%.2f"|format(product_total_amount) }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
         <div class="page-break"></div>
         
         <!-- Transactions Table -->
         <div class="transactions-table-container">
             <div class="table-toolbar">
-                <h3 class="table-title">Transazioni del {{ report_date.strftime('%d/%m/%Y') }}</h3>
+                <h3 class="table-title">{{ report_title }}</h3>
                 <div class="table-controls no-print">
                     <select class="form-select table-filter" id="typeFilter">
                         <option value="all">Tutte le transazioni</option>
@@ -553,8 +640,8 @@
                             </td>
                             <td class="transaction-product">
                                 {{ transaction.product_name }}
-                                {% if transaction.transaction_type == 'debit' and '(x' not in transaction.product_name %}
-                                    (x1)
+                                {% if transaction.transaction_type == 'debit' %}
+                                    (x{{ transaction.quantity|default(1) }})
                                 {% endif %}
                             </td>
                             <td class="transaction-operator">
@@ -570,8 +657,12 @@
                 <div style="font-size: 3rem; color: #ced4da; margin-bottom: 1rem;">
                     <i class="fas fa-calendar-day"></i>
                 </div>
-                <h4>Nessuna transazione in questa data</h4>
+                <h4>Nessuna transazione trovata</h4>
+                {% if is_period_report %}
+                <p class="text-muted">Non ci sono transazioni registrate nel periodo selezionato.</p>
+                {% else %}
                 <p class="text-muted">Non ci sono transazioni registrate per il {{ report_date.strftime('%d/%m/%Y') }}.</p>
+                {% endif %}
             </div>
             {% endif %}
         </div>
@@ -582,13 +673,71 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Elementi DOM
+        const reportTypeRadios = document.querySelectorAll('input[name="reportType"]');
+        const dailyControls = document.getElementById('dailyControls');
+        const periodControls = document.getElementById('periodControls');
         const reportDateInput = document.getElementById('reportDate');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
         const updateReportBtn = document.getElementById('updateReportBtn');
         const prevDayBtn = document.getElementById('prevDayBtn');
         const nextDayBtn = document.getElementById('nextDayBtn');
         const typeFilter = document.getElementById('typeFilter');
         const printReportBtn = document.getElementById('printReportBtn');
         const printHeader = document.getElementById('printHeader');
+        
+        // Inizializza i controlli in base al tipo di report corrente
+        function initReportControls() {
+            // Controlla se siamo in un report di periodo
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPeriodReport = urlParams.has('start_date') && urlParams.has('end_date');
+            
+            if (isPeriodReport) {
+                // Seleziona il radio button del report di periodo
+                document.getElementById('periodReport').checked = true;
+                
+                // Mostra i controlli del periodo e nascondi quelli giornalieri
+                dailyControls.style.display = 'none';
+                periodControls.style.display = 'flex';
+                
+                // Imposta le date di inizio e fine
+                if (urlParams.get('start_date')) {
+                    startDateInput.value = urlParams.get('start_date');
+                }
+                if (urlParams.get('end_date')) {
+                    endDateInput.value = urlParams.get('end_date');
+                }
+            } else {
+                // Seleziona il radio button del report giornaliero
+                document.getElementById('dailyReport').checked = true;
+                
+                // Mostra i controlli giornalieri e nascondi quelli del periodo
+                dailyControls.style.display = 'flex';
+                periodControls.style.display = 'none';
+                
+                // Imposta la data del report
+                if (urlParams.get('date')) {
+                    reportDateInput.value = urlParams.get('date');
+                }
+            }
+        }
+        
+        // Inizializza i controlli al caricamento della pagina
+        initReportControls();
+        
+        // Gestione cambio tipo di report (giornaliero/periodo)
+        reportTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'daily') {
+                    dailyControls.style.display = 'flex';
+                    periodControls.style.display = 'none';
+                } else {
+                    dailyControls.style.display = 'none';
+                    periodControls.style.display = 'flex';
+                }
+            });
+        });
         
         // Filtro tipo transazione
         typeFilter.addEventListener('change', function() {
@@ -605,12 +754,11 @@
             });
         });
         
-        // Navigazione date
+        // Navigazione date per report giornaliero
         function changeDate(days) {
             const currentDate = new Date(reportDateInput.value);
             currentDate.setDate(currentDate.getDate() + days);
             reportDateInput.value = currentDate.toISOString().split('T')[0];
-            updateReport();
         }
         
         prevDayBtn.addEventListener('click', function() {
@@ -622,23 +770,45 @@
         });
         
         // Aggiornamento report
-        function updateReport() {
-            const date = reportDateInput.value;
-            window.location.href = "{{ url_for('admin_reports') }}?date=" + date;
-        }
-        
-        updateReportBtn.addEventListener('click', updateReport);
-        
-        // Formattazione data per la vista
-        reportDateInput.addEventListener('change', function() {
-            const selectedDate = new Date(this.value);
-            if (!isNaN(selectedDate.getTime())) {
-                reportDateInput.value = selectedDate.toISOString().split('T')[0];
+        updateReportBtn.addEventListener('click', function() {
+            const reportType = document.querySelector('input[name="reportType"]:checked').value;
+            
+            if (reportType === 'daily') {
+                const date = reportDateInput.value;
+                window.location.href = "{{ url_for('admin_reports') }}?date=" + date;
+            } else {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                window.location.href = "{{ url_for('admin_reports') }}?start_date=" + startDate + "&end_date=" + endDate;
             }
+        });
+        
+        // Formattazione date per la vista
+        [reportDateInput, startDateInput, endDateInput].forEach(input => {
+            input.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                if (!isNaN(selectedDate.getTime())) {
+                    this.value = selectedDate.toISOString().split('T')[0];
+                }
+            });
         });
         
         // Stampa report
         printReportBtn.addEventListener('click', function() {
+            // Aggiorna il titolo del report in base al tipo
+            const reportType = document.querySelector('input[name="reportType"]:checked').value;
+            const reportTitle = document.querySelector('#printHeader h2');
+            
+            if (reportType === 'daily') {
+                reportTitle.textContent = "{{ app_name }} - Report Giornaliero";
+                document.querySelector('#printHeader h3').textContent = "{{ report_date.strftime('%d/%m/%Y') }}";
+            } else {
+                reportTitle.textContent = "{{ app_name }} - Report Periodo";
+                document.querySelector('#printHeader h3').textContent = 
+                    "Dal " + new Date(startDateInput.value).toLocaleDateString('it-IT') + 
+                    " al " + new Date(endDateInput.value).toLocaleDateString('it-IT');
+            }
+            
             // Mostra l'intestazione di stampa
             printHeader.style.display = 'block';
             

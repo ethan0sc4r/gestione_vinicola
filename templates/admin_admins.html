@@ -1,0 +1,545 @@
+<!-- admin_admins.html -->
+{% extends "base.html" %}
+
+{% block title %}Gestione Amministratori - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .admins-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .admin-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .admin-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .admin-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .super-admin-header {
+        background: linear-gradient(to right, var(--primary-color), #0062cc);
+    }
+    
+    .admin-avatar {
+        width: 80px;
+        height: 80px;
+        background-color: white;
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0 auto 1rem;
+    }
+    
+    .admin-username {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .admin-role {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .admin-body {
+        padding: 1.5rem;
+    }
+    
+    .admin-email {
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .admin-actions {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .toggle-active {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 26px;
+    }
+    
+    .toggle-active input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 26px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: var(--success-color);
+    }
+    
+    input:focus + .slider {
+        box-shadow: 0 0 1px var(--success-color);
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    .activity-status {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .activity-label {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .activity-active {
+        background-color: rgba(52, 199, 89, 0.1);
+        color: var(--success-color);
+    }
+    
+    .activity-inactive {
+        background-color: rgba(142, 142, 147, 0.1);
+        color: #6c757d;
+    }
+    
+    .super-admin-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background-color: rgba(255, 149, 0, 0.1);
+        color: #ff9500;
+        margin-top: 0.5rem;
+    }
+    
+    .add-admin-section {
+        margin-bottom: 2rem;
+    }
+    
+    .divider {
+        margin: 2rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    .current-user-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: var(--success-color);
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Gestione Amministratori</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        <a href="{{ url_for('admin_admins') }}" class="admin-tab active">
+            <i class="fas fa-user-cog"></i> Amministratori
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+    </div>
+    
+    <!-- Add Admin Section -->
+    <div class="card add-admin-section">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-2">Amministratori</h4>
+                    <p class="text-muted mb-0">Gli amministratori hanno accesso completo al pannello di amministrazione</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                        <i class="fas fa-plus me-1"></i> Aggiungi Amministratore
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admins Grid -->
+    <div class="admins-grid">
+        {% for admin in admins %}
+        <div class="admin-card">
+            <div class="admin-header {% if admin.is_super_admin %}super-admin-header{% endif %}">
+                {% if admin.id == session.admin_id %}
+                <div class="current-user-indicator" title="Utente corrente">
+                    <i class="fas fa-user"></i>
+                </div>
+                {% endif %}
+                <div class="admin-avatar">{{ admin.username[0]|upper }}</div>
+                <h3 class="admin-username">{{ admin.username }}</h3>
+                <div class="admin-role">Amministratore</div>
+                {% if admin.is_super_admin %}
+                <div class="super-admin-badge">
+                    <i class="fas fa-crown me-1"></i> Super Admin
+                </div>
+                {% endif %}
+            </div>
+            <div class="admin-body">
+                {% if admin.email %}
+                <div class="admin-email">
+                    <i class="fas fa-envelope me-1"></i> {{ admin.email }}
+                </div>
+                {% endif %}
+                
+                <div class="admin-actions">
+                    <button class="btn btn-outline-primary edit-admin-btn" data-admin-id="{{ admin.id }}" data-bs-toggle="modal" data-bs-target="#editAdminModal" {% if admin.id == session.admin_id %}disabled{% endif %}>
+                        <i class="fas fa-edit me-1"></i> Modifica
+                    </button>
+                    
+                    <div>
+                        <label class="toggle-active">
+                            <input type="checkbox" class="toggle-active-checkbox" data-admin-id="{{ admin.id }}" {% if admin.active %}checked{% endif %} {% if admin.id == session.admin_id or admin.is_super_admin %}disabled{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="activity-status">
+                    <span class="activity-label {% if admin.active %}activity-active{% else %}activity-inactive{% endif %}">
+                        {% if admin.active %}
+                        <i class="fas fa-check-circle me-1"></i> Attivo
+                        {% else %}
+                        <i class="fas fa-times-circle me-1"></i> Inattivo
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Empty state -->
+    {% if not admins %}
+    <div class="text-center py-5">
+        <div class="mb-3" style="font-size: 3rem; color: #ced4da;">
+            <i class="fas fa-user-cog"></i>
+        </div>
+        <h4>Nessun amministratore trovato</h4>
+        <p class="text-muted">Aggiungi amministratori per consentire l'accesso al pannello di amministrazione</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAdminModalLabel">Aggiungi Amministratore</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin_add_admin') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nome Utente</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email (opzionale)</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Conferma Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="is_super_admin" name="is_super_admin">
+                        <label class="form-check-label" for="is_super_admin">
+                            Super Admin (accesso completo a tutte le funzionalità)
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Aggiungi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Admin Modal -->
+<div class="modal fade" id="editAdminModal" tabindex="-1" aria-labelledby="editAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAdminModalLabel">Modifica Amministratore</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin_edit_admin') }}" method="POST">
+                <input type="hidden" id="edit_admin_id" name="admin_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_username" class="form-label">Nome Utente</label>
+                        <input type="text" class="form-control" id="edit_username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_email" class="form-label">Email (opzionale)</label>
+                        <input type="email" class="form-control" id="edit_email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_password" class="form-label">Nuova Password (lasciare vuoto per non modificare)</label>
+                        <input type="password" class="form-control" id="edit_password" name="password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_confirm_password" class="form-label">Conferma Nuova Password</label>
+                        <input type="password" class="form-control" id="edit_confirm_password" name="confirm_password">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="edit_is_super_admin" name="is_super_admin">
+                        <label class="form-check-label" for="edit_is_super_admin">
+                            Super Admin (accesso completo a tutte le funzionalità)
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elements
+        const toggleActiveCheckboxes = document.querySelectorAll('.toggle-active-checkbox');
+        const editAdminBtns = document.querySelectorAll('.edit-admin-btn');
+        
+        // Function to toggle admin active status
+        function toggleAdminStatus(adminId, active) {
+            fetch("{{ url_for('admin_toggle_admin_status') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    admin_id: adminId,
+                    active: active
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI
+                    document.querySelectorAll('.admin-card').forEach(card => {
+                        const editBtn = card.querySelector('.edit-admin-btn');
+                        if (editBtn && editBtn.dataset.adminId === adminId) {
+                            const statusLabel = card.querySelector('.activity-label');
+                            
+                            if (active) {
+                                statusLabel.classList.remove('activity-inactive');
+                                statusLabel.classList.add('activity-active');
+                                statusLabel.innerHTML = '<i class="fas fa-check-circle me-1"></i> Attivo';
+                            } else {
+                                statusLabel.classList.remove('activity-active');
+                                statusLabel.classList.add('activity-inactive');
+                                statusLabel.innerHTML = '<i class="fas fa-times-circle me-1"></i> Inattivo';
+                            }
+                        }
+                    });
+                    
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message || 'Errore durante l\'aggiornamento dello stato.', 'danger');
+                    // Reset checkbox to previous state
+                    toggleActiveCheckboxes.forEach(checkbox => {
+                        if (checkbox.dataset.adminId === adminId) {
+                            checkbox.checked = !active;
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Errore di connessione.', 'danger');
+                // Reset checkbox to previous state
+                toggleActiveCheckboxes.forEach(checkbox => {
+                    if (checkbox.dataset.adminId === adminId) {
+                        checkbox.checked = !active;
+                    }
+                });
+            });
+        }
+        
+        // Function to load admin data for editing
+        function loadAdminData(adminId) {
+            fetch(`{{ url_for('admin_get_admin_data') }}?admin_id=${adminId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Populate form fields
+                    document.getElementById('edit_admin_id').value = data.admin.id;
+                    document.getElementById('edit_username').value = data.admin.username;
+                    document.getElementById('edit_email').value = data.admin.email || '';
+                    document.getElementById('edit_is_super_admin').checked = data.admin.is_super_admin;
+                    
+                    // Clear password fields
+                    document.getElementById('edit_password').value = '';
+                    document.getElementById('edit_confirm_password').value = '';
+                } else {
+                    showToast(data.message || 'Errore durante il caricamento dei dati.', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Errore di connessione.', 'danger');
+            });
+        }
+        
+        // Event listeners
+        toggleActiveCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const adminId = this.dataset.adminId;
+                const active = this.checked;
+                
+                toggleAdminStatus(adminId, active);
+            });
+        });
+        
+        editAdminBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const adminId = this.dataset.adminId;
+                loadAdminData(adminId);
+            });
+        });
+        
+        // Password confirmation validation
+        document.querySelector('#addAdminModal form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showToast('Le password non corrispondono.', 'danger');
+            }
+        });
+        
+        document.querySelector('#editAdminModal form').addEventListener('submit', function(e) {
+            const password = document.getElementById('edit_password').value;
+            const confirmPassword = document.getElementById('edit_confirm_password').value;
+            
+            if (password && password !== confirmPassword) {
+                e.preventDefault();
+                showToast('Le password non corrispondono.', 'danger');
+            }
+        });
+    });
+</script>
+{% endblock %}

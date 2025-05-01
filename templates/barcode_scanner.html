@@ -499,8 +499,11 @@
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <button class="btn btn-sm btn-success select-employee-btn" data-employee-id="{{ employee.id }}">
-                                        <i class="fas fa-user-check"></i> Seleziona
+                                    <button class="btn btn-sm btn-primary add-credit-btn" data-employee-id="{{ employee.id }}">
+                                        <i class="fas fa-plus-circle"></i> Ricarica
+                                    </button>
+                                    <button class="btn btn-sm btn-success purchase-btn" data-employee-id="{{ employee.id }}">
+                                        <i class="fas fa-shopping-cart"></i> Acquista
                                     </button>
                                 </div>
                             </td>
@@ -559,6 +562,19 @@
     <!-- Selezione prodotti (visualizzata dopo aver cliccato "Acquista") -->
     <div class="product-selection" id="productSelection">
         <h4 class="mb-3">Seleziona Prodotto o Importo</h4>
+        
+        <!-- Ricerca prodotti -->
+        <div class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchProductSale" placeholder="Cerca prodotto...">
+                <button class="btn btn-outline-secondary" type="button" id="clearProductSearchBtn">
+                    <i class="fas fa-times"></i> Pulisci
+                </button>
+            </div>
+        </div>
         
         <div class="product-grid">
             {% for product in products %}
@@ -629,6 +645,60 @@
             <button class="btn btn-success btn-lg" id="confirmCreditButton">
                 <i class="fas fa-check me-1"></i> Conferma Ricarica
             </button>
+        </div>
+    </div>
+    
+    <!-- Modal di conferma acquisto -->
+    <div class="modal fade" id="purchaseConfirmModal" tabindex="-1" aria-labelledby="purchaseConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="purchaseConfirmModalLabel">
+                        <i class="fas fa-shopping-cart me-2"></i> Conferma Acquisto
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Utente:</strong> <span id="confirmUserName"></span>
+                    </div>
+                    
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Prodotto</th>
+                                    <th>Quantità</th>
+                                    <th>Prezzo</th>
+                                    <th>Totale</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchaseItemsList">
+                                <!-- Popolato dinamicamente -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Totale:</th>
+                                    <th id="purchaseTotalAmount">€ 0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Credito disponibile: <strong id="confirmAvailableCredit">€ 0.00</strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-arrow-left me-1"></i> Modifica
+                    </button>
+                    <button type="button" class="btn btn-success" id="finalConfirmBtn">
+                        <i class="fas fa-check me-1"></i> Conferma Acquisto
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -722,11 +792,20 @@
     const reloadSound = document.getElementById('reloadSound');
     const errorSound = document.getElementById('errorSound');
     
+    // Elementi del modal di conferma acquisto
+    const purchaseConfirmModal = new bootstrap.Modal(document.getElementById('purchaseConfirmModal'));
+    const confirmUserName = document.getElementById('confirmUserName');
+    const purchaseItemsList = document.getElementById('purchaseItemsList');
+    const purchaseTotalAmount = document.getElementById('purchaseTotalAmount');
+    const confirmAvailableCredit = document.getElementById('confirmAvailableCredit');
+    const finalConfirmBtn = document.getElementById('finalConfirmBtn');
+    
     // Variabili di stato dell'applicazione
     let currentEmployee = null;
     let selectedProduct = null;
     let selectedCreditAmount = null;
     let pollTimer = null;
+    let purchaseData = null; // Dati dell'acquisto corrente
     
     // Inizializza l'applicazione
     function initApp() {
@@ -801,7 +880,25 @@
             showEmployeeCard();
         });
         
-        confirmProductButton.addEventListener('click', processDeduction);
+        // Mostra il modal di conferma acquisto quando si clicca su Conferma
+        confirmProductButton.addEventListener('click', showPurchaseConfirmation);
+        
+        // Gestisci il pulsante di conferma finale nel modal
+        finalConfirmBtn.addEventListener('click', function() {
+            // Chiudi il modal
+            purchaseConfirmModal.hide();
+            
+            // Processa l'acquisto
+            processDeduction();
+        });
+        
+        // Supporto per la conferma con il tasto Enter nel modal
+        document.getElementById('purchaseConfirmModal').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                // Simula il click sul pulsante di conferma
+                finalConfirmBtn.click();
+            }
+        });
         
         // Gestisci i preset di ricarica credito
         creditPresets.forEach(preset => {
@@ -838,11 +935,49 @@
     // Gestisci il pulsante per una nuova operazione
     newOperationButton.addEventListener('click', resetApp);
     
+    // Ricerca prodotti nella schermata di vendita
+    const searchProductSale = document.getElementById('searchProductSale');
+    const clearProductSearchBtn = document.getElementById('clearProductSearchBtn');
+    const productItemsInSale = document.querySelectorAll('.product-item');
+    
+    // Funzione per filtrare i prodotti nella schermata di vendita
+    function filterProductsInSale() {
+        const searchTerm = searchProductSale.value.toLowerCase().trim();
+        
+        productItemsInSale.forEach(item => {
+            const productName = item.querySelector('.product-name').textContent.toLowerCase().trim();
+            
+            if (searchTerm === '' || productName.includes(searchTerm)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    // Event listener per la ricerca prodotti nella vendita
+    searchProductSale.addEventListener('input', filterProductsInSale);
+    
+    // Event listener per il pulsante di pulizia nella ricerca prodotti
+    clearProductSearchBtn.addEventListener('click', function() {
+        searchProductSale.value = '';
+        filterProductsInSale();
+        searchProductSale.focus();
+    });
+    
     // Funzione per resettare le quantità dei prodotti a 1
     function resetProductQuantities() {
         document.querySelectorAll('.quantity-input').forEach(input => {
             input.value = 1;
         });
+    }
+    
+    // Funzione per resettare la ricerca prodotti
+    function resetProductSearch() {
+        if (searchProductSale) {
+            searchProductSale.value = '';
+            filterProductsInSale();
+        }
     }
     }
     
@@ -871,9 +1006,21 @@
                     // Un codice è stato letto e un dipendente è stato trovato
                     updateScannerStatus('connected');
                     
-                    // Se non stiamo già visualizzando un dipendente, processiamo il codice
-                    if (!employeeCard.classList.contains('active')) {
-                        processEmployeeData(data.employee);
+                    // Se non stiamo già visualizzando un dipendente, vai direttamente alla fase di acquisto
+                    if (!employeeCard.classList.contains('active') && !productSelection.style.display === 'block' && !creditForm.style.display === 'block') {
+                        // Salva i dati del dipendente
+                        currentEmployee = data.employee;
+                        
+                        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
+                        employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
+                        employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
+                        employeeRank.textContent = data.employee.rank;
+                        creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
+                        creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
+                        
+                        // Vai direttamente alla schermata di acquisto
+                        hideScannerArea();
+                        showProductSelection();
                     }
                 } else if (data.barcode) {
                     // Un codice è stato letto ma non è stato trovato un dipendente
@@ -938,24 +1085,112 @@
         });
     }
     
-    // Processa i dati del dipendente e mostra la scheda
+    // Processa i dati del dipendente e vai direttamente alla fase di acquisto
     function processEmployeeData(employee) {
         // Salva i dati del dipendente
         currentEmployee = employee;
         
-        // Aggiorna la scheda del dipendente
+        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
         employeeAvatar.textContent = (employee.first_name[0] + employee.last_name[0]).toUpperCase();
         employeeName.textContent = `${employee.first_name} ${employee.last_name}`;
         employeeRank.textContent = employee.rank;
         creditAmount.textContent = `€ ${employee.credit.toFixed(2)}`;
         creditLimit.textContent = `Limite: € ${employee.credit_limit.toFixed(2)}`;
         
-        // Nascondi lo scanner e mostra la scheda dipendente
+        // Nascondi lo scanner e vai direttamente alla schermata di acquisto
         hideScannerArea();
-        showEmployeeCard();
+        showProductSelection();
         
         // Pulisci l'input manuale
         manualBarcodeInput.value = '';
+    }
+    
+    // Mostra il modal di conferma acquisto
+    function showPurchaseConfirmation() {
+        if (!currentEmployee) {
+            showToast('Nessun utente selezionato.', 'danger');
+            return;
+        }
+        
+        // Ottieni tutti i prodotti selezionati con le loro quantità
+        const selectedProducts = [];
+        let totalAmount = 0;
+        
+        // Raccogli i prodotti selezionati
+        document.querySelectorAll('.product-item.selected').forEach(item => {
+            const productId = item.dataset.productId;
+            const productName = item.dataset.productName;
+            const productPrice = parseFloat(item.dataset.productPrice);
+            const quantityInput = item.querySelector('.quantity-input');
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            if (quantity > 0) {
+                selectedProducts.push({
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    quantity: quantity
+                });
+                
+                totalAmount += productPrice * quantity;
+            }
+        });
+        
+        // Controlla se è stato inserito un importo personalizzato
+        let customAmount = null;
+        let customProduct = null;
+        
+        if (customAmountInput.value) {
+            customAmount = parseFloat(customAmountInput.value);
+            customProduct = customProductInput.value || 'Importo personalizzato';
+            totalAmount = customAmount;
+            
+            // Aggiungi l'importo personalizzato come prodotto
+            selectedProducts.push({
+                id: null,
+                name: customProduct,
+                price: customAmount,
+                quantity: 1
+            });
+        }
+        
+        // Verifica che sia stato selezionato almeno un prodotto o inserito un importo
+        if (selectedProducts.length === 0) {
+            showToast('Seleziona almeno un prodotto o inserisci un importo personalizzato.', 'warning');
+            return;
+        }
+        
+        // Salva i dati dell'acquisto per il processamento successivo
+        purchaseData = {
+            selectedProducts: selectedProducts,
+            totalAmount: totalAmount
+        };
+        
+        // Aggiorna il modal con i dati dell'acquisto
+        confirmUserName.textContent = `${currentEmployee.first_name} ${currentEmployee.last_name}`;
+        confirmAvailableCredit.textContent = `€ ${currentEmployee.credit.toFixed(2)}`;
+        purchaseTotalAmount.textContent = `€ ${totalAmount.toFixed(2)}`;
+        
+        // Popola la tabella dei prodotti
+        purchaseItemsList.innerHTML = '';
+        selectedProducts.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${product.name}</td>
+                <td>${product.quantity}</td>
+                <td>€ ${product.price.toFixed(2)}</td>
+                <td>€ ${(product.price * product.quantity).toFixed(2)}</td>
+            `;
+            purchaseItemsList.appendChild(row);
+        });
+        
+        // Mostra il modal
+        purchaseConfirmModal.show();
+        
+        // Focus sul pulsante di conferma per supportare la pressione di Enter
+        setTimeout(() => {
+            finalConfirmBtn.focus();
+        }, 500);
     }
     
     // Elabora la richiesta di deduzione di credito
@@ -1318,23 +1553,80 @@
         // Aggiungi event listener per l'input di ricerca
         searchEmployee.addEventListener('input', filterRows);
         
-        // Gestisci la selezione di un dipendente dalla tabella
-        document.querySelectorAll('.select-employee-btn').forEach(button => {
+        // Gestisci i pulsanti di ricarica e acquisto nella tabella
+        document.querySelectorAll('.add-credit-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const employeeId = this.dataset.employeeId;
                 
-                // Simula una scansione del codice a barre
+                // Ottieni i dati del dipendente e vai direttamente alla ricarica
                 fetch("{{ url_for('scan_barcode') }}", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-Requested-With": "XMLHttpRequest"
                     },
-                    body: `employee_id=${employeeId}`
+                    body: new URLSearchParams({
+                        'employee_id': employeeId
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        processEmployeeData(data.employee);
+                        // Salva i dati del dipendente
+                        currentEmployee = data.employee;
+                        
+                        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
+                        employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
+                        employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
+                        employeeRank.textContent = data.employee.rank;
+                        creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
+                        creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
+                        
+                        // Vai direttamente alla schermata di ricarica
+                        hideScannerArea();
+                        showCreditForm();
+                    } else {
+                        showToast(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error("Errore:", error);
+                    showToast("Errore durante la selezione dell'utente.", 'danger');
+                });
+            });
+        });
+        
+        document.querySelectorAll('.purchase-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const employeeId = this.dataset.employeeId;
+                
+                // Ottieni i dati del dipendente e vai direttamente all'acquisto
+                fetch("{{ url_for('scan_barcode') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: new URLSearchParams({
+                        'employee_id': employeeId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Salva i dati del dipendente
+                        currentEmployee = data.employee;
+                        
+                        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
+                        employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
+                        employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
+                        employeeRank.textContent = data.employee.rank;
+                        creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
+                        creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
+                        
+                        // Vai direttamente alla schermata di acquisto
+                        hideScannerArea();
+                        showProductSelection();
                     } else {
                         showToast(data.message, 'danger');
                     }

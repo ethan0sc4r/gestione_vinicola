@@ -3521,3 +3521,1207 @@
 2025-05-01 10:29:12,247 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 10:29:12] "GET /get_serial_barcode HTTP/1.1" 200 -
 2025-05-01 10:29:14,244 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 10:29:14] "GET /get_serial_barcode HTTP/1.1" 200 -
 2025-05-01 10:29:16,249 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 10:29:16] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:02:14,005 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 12:02:14,219 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 12:02:14,421 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 12:03:04,472 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 12:03:04,689 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 12:03:04,843 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 12:03:04,931 - vinicola - INFO - Super admin account created
+2025-05-01 12:03:04,940 - vinicola - INFO - Initialized global credit limit
+2025-05-01 12:03:04,940 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 12:03:05,205 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-05-01 12:03:05,205 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-01 12:03:05,209 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 12:03:05,312 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 12:03:05,520 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 12:03:05,676 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 12:03:05,721 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 12:03:05,723 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 12:03:05,732 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 12:03:21,053 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 12:03:21,077 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:03:21,090 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:03:21,093 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:03:21,095 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:03:21,095 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:03:21,114 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:03:23,119 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:03:25,117 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:03:25,404 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:25] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:03:25,418 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:25] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:03:31,594 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:31] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:03:31,607 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:31] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:03:31,618 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:31] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:03:35,720 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:35] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 12:03:35,731 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:35] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:03:55,554 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:55] "[32mPOST /admin/admins/add HTTP/1.1[0m" 302 -
+2025-05-01 12:03:55,557 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:55] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 12:03:55,567 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:55] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:03:59,074 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "[32mGET /admin/logout HTTP/1.1[0m" 302 -
+2025-05-01 12:03:59,085 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:03:59,097 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:03:59,101 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:03:59,105 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:03:59,107 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:03:59,107 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:03:59] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:04:01,103 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:04:01,345 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:01] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:04:01,362 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:01] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:04:06,981 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:06] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:04:06,988 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:06] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:04:07,000 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:07] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:04:12,676 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:12] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:04:12,682 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:12] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:04:12,692 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:12] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:04:16,335 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:16] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:04:16,341 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:16] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:04:16,354 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:16] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:04:19,475 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:19] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 12:04:19,491 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:19] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:04:23,982 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:23] "GET /admin/admins/get_data?admin_id=2 HTTP/1.1" 200 -
+2025-05-01 12:04:29,387 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:29] "POST /admin/admins/toggle_status HTTP/1.1" 200 -
+2025-05-01 12:04:32,680 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:32] "POST /admin/admins/toggle_status HTTP/1.1" 200 -
+2025-05-01 12:04:34,513 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:34] "GET /admin/admins/get_data?admin_id=2 HTTP/1.1" 200 -
+2025-05-01 12:04:37,939 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:37] "GET /admin/admins/get_data?admin_id=2 HTTP/1.1" 200 -
+2025-05-01 12:04:44,643 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:04:44] "GET /admin/admins/get_data?admin_id=2 HTTP/1.1" 200 -
+2025-05-01 12:05:02,538 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:02] "[32mPOST /admin/admins/edit HTTP/1.1[0m" 302 -
+2025-05-01 12:05:02,541 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:02] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 12:05:02,551 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:02] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:05:10,891 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "[32mGET /admin/logout HTTP/1.1[0m" 302 -
+2025-05-01 12:05:10,902 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:05:10,914 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:05:10,915 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:05:10,923 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:05:10,923 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:05:10,923 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:10] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:05:12,921 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:12] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:05:14,132 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:14] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:05:14,145 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:05:18,039 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:18] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:05:18,044 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:18] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:05:18,053 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:18] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:05:21,402 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:21] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 12:05:21,414 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:21] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:05:22,481 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:22] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 12:05:22,495 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:22] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:05:25,022 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:25] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 12:05:25,033 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:05:25] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:23:28,837 - vinicola - INFO - Filtering transactions between 2025-05-01 00:00:00 and 2025-05-01 23:59:59.999999
+2025-05-01 12:23:28,841 - vinicola - INFO - Found 0 transactions
+2025-05-01 12:23:28,863 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:23:28] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 12:23:28,875 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:23:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:01,751 - vinicola - INFO - Filtering transactions between 2025-05-01 00:00:00 and 2025-05-01 23:59:59.999999
+2025-05-01 12:48:01,753 - vinicola - INFO - Found 0 transactions
+2025-05-01 12:48:01,756 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:01] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 12:48:01,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:01] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:03,302 - vinicola - INFO - Filtering transactions between 2025-05-01 00:00:00 and 2025-05-01 23:59:59.999999
+2025-05-01 12:48:03,305 - vinicola - INFO - Found 0 transactions
+2025-05-01 12:48:03,307 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:03] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 12:48:03,318 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:03] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:05,872 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "[32mGET /admin/logout HTTP/1.1[0m" 302 -
+2025-05-01 12:48:05,897 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:48:05,909 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:05,911 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:05,917 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:48:05,919 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:48:05,919 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:05] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:48:07,915 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:09,914 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:10,468 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:10] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:48:10,485 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:10] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:15,324 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:15] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:48:15,328 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:15] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:48:15,344 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:15] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:19,416 - vinicola - INFO - Filtering transactions between 2025-05-01 00:00:00 and 2025-05-01 23:59:59.999999
+2025-05-01 12:48:19,419 - vinicola - INFO - Found 0 transactions
+2025-05-01 12:48:19,421 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:19] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 12:48:19,438 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:19] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:25,881 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:25] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 12:48:25,895 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:25] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:37,189 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:37] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 12:48:37,201 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:37] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:38,433 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:38] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 12:48:38,445 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:38] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:40,613 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:40] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 12:48:40,628 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:40] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:44,126 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:44] "GET /admin/employee/new HTTP/1.1" 200 -
+2025-05-01 12:48:44,137 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:44] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:48:46,145 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:46] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:48,143 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:48] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:50,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:50] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:52,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:52] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:54,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:54] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:56,141 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:56] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:48:58,145 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:48:58] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:00,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:00] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:02,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:02] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:03,388 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:03] "[32mPOST /admin/employee/new HTTP/1.1[0m" 302 -
+2025-05-01 12:49:03,394 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:03] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 12:49:03,411 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:03] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:06,301 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:06] "GET /admin/employee/2 HTTP/1.1" 200 -
+2025-05-01 12:49:06,317 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:06] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:08,043 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:08] "[32mPOST /admin/employee/2 HTTP/1.1[0m" 302 -
+2025-05-01 12:49:08,052 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:08] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 12:49:08,067 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:08] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:10,572 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:10] "GET /admin/employee/1 HTTP/1.1" 200 -
+2025-05-01 12:49:10,583 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:10] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:12,390 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:12] "[32mPOST /admin/employee/1 HTTP/1.1[0m" 302 -
+2025-05-01 12:49:12,399 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:12] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 12:49:12,419 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:12] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:14,700 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "[32mGET /admin/logout HTTP/1.1[0m" 302 -
+2025-05-01 12:49:14,712 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:49:14,723 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:14,727 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:14,733 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:49:14,735 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:49:14,735 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:14] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:49:16,730 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:16] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:18,730 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:18] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:20,732 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:20] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:21,850 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:21] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:28,088 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:28] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:30,092 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:30] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:32,092 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:32] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:49:32,680 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:32] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:49:32,700 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:32] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:36,235 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:36] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:49:36,239 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:36] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:49:36,252 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:36] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:40,926 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:40] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 12:49:40,942 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:40] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:49,378 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:49] "[32mPOST /admin/product/new HTTP/1.1[0m" 302 -
+2025-05-01 12:49:49,388 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:49] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 12:49:49,564 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:49] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:49:55,980 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:55] "[32mPOST /admin/product/new HTTP/1.1[0m" 302 -
+2025-05-01 12:49:55,990 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:55] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 12:49:56,000 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:49:56] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:50:01,060 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 12:50:01,068 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:50:01,081 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:50:01,088 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:01,091 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:50:01,093 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:50:01,093 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:01] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:50:03,090 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:05,090 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:07,089 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:07,196 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:07] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:13,547 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:13] "POST /deduct_credit HTTP/1.1" 200 -
+2025-05-01 12:50:18,346 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:18] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:18,562 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:18] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:20,350 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:20] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:20,564 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:20] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:20,894 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:20] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:22,349 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:22] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:24,351 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:24] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:26,350 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:26] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:28,353 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:28] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:30,351 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:30] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:31,282 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:31] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 12:50:31,294 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:31] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 12:50:32,350 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:32] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:34,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:34] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:34,429 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:34] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 12:50:36,351 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:36] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:38,346 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:38] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:40,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:40] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:41,000 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:41] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:50:41,022 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:41] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:50:41,023 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:41] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:50:41,023 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:41] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:50:41,025 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:41] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:50:41,050 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:41] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:42,349 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:42] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:43,052 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:43] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:43,214 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:43] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:50:43,233 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:50:44,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:44] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:46,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:46] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:46,737 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:46] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:50:46,742 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:46] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:50:46,754 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:46] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:50:48,346 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:48] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:49,500 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:49] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 12:50:49,511 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:49] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:50:50,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:50] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:52,351 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:52] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:54,349 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:54] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:55,969 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:55] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 12:50:55,979 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:55] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:50:56,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:56] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:50:58,351 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:50:58] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:00,350 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:00] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:00,977 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:00] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:02,351 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:02] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:02,980 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:02] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:03,847 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:04,350 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:04] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:05,850 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:06,349 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:06] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:07,852 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:08,349 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:08] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:09,185 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:09] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 12:51:09,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:09,215 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:09] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 12:51:09,215 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:09] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:51:09,216 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:09] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 12:51:11,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:13,207 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:15,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:15] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:17,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:17] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:19,208 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:19] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:21,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:23,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:25,205 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:27,208 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:27] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:29,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:29] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:31,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:31] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:33,208 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:33] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:35,207 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:35] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:37,207 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:37] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:39,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:39] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:41,207 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:41] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:43,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:43] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:45,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:45] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:47,207 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:47] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:49,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:49] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:51,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:51] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:53,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:53] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:55,205 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:55] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:57,208 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:57] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:51:59,207 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:51:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:01,211 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:03,205 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:05,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:07,205 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:09,208 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:11,209 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:13,205 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:15,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:15] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 12:52:16,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:16] "GET /admin HTTP/1.1" 200 -
+2025-05-01 12:52:16,367 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:16] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:52:21,051 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:21] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 12:52:21,055 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:21] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 12:52:21,068 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:21] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:52:28,624 - vinicola - INFO - Filtering transactions between 2025-05-01 00:00:00 and 2025-05-01 23:59:59.999999
+2025-05-01 12:52:28,627 - vinicola - INFO - Found 2 transactions
+2025-05-01 12:52:28,653 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:28] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 12:52:28,669 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:52:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:54:24,526 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 12:54:24,608 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 12:54:24,712 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 12:54:24,921 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 12:54:25,081 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 12:54:25,127 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 12:54:25,129 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 12:54:25,136 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 12:54:49,612 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 12:54:49,697 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 12:54:49,797 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 12:54:50,036 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 12:54:50,195 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 12:54:50,243 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 12:54:50,245 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 12:54:50,252 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 12:56:54,152 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 12:56:54,154 - vinicola - INFO - Found 2 transactions
+2025-05-01 12:56:54,172 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:56:54] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 12:56:54,185 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:56:54] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:57:16,655 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 12:57:16,659 - vinicola - INFO - Found 2 transactions
+2025-05-01 12:57:16,663 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:57:16] "GET /admin/reports?start_date=2025-05-01&end_date=2025-05-01 HTTP/1.1" 200 -
+2025-05-01 12:57:16,676 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:57:16] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:57:24,753 - vinicola - INFO - Filtering transactions between 2025-05-01 22:00:00+00:00 and 2025-05-02 21:59:59.999999+00:00
+2025-05-01 12:57:24,755 - vinicola - INFO - Found 0 transactions
+2025-05-01 12:57:24,758 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:57:24] "GET /admin/reports?date=2025-05-02 HTTP/1.1" 200 -
+2025-05-01 12:57:24,771 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:57:24] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 12:57:35,953 - vinicola - INFO - Filtering transactions between 2025-04-29 22:00:00+00:00 and 2025-05-02 21:59:59.999999+00:00
+2025-05-01 12:57:35,955 - vinicola - INFO - Found 2 transactions
+2025-05-01 12:57:35,964 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:57:35] "GET /admin/reports?start_date=2025-04-30&end_date=2025-05-02 HTTP/1.1" 200 -
+2025-05-01 12:57:35,976 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 12:57:35] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:01:47,539 - vinicola - INFO - Filtering transactions between 2025-04-29 22:00:00+00:00 and 2025-05-02 21:59:59.999999+00:00
+2025-05-01 13:01:47,541 - vinicola - INFO - Found 2 transactions
+2025-05-01 13:01:47,566 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:01:47] "GET /admin/reports?start_date=2025-04-30&end_date=2025-05-02 HTTP/1.1" 200 -
+2025-05-01 13:01:47,578 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:01:47] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:02:00,694 - vinicola - INFO - Filtering transactions between 2025-04-29 22:00:00+00:00 and 2025-05-02 21:59:59.999999+00:00
+2025-05-01 13:02:00,695 - vinicola - INFO - Found 2 transactions
+2025-05-01 13:02:00,697 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:02:00] "GET /admin/reports?start_date=2025-04-30&end_date=2025-05-02 HTTP/1.1" 200 -
+2025-05-01 13:02:00,714 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:02:00] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:14:25,825 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:14:25,940 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:14:26,060 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:14:26,285 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:14:26,445 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:14:26,493 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:14:26,495 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:14:26,503 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:17:14,468 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:17:14,562 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:17:14,733 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:17:14,943 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:17:15,100 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:17:15,146 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:17:15,148 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:17:15,155 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:17:43,717 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:17:43,827 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:17:43,938 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:17:44,180 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:17:44,340 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:17:44,388 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:17:44,390 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:17:44,397 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:18:12,951 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:18:13,085 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:18:13,193 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:18:13,414 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:18:13,574 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:18:13,621 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:18:13,623 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:18:13,630 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:21:18,371 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:21:18,517 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:21:18,616 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:21:18,844 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:21:19,003 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:21:19,050 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:21:19,052 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:21:19,059 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:22:03,924 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:22:04,031 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:22:04,126 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:22:04,370 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:22:04,528 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:22:04,575 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:22:04,577 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:22:04,585 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:40:22,223 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:40:22,439 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:40:22,593 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:40:22,639 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:40:22,739 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-05-01 13:40:22,739 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-01 13:40:22,740 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:40:22,832 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:40:23,073 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:40:23,230 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:40:23,278 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:40:23,280 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:40:23,289 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:40:28,112 - vinicola - INFO - Filtering transactions between 2025-04-29 22:00:00+00:00 and 2025-05-02 21:59:59.999999+00:00
+2025-05-01 13:40:28,115 - vinicola - ERROR - Error in admin_reports: (sqlite3.OperationalError) no such column: transaction.quantity
+[SQL: SELECT "transaction".id AS transaction_id, "transaction".timestamp AS transaction_timestamp, "transaction".employee_id AS transaction_employee_id, "transaction".operator_id AS transaction_operator_id, "transaction".amount AS transaction_amount, "transaction".product_id AS transaction_product_id, "transaction".custom_product_name AS transaction_custom_product_name, "transaction".transaction_type AS transaction_transaction_type, "transaction".quantity AS transaction_quantity 
+FROM "transaction" 
+WHERE "transaction".timestamp >= ? AND "transaction".timestamp <= ? ORDER BY "transaction".timestamp DESC]
+[parameters: ('2025-04-29 22:00:00.000000', '2025-05-02 21:59:59.999999')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-05-01 13:40:28,116 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:28] "[32mGET /admin/reports?start_date=2025-04-30&end_date=2025-05-02 HTTP/1.1[0m" 302 -
+2025-05-01 13:40:28,132 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:28] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-05-01 13:40:28,146 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:28] "GET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-01 13:40:28,146 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:28] "GET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-01 13:40:28,151 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:28] "GET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-01 13:40:28,181 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:28] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 13:40:42,775 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:42] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-05-01 13:40:42,789 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-01 13:40:42,789 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-01 13:40:42,793 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 13:40:42,809 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 13:40:43,745 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:43] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-05-01 13:40:43,757 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-01 13:40:43,757 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-01 13:40:43,762 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 13:40:43,776 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 13:40:48,413 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 13:40:48,448 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 13:40:48,466 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 13:40:48,466 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 13:40:48,466 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 13:40:48,466 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:40:48,472 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:48] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:40:50,476 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:50] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:40:52,475 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:52] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:40:54,476 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:54] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:40:56,478 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:56] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:40:58,476 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:40:58] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:01,543 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:41:01,787 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:41:01,941 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:41:02,028 - vinicola - INFO - Super admin account created
+2025-05-01 13:41:02,036 - vinicola - INFO - Initialized global credit limit
+2025-05-01 13:41:02,036 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:41:02,053 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-05-01 13:41:02,053 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-01 13:41:02,054 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:41:02,142 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:41:02,374 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:41:02,526 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:41:02,570 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:41:02,572 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:41:02,579 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:41:02,588 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:02] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:04,477 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:04] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:06,476 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:06] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:06,870 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:06] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 13:41:06,889 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:06] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:06,899 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:06] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 13:41:06,901 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:06] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:08,887 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:08] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:10,168 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:10] "GET /admin HTTP/1.1" 200 -
+2025-05-01 13:41:10,182 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:10] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:14,012 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:14] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 13:41:14,024 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:14] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 13:41:14,040 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:18,970 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:18] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 13:41:18,982 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:18] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:20,003 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:20] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 13:41:20,017 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:20] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:20,998 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:20] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 13:41:21,012 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:21] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:23,382 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:23] "GET /admin/employee/new HTTP/1.1" 200 -
+2025-05-01 13:41:23,395 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:23] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:25,401 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:27,399 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:27] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:29,402 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:29] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:31,400 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:31] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:33,401 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:33] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:35,399 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:35] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:41:36,723 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:36] "[32mPOST /admin/employee/new HTTP/1.1[0m" 302 -
+2025-05-01 13:41:36,729 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:36] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 13:41:36,739 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:36] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:39,885 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:39] "GET /admin/employee/2 HTTP/1.1" 200 -
+2025-05-01 13:41:39,900 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:39] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:42,426 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:42] "[32mPOST /admin/employee/2 HTTP/1.1[0m" 302 -
+2025-05-01 13:41:42,434 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:42] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 13:41:42,448 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:42] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:46,621 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:46] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 13:41:46,634 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:46] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:41:57,406 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:57] "[32mPOST /admin/product/new HTTP/1.1[0m" 302 -
+2025-05-01 13:41:57,415 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:57] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 13:41:57,779 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:41:57] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:42:06,433 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:06] "[32mPOST /admin/product/new HTTP/1.1[0m" 302 -
+2025-05-01 13:42:06,446 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:06] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 13:42:06,457 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:06] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:42:09,720 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 13:42:09,729 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 13:42:09,741 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:42:09,745 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:09,750 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 13:42:09,752 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 13:42:09,752 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:09] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 13:42:11,747 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:13,750 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:14,215 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:14] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:20,987 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:20] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 13:42:21,001 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:21] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:42:30,390 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "[32mGET /admin/logout HTTP/1.1[0m" 302 -
+2025-05-01 13:42:30,400 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 13:42:30,414 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:42:30,416 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:30,422 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 13:42:30,424 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 13:42:30,425 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:30] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 13:42:32,422 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:32] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:33,262 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:33] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:37,974 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:37] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 13:42:37,982 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 13:42:42,272 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:42] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:42,982 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:42] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:43,675 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:43] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:44,275 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:44] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:46,275 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:46] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:48,275 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:48] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:50,274 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:50] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:52,274 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:52] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:54,270 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:54] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:56,274 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:56] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:58,274 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:58] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:42:59,204 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:42:59] "POST /deduct_credit HTTP/1.1" 200 -
+2025-05-01 13:43:00,275 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:00] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:43:02,274 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:02] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:43:04,221 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:04] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:43:04,272 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:04] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:43:06,225 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:06] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:43:06,272 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:06] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 13:43:07,987 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:07] "GET /admin HTTP/1.1" 200 -
+2025-05-01 13:43:08,001 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:08] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:43:13,458 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:13] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 13:43:13,462 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:13] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 13:43:13,472 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:13] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:43:28,428 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 13:43:28,430 - vinicola - INFO - Found 3 transactions
+2025-05-01 13:43:28,446 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:28] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 13:43:28,457 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 13:43:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 13:50:47,605 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:50:47,719 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:50:47,842 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:50:48,070 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:50:48,229 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:50:48,277 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:50:48,279 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:50:48,287 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:56:31,637 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:56:31,716 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:56:31,818 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:56:32,095 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:56:32,254 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:56:32,302 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:56:32,304 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:56:32,311 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:58:48,949 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:58:49,063 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:58:49,185 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:58:49,420 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:58:49,579 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:58:49,626 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:58:49,628 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:58:49,636 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 13:59:43,654 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 13:59:43,741 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 13:59:43,844 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 13:59:44,082 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 13:59:44,241 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 13:59:44,287 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 13:59:44,289 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 13:59:44,296 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:01:17,465 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:01:17,469 - vinicola - INFO - Found 3 transactions
+2025-05-01 14:01:17,471 - vinicola - ERROR - Error in admin_reports: (sqlite3.OperationalError) no such column: product.inventory
+[SQL: SELECT product.id AS product_id, product.name AS product_name, product.price AS product_price, product.active AS product_active, product.inventory AS product_inventory 
+FROM product 
+WHERE product.id = ?]
+[parameters: (2,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-05-01 14:01:17,472 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:01:17] "[32mGET /admin/reports HTTP/1.1[0m" 302 -
+2025-05-01 14:01:17,513 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:01:17] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:01:17,530 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:01:17] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:06:24,085 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:06:24,234 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:06:24,457 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:06:24,652 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:06:24,825 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:06:24,871 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:06:24,873 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:06:24,881 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:08:09,583 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:08:09,811 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:08:09,969 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:08:10,059 - vinicola - INFO - Super admin account created
+2025-05-01 14:08:10,067 - vinicola - INFO - Initialized global credit limit
+2025-05-01 14:08:10,067 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:08:10,174 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.200:8100
+2025-05-01 14:08:10,174 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-01 14:08:10,175 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:08:10,280 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:08:10,504 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:08:10,657 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:08:10,701 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:08:10,703 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:08:10,710 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:08:20,059 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:08:20,098 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:08:20,113 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:08:20,120 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:08:20,123 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:08:20,125 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:20,125 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:20] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:08:22,127 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:22] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:22,470 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:22] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:08:22,484 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:22] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:08:26,468 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:26] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:08:26,483 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:26] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:08:26,502 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:26] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:08:36,178 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:36] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:08:36,191 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:36] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:08:38,263 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:38] "GET /admin/employee/new HTTP/1.1" 200 -
+2025-05-01 14:08:38,276 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:38] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:08:40,281 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:40] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:42,279 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:42] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:44,282 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:44] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:46,281 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:46] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:48,282 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:48] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:08:50,160 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:50] "[32mPOST /admin/employee/new HTTP/1.1[0m" 302 -
+2025-05-01 14:08:50,166 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:50] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:08:50,176 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:08:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:09:14,319 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:14] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:09:14,331 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:09:29,932 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:29] "[32mPOST /admin/product/new HTTP/1.1[0m" 302 -
+2025-05-01 14:09:29,941 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:29] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:09:30,393 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:09:45,897 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:45] "[32mPOST /admin/product/new HTTP/1.1[0m" 302 -
+2025-05-01 14:09:45,908 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:45] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:09:45,918 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:45] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:09:48,367 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:48] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 14:09:48,380 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:48] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:09:51,946 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:51] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 14:09:51,955 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:51] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:09:53,508 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:09:53,510 - vinicola - INFO - Found 0 transactions
+2025-05-01 14:09:53,523 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:53] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:09:53,535 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:09:53] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:10:00,989 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:00] "[32mGET /admin/logout HTTP/1.1[0m" 302 -
+2025-05-01 14:10:00,999 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:00] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:10:01,014 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:01] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:10:01,016 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:01,024 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:01] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:10:01,025 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:01] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:10:01,025 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:01] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:10:03,022 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:05,019 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:05,771 - vinicola - WARNING - SECURITY ALERT: Credit integrity check failed for employee 2 (test test)
+2025-05-01 14:10:05,779 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:05] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:07,018 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:09,019 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:09,483 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:09] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:30,312 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:30] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 14:10:30,321 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:30] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 14:10:35,319 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:35] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:35,365 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:35] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:37,367 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:37] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:37,684 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:37] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:47,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:47] "POST /deduct_credit HTTP/1.1" 200 -
+2025-05-01 14:10:48,827 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:48] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:50,852 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:50] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:50,939 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:50] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:52,653 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:52] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:54,655 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:54] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:56,654 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:56] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:10:58,654 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:10:58] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:00,655 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:00] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:02,656 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:02] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:04,656 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:04] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:06,655 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:06] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:08,655 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:08] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:09,646 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:09] "POST /deduct_credit HTTP/1.1" 200 -
+2025-05-01 14:11:11,178 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:13,179 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:11:14,026 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:14] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:11:14,043 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:11:18,537 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:18] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:11:18,543 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:18] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:11:18,553 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:18] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:11:29,063 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:29] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:11:29,076 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:29] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:11:30,120 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:30] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:11:30,133 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:11:39,772 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:11:39,775 - vinicola - INFO - Found 3 transactions
+2025-05-01 14:11:39,788 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:39] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:11:39,805 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:11:39] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:14:48,207 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:14:48,320 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:14:48,424 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:14:48,653 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:14:48,816 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:14:48,863 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:14:48,865 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:14:48,873 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:15:55,786 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:15:55] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:15:55,802 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:15:55] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:16:08,244 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:16:08] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 14:16:08,259 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:16:08] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:16:15,741 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:16:15] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:16:15,753 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:16:15] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:17:40,171 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:17:40,299 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:17:40,441 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:17:40,703 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:17:40,862 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:17:40,910 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:17:40,912 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:17:40,920 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:18:08,394 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:18:08,503 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:18:08,609 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:18:08,839 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:18:08,999 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:18:09,047 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:18:09,049 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:18:09,057 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:18:41,649 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:18:41,774 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:18:41,894 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:18:42,159 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:18:42,327 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:18:42,378 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:18:42,380 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:18:42,389 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:21:55,073 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:55] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:21:55,093 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:55] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:21:57,206 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:57] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:21:57,226 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:57] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:21:59,677 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:21:59,709 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:21:59,724 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:21:59,725 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:21:59,732 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:21:59,734 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:21:59,734 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:21:59] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:22:01,731 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:22:02,086 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:02] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:22:13,554 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:13] "POST /deduct_credit HTTP/1.1" 200 -
+2025-05-01 14:22:16,488 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:16] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:22:16,500 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:16] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:22:20,300 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:20] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:22:20,304 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:20] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:22:20,315 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:20] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:22:29,105 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:22:29,118 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:22:29,130 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:22:29,138 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:22:29,143 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:22:29,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:22:29,144 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:29] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:22:30,935 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:30] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:22:41,153 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:41] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:22:41,167 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:41] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:22:44,656 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:44] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:22:44,663 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:44] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:22:44,673 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:44] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:22:56,087 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:22:56,100 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:22:56,113 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:22:56,123 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:22:56,124 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:22:56,126 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:22:56,126 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:56] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:22:57,793 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:22:57] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:23:02,077 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:02] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 14:23:02,094 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:02] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 14:23:05,108 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:23:07,093 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:23:07,109 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:23:08,766 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:08] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:23:08,781 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:08] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:23:12,087 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:12] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:23:12,091 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:12] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:23:12,104 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:12] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:23:24,082 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:23:24,084 - vinicola - INFO - Found 5 transactions
+2025-05-01 14:23:24,099 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:24] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:23:24,109 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:23:24] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:25:35,002 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:25:35] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:25:35,014 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:25:35] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:26:46,673 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:46] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 14:26:46,687 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:46] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:26:48,071 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:48] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 14:26:48,084 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:48] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:26:50,325 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:50] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:26:50,337 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:26:51,657 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:51] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:26:51,670 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:26:51] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:08,398 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:08] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:27:08,410 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:08] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:15,384 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:15] "POST /admin/withdraw_cash HTTP/1.1" 200 -
+2025-05-01 14:27:28,576 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:28] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:27:28,588 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:33,156 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:33] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:27:33,170 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:33] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:39,787 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:39] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:27:39,797 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:39] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:42,060 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:42] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 14:27:42,074 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:42] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:43,139 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:43] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:27:43,150 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:45,456 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:45] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:27:45,468 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:45] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:46,512 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:46] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 14:27:46,523 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:46] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:47,668 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:47] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 14:27:47,682 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:47] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:52,191 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:52] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:27:52,204 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:52] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:57,763 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:27:57,777 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:27:57,794 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:27:57,795 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:27:57,801 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:27:57,802 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:27:57,802 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:57] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:27:59,797 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:27:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:00,476 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:00] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:06,219 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:06] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 14:28:06,228 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 14:28:07,922 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:09,924 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:11,230 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:11,921 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:13,230 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:13,923 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:15,230 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:15] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:15,920 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:15] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:17,232 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:17] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:17,922 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:17] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:19,233 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:19] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:19,923 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:19] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:21,232 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:21,923 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:23,232 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:23,924 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:25,230 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:25,920 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:27,229 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:27] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:28:27,832 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:27] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:28:27,844 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:27] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:28:31,359 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:31] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:28:31,364 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:31] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:28:31,378 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:31] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:28:37,451 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:28:37] "POST /admin/withdraw_cash HTTP/1.1" 200 -
+2025-05-01 14:29:10,753 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:29:10] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:29:10,764 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:29:10] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:29:14,137 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:29:14,139 - vinicola - INFO - Found 8 transactions
+2025-05-01 14:29:14,148 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:29:14] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:29:14,159 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:29:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:04,164 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:35:04,166 - vinicola - INFO - Found 8 transactions
+2025-05-01 14:35:04,194 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:04] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:35:04,204 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:04] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:11,007 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:35:11,117 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:35:11,265 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:35:11,502 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:35:11,708 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:35:11,760 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:35:11,764 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:35:11,773 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:35:19,227 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:35:19,264 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:35:19,277 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:35:19,283 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:35:19,283 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:19,285 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:35:19,285 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:19] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:35:21,284 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:35:21,940 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 14:35:22,055 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 14:35:22,160 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 14:35:22,399 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 14:35:22,556 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 14:35:22,605 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 14:35:22,607 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 14:35:22,615 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 14:35:23,283 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:35:25,027 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:25] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:35:25,039 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:25] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:28,278 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:28] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:35:28,293 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:28] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:35:28,305 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:36,889 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:36] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:35:36,903 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:36] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:38,486 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:35:38,511 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:35:38,525 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:35:38,527 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:38,539 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:35:38,545 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:35:38,547 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:38] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:35:39,828 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:39] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:35:45,241 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:45] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 14:35:45,251 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 14:35:47,436 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:47] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:35:47,449 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:47] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:50,630 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:50] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:35:50,636 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:50] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:35:50,649 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:35:55,534 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:35:55] "POST /admin/withdraw_cash HTTP/1.1" 200 -
+2025-05-01 14:36:33,413 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:36:33,415 - vinicola - INFO - Found 10 transactions
+2025-05-01 14:36:33,431 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:36:33] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:36:33,441 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:36:33] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:38:33,493 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:33] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:38:33,508 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:33] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:38:35,604 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:35] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:38:35,617 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:35] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:38:49,388 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:38:49,398 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:38:49,411 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:38:49,413 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:38:49,416 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:38:49,418 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:38:49,419 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:49] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:38:50,988 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:50] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 14:38:55,263 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:55] "POST /add_credit HTTP/1.1" 200 -
+2025-05-01 14:38:55,270 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:55] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 14:38:57,073 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:57] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:38:59,073 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:38:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:39:00,271 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:00] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:39:01,072 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:39:01,858 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:01] "GET /admin HTTP/1.1" 200 -
+2025-05-01 14:39:01,872 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:01] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:39:05,474 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:05] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 14:39:05,479 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:05] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:39:05,492 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:05] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:39:12,667 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:12] "POST /admin/withdraw_cash HTTP/1.1" 200 -
+2025-05-01 14:39:14,198 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:14] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 14:39:14,210 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:39:17,373 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 14:39:17,376 - vinicola - INFO - Found 12 transactions
+2025-05-01 14:39:17,383 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:17] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 14:39:17,393 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:17] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:39:33,616 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:33] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:39:33,629 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:39:33] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:43:03,164 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:43:03] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:43:03,177 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:43:03] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:43:07,100 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:43:07] "GET /admin/employee/2 HTTP/1.1" 200 -
+2025-05-01 14:43:07,113 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:43:07] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:43:14,278 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:43:14] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 14:43:14,291 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:43:14] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:51:06,308 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:06] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 14:51:06,345 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:06] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:51:32,532 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 14:51:32,564 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 14:51:32,578 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 14:51:32,584 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:51:32,593 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 14:51:32,594 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:51:32,595 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:32] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 14:51:34,587 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:34] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 14:51:34,937 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 14:51:34] "POST /scan_barcode HTTP/1.1" 200 -
+2025-05-01 15:39:29,416 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:29] "GET /admin HTTP/1.1" 200 -
+2025-05-01 15:39:29,436 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:29] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:39:34,027 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:34] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 15:39:34,031 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:34] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:39:34,042 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:34] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:39:59,588 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 15:39:59,615 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 15:39:59,630 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:39:59,633 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:39:59,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 15:39:59,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:39:59,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:39:59] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:40:01,632 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:03,634 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:05,633 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:07,637 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:09,639 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:11,636 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:13,636 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:13] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:15,636 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:15] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:17,639 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:17] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:19,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:19] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:21,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:23,639 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:25,637 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:27,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:27] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:29,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:29] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:31,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:31] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:33,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:33] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:35,638 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:35] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:37,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:37] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:39,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:39] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:41,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:41] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:43,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:43] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:45,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:45] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:47,639 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:47] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:49,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:49] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:51,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:51] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:53,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:53] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:55,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:55] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:57,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:57] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:40:59,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:40:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:41:01,641 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:01] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:41:03,640 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:03] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:41:05,637 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:05] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:41:06,347 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:06] "GET /admin HTTP/1.1" 200 -
+2025-05-01 15:41:06,363 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:06] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:10,594 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:10] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 15:41:10,599 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:10] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:41:10,618 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:10] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:13,815 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:13] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 15:41:13,827 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:13] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:30,283 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:30] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:41:30,298 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:36,979 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:36] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 15:41:36,995 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:36] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:43,413 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:43] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 15:41:43,430 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:48,034 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:48] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 15:41:48,047 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:48] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:49,311 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:49] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 15:41:49,331 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:49] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:41:50,584 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 15:41:50,587 - vinicola - INFO - Found 12 transactions
+2025-05-01 15:41:50,598 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:50] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 15:41:50,611 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:41:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:45:32,319 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:45:32] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:45:32,334 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:45:32] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:45:48,843 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:45:48] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 15:45:48,855 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:45:48] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:45:56,854 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:45:56] "GET /admin/employee/1 HTTP/1.1" 200 -
+2025-05-01 15:45:56,872 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:45:56] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:46:04,063 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:04] "[32mPOST /admin/employee/1 HTTP/1.1[0m" 302 -
+2025-05-01 15:46:04,073 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:04] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 15:46:04,087 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:04] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:46:20,016 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:20] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 15:46:20,036 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:20] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:46:23,471 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:23] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:46:23,483 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:23] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:46:28,809 - vinicola - INFO - Filtering transactions between 2025-04-30 22:00:00+00:00 and 2025-05-01 21:59:59.999999+00:00
+2025-05-01 15:46:28,811 - vinicola - INFO - Found 12 transactions
+2025-05-01 15:46:28,822 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:28] "GET /admin/reports HTTP/1.1" 200 -
+2025-05-01 15:46:28,839 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:46:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:47:15,743 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 15:47:15,749 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 15:47:15,760 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:47:15,766 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:15,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 15:47:15,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:47:15,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:15] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:47:17,767 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:17] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:19,766 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:19] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:21,767 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:21] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:23,773 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:23] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:25,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:25] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:27,769 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:27] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:29,769 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:29] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:31,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:31] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:33,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:33] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:35,767 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:35] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:37,767 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:37] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:39,767 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:39] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:41,765 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:41] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:43,766 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:43] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:45,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:45] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:47,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:47] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:49,770 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:49] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:51,769 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:51] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:53,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:53] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:55,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:55] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:57,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:57] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:47:59,768 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:47:59] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:48:01,695 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:01] "GET /admin HTTP/1.1" 200 -
+2025-05-01 15:48:01,712 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:01] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:08,379 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:08] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 15:48:08,383 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:08] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:48:08,392 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:08] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:16,988 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:16] "GET /admin/employees HTTP/1.1" 200 -
+2025-05-01 15:48:17,004 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:17] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:17,834 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:17] "GET /admin/products HTTP/1.1" 200 -
+2025-05-01 15:48:17,850 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:17] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:18,781 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:18] "GET /admin/operators HTTP/1.1" 200 -
+2025-05-01 15:48:18,796 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:18] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:19,313 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:19] "GET /admin/admins HTTP/1.1" 200 -
+2025-05-01 15:48:19,329 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:19] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:49,874 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 15:48:50,077 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 15:48:50,245 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 15:48:50,281 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 15:48:50,305 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.88:8100
+2025-05-01 15:48:50,305 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-01 15:48:50,306 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 15:48:50,377 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 15:48:50,570 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 15:48:50,700 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 15:48:50,733 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 15:48:50,735 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 15:48:50,741 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 15:48:53,817 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:53] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 15:48:53,844 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:53] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 15:48:53,855 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:53] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:53,862 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:53] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:48:54,117 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:54] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 15:48:54,120 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:54] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:48:54,121 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:54] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:48:55,867 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:55] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:48:56,213 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:56] "GET /admin HTTP/1.1" 200 -
+2025-05-01 15:48:56,227 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:56] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:48:59,822 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:59] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 15:48:59,835 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:59] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:48:59,847 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:48:59] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:49:15,302 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:15] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2025-05-01 15:49:15,320 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:15] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-01 15:49:15,323 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:15] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-01 15:49:15,345 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:15] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 15:49:32,736 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 15:49:32,913 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 15:49:33,042 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 15:49:33,109 - vinicola - INFO - Super admin account created
+2025-05-01 15:49:33,115 - vinicola - INFO - Initialized global credit limit
+2025-05-01 15:49:33,115 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 15:49:33,140 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8100
+ * Running on http://192.168.50.88:8100
+2025-05-01 15:49:33,140 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-01 15:49:33,141 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 15:49:33,223 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 15:49:33,422 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 15:49:33,542 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 15:49:33,577 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 15:49:33,579 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 15:49:33,585 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 15:49:36,169 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:36] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2025-05-01 15:49:36,180 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-01 15:49:36,181 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-01 15:49:36,189 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 15:49:39,968 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:39] "[32mGET / HTTP/1.1[0m" 302 -
+2025-05-01 15:49:40,012 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:40] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 15:49:40,017 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:40] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:49:40,025 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:40] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 15:49:40,255 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:40] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:49:40,257 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:40] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 15:49:40,257 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:40] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 15:49:41,885 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:41] "GET /admin HTTP/1.1" 200 -
+2025-05-01 15:49:41,898 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:41] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:49:45,497 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:45] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 15:49:45,508 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:45] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 15:49:45,519 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:49:45] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 15:50:17,214 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:17] "[32mGET /settings HTTP/1.1[0m" 302 -
+2025-05-01 15:50:17,221 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:17] "GET /login?next=%2Fsettings HTTP/1.1" 200 -
+2025-05-01 15:50:17,232 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:17] "GET /static/logo.png HTTP/1.1" 200 -
+2025-05-01 15:50:17,633 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-01 15:50:23,431 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:23] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-05-01 15:50:23,435 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:23] "[35m[1mGET /dashboard HTTP/1.1[0m" 500 -
+2025-05-01 15:50:23,443 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:23] "GET /dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-01 15:50:23,444 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:23] "GET /dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-01 15:50:23,455 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:23] "GET /dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-01 15:50:23,467 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 15:50:23] "[36mGET /dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-01 15:51:08,307 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 15:51:08,412 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 15:51:08,502 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 15:51:08,713 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 15:51:08,836 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 15:51:08,871 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 15:51:08,872 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 15:51:08,877 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 15:51:37,366 - werkzeug - INFO -  * Detected change in '/Users/salagrafica/gestione_vinicola/app.py', reloading
+2025-05-01 15:51:37,501 - werkzeug - INFO -  * Restarting with stat
+2025-05-01 15:51:37,589 - vinicola - INFO - NumPy version: 1.24.3
+2025-05-01 15:51:37,778 - vinicola - INFO - Pandas version: 1.5.3
+2025-05-01 15:51:37,910 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-05-01 15:51:37,945 - vinicola - ERROR - Errore configurazione lettore di codici a barre: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+2025-05-01 15:51:37,946 - werkzeug - WARNING -  * Debugger is active!
+2025-05-01 15:51:37,952 - werkzeug - INFO -  * Debugger PIN: 279-576-846
+2025-05-01 16:00:52,134 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:00:52] "GET /dashboard HTTP/1.1" 200 -
+2025-05-01 16:00:52,147 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:00:52] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 16:01:07,312 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:07] "GET /barcode_scanner HTTP/1.1" 200 -
+2025-05-01 16:01:07,326 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:07] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 16:01:07,331 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:07] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 16:01:07,340 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:07] "[33mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 404 -
+2025-05-01 16:01:07,342 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:07] "[35m[1mGET /static/sounds/reload.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 16:01:07,342 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:07] "[35m[1mGET /static/sounds/error.mp3 HTTP/1.1[0m" 206 -
+2025-05-01 16:01:09,334 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:09] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 16:01:11,333 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:11] "GET /get_serial_barcode HTTP/1.1" 200 -
+2025-05-01 16:01:12,147 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:12] "GET /admin HTTP/1.1" 200 -
+2025-05-01 16:01:12,159 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:12] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 16:01:20,777 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:20] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2025-05-01 16:01:20,789 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:20] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-05-01 16:01:20,798 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:20] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-05-01 16:01:41,107 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:41] "GET /settings HTTP/1.1" 200 -
+2025-05-01 16:01:41,116 - werkzeug - INFO - 127.0.0.1 - - [01/May/2025 16:01:41] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
