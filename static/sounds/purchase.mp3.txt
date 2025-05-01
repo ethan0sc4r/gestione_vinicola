@@ -1,0 +1,5 @@
+This is a placeholder file for the purchase sound.
+Please replace this file with an actual MP3 sound file named "purchase.mp3".
+
+The purchase sound should be a positive, confirmatory sound (like a cash register or a pleasant chime)
+that plays when a purchase is successfully completed.

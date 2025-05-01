@@ -44,8 +44,11 @@ try:
     # Poi importa pandas
     import pandas as pd
     logger.info(f"Pandas version: {pd.__version__}")
-except ValueError as e:
-    if "numpy.dtype size changed" in str(e):
+except (ValueError, ModuleNotFoundError) as e:
+    if isinstance(e, ModuleNotFoundError):
+        logger.warning(f"Modulo non trovato: {str(e)}. Utilizzo alternative methods.")
+        pd = None
+    elif "numpy.dtype size changed" in str(e):
         logger.error("Incompatibilità tra NumPy e Pandas. Utilizzo alternative methods.")
         # Useremo CSV nativo invece di pandas
         pd = None
@@ -106,7 +109,7 @@ SERIAL_CONFIG = {
 # Definizione Modelli #
 #######################
 
-class Admin(db.Model):
+class Admin(db.Model, UserMixin):
     """
     Modello per l'amministratore principale del sistema.
     Ha accesso a tutte le funzionalità amministrative.
@@ -174,9 +177,24 @@ class Employee(db.Model):
     def has_sufficient_credit(self, amount):
         """
         Verifica se il dipendente ha credito sufficiente per una spesa,
-        considerando anche il limite di credito negativo.
+        considerando anche il limite di credito negativo globale.
         """
-        return (self.credit - amount) >= -self.credit_limit
+        # Se è l'utente "cassa", non ha limiti di credito
+        if self.code == 'CASSA':
+            return True
+            
+        # Ottieni il limite di credito globale, se non esiste usa il limite dell'utente
+        global_limit = GlobalSetting.get('credit_limit', None)
+        
+        if global_limit is not None:
+            try:
+                limit = Decimal(global_limit)
+            except:
+                limit = self.credit_limit
+        else:
+            limit = self.credit_limit
+            
+        return (self.credit - amount) >= -limit
     
     def to_dict(self):
         """Converte l'oggetto in un dizionario."""
@@ -214,6 +232,37 @@ class Product(db.Model):
             'active': self.active
         }
     
+
+
+class GlobalSetting(db.Model):
+    """
+    Modello per le impostazioni globali del sistema.
+    Contiene configurazioni che si applicano a tutto il sistema.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True)
+    value = db.Column(db.String(200))
+    description = db.Column(db.String(200))
+    
+    @classmethod
+    def get(cls, key, default=None):
+        """Ottiene il valore di un'impostazione."""
+        setting = cls.query.filter_by(key=key).first()
+        return setting.value if setting else default
+    
+    @classmethod
+    def set(cls, key, value, description=None):
+        """Imposta il valore di un'impostazione."""
+        setting = cls.query.filter_by(key=key).first()
+        if setting:
+            setting.value = value
+            if description:
+                setting.description = description
+        else:
+            setting = cls(key=key, value=value, description=description)
+            db.session.add(setting)
+        db.session.commit()
+        return setting
 
 
 class Transaction(db.Model):
@@ -292,6 +341,7 @@ def regenerate_all_operator_passwords():
 def ensure_cash_register_exists():
     """
     Assicura che esista l'utente speciale 'cassa' per gli acquisti di utenti non registrati.
+    Questo utente è fittizio e non è soggetto a limiti di credito.
     """
     cash_register = Employee.query.filter_by(code='CASSA').first()
     
@@ -301,7 +351,8 @@ def ensure_cash_register_exists():
             first_name='Cassa',
             last_name='Centrale',
             rank='Sistema',
-            credit=0
+            credit=0,
+            credit_limit=999999  # Limite di credito molto alto per evitare problemi
         )
         cash_register.update_credit_hash()
         db.session.add(cash_register)
@@ -788,6 +839,11 @@ def delete_employee(id):
     """Elimina dipendente."""
     employee = Employee.query.get_or_404(id)
     
+    # Verifica che non sia l'utente "cassa"
+    if employee.code == 'CASSA':
+        flash('Non è possibile eliminare l\'utente "cassa" in quanto è necessario per il sistema.', 'danger')
+        return redirect(url_for('dashboard'))
+    
     # Elimina tutte le transazioni associate
     Transaction.query.filter_by(employee_id=id).delete()
     
@@ -895,10 +951,14 @@ def barcode_scanner():
     # Ottieni la lista dei prodotti per la selezione rapida
     products = Product.query.filter_by(active=True).all()
     
+    # Ottieni la lista dei dipendenti per la tabella
+    employees = Employee.query.order_by(Employee.last_name).all()
+    
     return render_template(
         'barcode_scanner.html', 
         last_barcode=last_barcode,
-        products=products
+        products=products,
+        employees=employees
     )
 
 @app.route('/get_serial_barcode')
@@ -944,14 +1004,18 @@ def get_serial_barcode():
 
 
 @app.route('/scan_barcode', methods=['POST'])
-@login_required
 def scan_barcode():
-    """Endpoint per scansione manuale di un codice a barre."""
+    """Endpoint per scansione manuale di un codice a barre o selezione diretta di un dipendente."""
     barcode = request.form.get('barcode')
-    if not barcode:
-        return jsonify({'success': False, 'message': 'Nessun codice fornito.'})
-        
-    employee = Employee.query.filter_by(code=barcode).first()
+    employee_id = request.form.get('employee_id')
+    
+    # Cerca il dipendente per ID o per codice a barre
+    if employee_id:
+        employee = Employee.query.get(employee_id)
+    elif barcode:
+        employee = Employee.query.filter_by(code=barcode).first()
+    else:
+        return jsonify({'success': False, 'message': 'Nessun codice o ID dipendente fornito.'})
     
     if not employee:
         return jsonify({'success': False, 'message': 'Dipendente non trovato.'})
@@ -983,7 +1047,7 @@ def scan_barcode():
 def deduct_credit():
     """
     Scala credito da un dipendente.
-    Può essere usato per un prodotto specifico o un importo generico.
+    Può essere usato per prodotti multipli con quantità o un importo generico.
     """
     employee_id = request.form.get('employee_id')
     
@@ -994,7 +1058,7 @@ def deduct_credit():
         employee_id = cash_register.id
     
     # Ottieni i parametri dalla richiesta
-    product_id = request.form.get('product_id')
+    products_json = request.form.get('products')
     custom_amount = request.form.get('custom_amount')
     custom_product = request.form.get('custom_product')
     
@@ -1008,16 +1072,52 @@ def deduct_credit():
         logger.warning(f"Credit integrity fixed during deduction for employee {employee_id}")
     
     try:
+        total_amount = Decimal('0')
+        product_descriptions = []
+        
         # Determina l'importo da scalare
-        if product_id:
-            # Se è stato selezionato un prodotto
-            product = Product.query.get_or_404(product_id)
-            amount = product.price
-            product_name = product.name
+        if products_json:
+            # Se sono stati selezionati dei prodotti
+            products = json.loads(products_json)
+            
+            for product_data in products:
+                product_id = product_data['id']
+                quantity = int(product_data['quantity'])
+                
+                if quantity <= 0:
+                    continue
+                
+                product = Product.query.get_or_404(product_id)
+                product_price = product.price
+                product_total = product_price * quantity
+                
+                total_amount += product_total
+                product_descriptions.append(f"{product.name} (x{quantity})")
+                
+                # Registra una transazione per ogni prodotto
+                transaction = Transaction(
+                    employee_id=employee.id,
+                    amount=-product_total,  # Negativo perché stiamo sottraendo
+                    transaction_type='debit',
+                    product_id=product_id
+                )
+                db.session.add(transaction)
+            
+            product_description = ", ".join(product_descriptions)
+            
         elif custom_amount:
             # Se è stato inserito un importo personalizzato
-            amount = Decimal(custom_amount)
-            product_name = custom_product if custom_product else "Importo personalizzato"
+            total_amount = Decimal(custom_amount)
+            product_description = custom_product if custom_product else "Importo personalizzato"
+            
+            # Registra la transazione per l'importo personalizzato
+            transaction = Transaction(
+                employee_id=employee.id,
+                amount=-total_amount,  # Negativo perché stiamo sottraendo
+                transaction_type='debit',
+                custom_product_name=product_description
+            )
+            db.session.add(transaction)
         else:
             return jsonify({
                 'success': False,
@@ -1025,9 +1125,19 @@ def deduct_credit():
             })
         
         # Controlla se il dipendente ha credito sufficiente (considerando il limite)
-        if not employee.has_sufficient_credit(amount):
+        if not employee.has_sufficient_credit(total_amount):
             remaining_credit = float(employee.credit)
-            credit_limit = float(employee.credit_limit)
+            
+            # Ottieni il limite di credito globale, se non esiste usa il limite dell'utente
+            global_limit = GlobalSetting.get('credit_limit', None)
+            
+            if global_limit is not None:
+                try:
+                    credit_limit = float(Decimal(global_limit))
+                except:
+                    credit_limit = float(employee.credit_limit)
+            else:
+                credit_limit = float(employee.credit_limit)
             
             return jsonify({
                 'success': False,
@@ -1037,27 +1147,16 @@ def deduct_credit():
             })
         
         # Aggiorna il credito
-        new_credit = employee.credit - amount
+        new_credit = employee.credit - total_amount
         employee.update_credit(new_credit)
         
-        # Registra la transazione
-        transaction = Transaction(
-            employee_id=employee.id,
-            amount=-amount,  # Negativo perché stiamo sottraendo
-            transaction_type='debit',
-            custom_product_name=product_name if not product_id else None,
-            product_id=product_id
-        )
-        
-        db.session.add(transaction)
         db.session.commit()
         
         return jsonify({
             'success': True,
-            'message': f'Scalati €{float(amount):.2f} dal credito per {product_name}.',
+            'message': f'Scalati €{float(total_amount):.2f} dal credito per {product_description}.',
             'new_credit': float(employee.credit),
-            'credit_limit': float(employee.credit_limit),
-            'transaction_id': transaction.id
+            'credit_limit': float(employee.credit_limit)
         })
         
     except Exception as e:
@@ -1151,6 +1250,17 @@ def admin_products():
     products = Product.query.all()
     return render_template('admin_products.html', products=products)
 
+@app.route('/admin/products/delete/<int:id>', methods=['POST'])
+
+def admin_delete_product(id):
+    # recupera il prodotto dal DB
+    product = Product.query.get_or_404(id)
+    # elimina e conferma
+    db.session.delete(product)
+    db.session.commit()
+    flash(f"Prodotto #{id} eliminato con successo.", 'success')
+    # torna alla lista prodotti
+    return redirect(url_for('admin_products')) 
 
 @app.route('/admin/reports')
 def admin_reports():
@@ -1165,14 +1275,45 @@ def admin_reports():
         # Converte la stringa in data
         report_date = datetime.strptime(date_str, '%Y-%m-%d')
         
-        # Filtra le transazioni del giorno
-        start_date = report_date.replace(hour=0, minute=0, second=0)
-        end_date = report_date.replace(hour=23, minute=59, second=59)
+        # Filtra le transazioni del giorno (usando la data locale)
+        start_date = report_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = report_date.replace(hour=23, minute=59, second=59, microsecond=999999)
         
+        logger.info(f"Filtering transactions between {start_date} and {end_date}")
+        
+        # Carica le transazioni con le relazioni
         transactions = Transaction.query.filter(
             Transaction.timestamp >= start_date,
             Transaction.timestamp <= end_date
         ).order_by(Transaction.timestamp.desc()).all()
+        
+        logger.info(f"Found {len(transactions)} transactions")
+        
+        # Prepara i dati delle transazioni per il template
+        transaction_data = []
+        for t in transactions:
+            # Ottieni i dati del dipendente
+            employee_name = f"{t.employee.first_name} {t.employee.last_name}" if t.employee else "N/A"
+            
+            # Ottieni i dati del prodotto
+            if t.product:
+                product_name = t.product.name
+            else:
+                product_name = t.custom_product_name if t.custom_product_name else "N/A"
+            
+            # Ottieni i dati dell'operatore
+            operator_name = t.operator.username if t.operator else "N/A"
+            
+            # Aggiungi i dati alla lista
+            transaction_data.append({
+                'id': t.id,
+                'timestamp': t.timestamp,
+                'amount': float(t.amount),
+                'transaction_type': t.transaction_type,
+                'employee_name': employee_name,
+                'product_name': product_name,
+                'operator_name': operator_name
+            })
         
         # Statistiche del giorno
         credit_sum = sum([t.amount for t in transactions if t.transaction_type == 'credit'])
@@ -1193,7 +1334,7 @@ def admin_reports():
         
         return render_template(
             'admin_reports.html',
-            transactions=transactions,
+            transactions=transaction_data,
             report_date=report_date,
             credit_sum=float(credit_sum),
             debit_sum=float(debit_sum),
@@ -1421,12 +1562,33 @@ def import_csv():
     return redirect(url_for('import_export'))
 
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
     """Pagina impostazioni."""
+    if request.method == 'POST':
+        # Gestisci l'aggiornamento del limite di credito globale
+        if 'global_credit_limit' in request.form:
+            try:
+                credit_limit = Decimal(request.form.get('global_credit_limit', '0'))
+                GlobalSetting.set('credit_limit', str(credit_limit), 'Limite di credito negativo globale')
+                flash('Limite di credito globale aggiornato con successo.', 'success')
+            except Exception as e:
+                flash(f'Errore durante l\'aggiornamento del limite di credito: {str(e)}', 'danger')
+        
+        return redirect(url_for('settings'))
+    
+    # Ottieni il limite di credito globale
+    global_credit_limit = GlobalSetting.get('credit_limit', '0')
+    
+    # Ottieni le statistiche di sistema
     stats = get_system_stats()
-    return render_template('settings.html', **stats)
+    
+    return render_template(
+        'settings.html', 
+        global_credit_limit=global_credit_limit,
+        **stats
+    )
 
 
 @app.route('/change_admin_password', methods=['POST'])
@@ -1564,6 +1726,11 @@ if __name__ == '__main__':
         
         # Crea l'utente "cassa" per acquisti anonimi
         ensure_cash_register_exists()
+        
+        # Inizializza il limite di credito globale se non esiste
+        if not GlobalSetting.get('credit_limit'):
+            GlobalSetting.set('credit_limit', '50', 'Limite di credito negativo globale')
+            logger.info("Initialized global credit limit")
         
         # Aggiorna gli hash del credito per i dipendenti esistenti che non ne hanno
         employees = Employee.query.all()

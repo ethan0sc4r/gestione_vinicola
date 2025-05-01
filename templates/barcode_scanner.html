@@ -317,6 +317,123 @@
         background-color: rgba(0, 0, 0, 0.2);
         color: #212529;
     }
+    
+    /* Stili per la tabella dipendenti in stile admin */
+    .employees-table-container {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+    
+    .table-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .table-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .table-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .table-search {
+        width: 300px;
+    }
+    
+    .table-wrapper {
+        padding: 1rem 1.5rem;
+        overflow-x: auto;
+    }
+    
+    .employees-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .employees-table th {
+        padding: 0.75rem;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        text-align: left;
+        color: #6c757d;
+    }
+    
+    .employees-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        vertical-align: middle;
+    }
+    
+    .employees-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .employees-table tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .employee-avatar {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 0.75rem;
+    }
+    
+    .employee-name-cell {
+        display: flex;
+        align-items: center;
+    }
+    
+    .employee-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .employee-name {
+        font-weight: 500;
+    }
+    
+    .employee-rank {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .employee-code {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+    
+    .employee-credit {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -328,18 +445,72 @@
             <i class="fas fa-circle me-1"></i> In attesa di connessione...
         </span>
         
-        <i class="fas fa-barcode scanner-icon scanner-pulse"></i>
-        <h3 class="mb-3">Scanner Codice a Barre</h3>
-        <p class="text-muted">Scansiona il badge del dipendente per iniziare</p>
-        
-        {% if last_barcode %}
-        <div class="last-scan">
-            <span id="lastBarcode">{{ last_barcode }}</span>
-            <button class="btn btn-sm btn-outline-primary ms-2" id="useLastBarcode">
-                <i class="fas fa-check me-1"></i> Usa
-            </button>
+        <div class="mb-3">
+            {% if last_barcode %}
+            <div class="last-scan mb-3">
+                <span id="lastBarcode">{{ last_barcode }}</span>
+                <button class="btn btn-sm btn-outline-primary ms-2" id="useLastBarcode">
+                    <i class="fas fa-check me-1"></i> Usa
+                </button>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
+        
+        <!-- Tabella dipendenti in stile admin -->
+        <div class="employees-table-container">
+            <div class="table-toolbar">
+                <h3 class="table-title">Elenco Dipendenti</h3>
+                <div class="table-controls">
+                    <div class="input-group table-search">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchEmployee" placeholder="Cerca utente...">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="employees-table" id="employeesTable">
+                    <thead>
+                        <tr>
+                            <th>Utente</th>
+                            <th>Codice</th>
+                            <th>Credito</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        {% if employee.code != 'CASSA' %}
+                        <tr class="employee-row" data-employee-id="{{ employee.id }}" data-first-name="{{ employee.first_name }}" data-last-name="{{ employee.last_name }}">
+                            <td class="employee-name-cell">
+                                <div class="employee-avatar">{{ employee.first_name[0] }}{{ employee.last_name[0] }}</div>
+                                <div class="employee-info">
+                                    <div class="employee-name">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                    <div class="employee-rank">{{ employee.rank }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="employee-code">{{ employee.code }}</span>
+                            </td>
+                            <td>
+                                <div class="employee-credit">€ {{ "%.2f"|format(employee.credit) }}</div>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-sm btn-success select-employee-btn" data-employee-id="{{ employee.id }}">
+                                        <i class="fas fa-user-check"></i> Seleziona
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <!-- Input manuale -->
@@ -359,8 +530,8 @@
             <div class="employee-info">
                 <div class="employee-avatar" id="employeeAvatar">AB</div>
                 <div>
-                    <div class="employee-name" id="employeeName">Nome Dipendente</div>
-                    <div class="employee-rank" id="employeeRank">Ruolo</div>
+                    <div class="employee-name" id="employeeName">Nome</div>
+                    <div class="employee-rank" id="employeeRank">Grado</div>
                 </div>
             </div>
             <div class="employee-credit">
@@ -394,6 +565,11 @@
             <div class="product-item" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}">
                 <div class="product-name">{{ product.name }}</div>
                 <div class="product-price">€ {{ "%.2f"|format(product.price) }}</div>
+                <div class="product-quantity mt-2">
+                    <label for="quantity-{{ product.id }}" class="form-label small">Quantità</label>
+                    <input type="number" class="form-control form-control-sm quantity-input" 
+                           id="quantity-{{ product.id }}" min="1" value="1">
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -464,7 +640,7 @@
         
         <div class="confirmation-details">
             <div class="confirmation-detail">
-                <span class="confirmation-label">Dipendente:</span>
+                <span class="confirmation-label">Utente:</span>
                 <span class="confirmation-value" id="confirmationEmployee">-</span>
             </div>
             <div class="confirmation-detail">
@@ -486,6 +662,17 @@
         </button>
     </div>
 </div>
+
+<!-- Audio per effetti sonori -->
+<audio id="purchaseSound" preload="auto">
+    <source src="{{ url_for('static', filename='sounds/purchase.mp3') }}" type="audio/mpeg">
+</audio>
+<audio id="reloadSound" preload="auto">
+    <source src="{{ url_for('static', filename='sounds/reload.mp3') }}" type="audio/mpeg">
+</audio>
+<audio id="errorSound" preload="auto">
+    <source src="{{ url_for('static', filename='sounds/error.mp3') }}" type="audio/mpeg">
+</audio>
 
 <!-- Link amministratore -->
 <a href="{{ url_for('admin_login') }}" class="admin-link">
@@ -529,6 +716,11 @@
     const confirmationAmount = document.getElementById('confirmationAmount');
     const confirmationCredit = document.getElementById('confirmationCredit');
     const newOperationButton = document.getElementById('newOperationButton');
+    
+    // Elementi audio
+    const purchaseSound = document.getElementById('purchaseSound');
+    const reloadSound = document.getElementById('reloadSound');
+    const errorSound = document.getElementById('errorSound');
     
     // Variabili di stato dell'applicazione
     let currentEmployee = null;
@@ -582,19 +774,14 @@
         // Gestisci la selezione prodotti
         productItems.forEach(item => {
             item.addEventListener('click', function() {
-                // Rimuovi la selezione da tutti i prodotti
-                productItems.forEach(p => p.classList.remove('selected'));
-                // Seleziona questo prodotto
-                this.classList.add('selected');
-                // Salva il prodotto selezionato
-                selectedProduct = {
-                    id: this.dataset.productId,
-                    name: this.dataset.productName,
-                    price: parseFloat(this.dataset.productPrice)
-                };
-                // Pulisci l'importo personalizzato
-                customAmountInput.value = '';
-                customProductInput.value = '';
+                // Alterna la selezione di questo prodotto
+                this.classList.toggle('selected');
+                
+                // Pulisci l'importo personalizzato se è stato selezionato almeno un prodotto
+                if (document.querySelectorAll('.product-item.selected').length > 0) {
+                    customAmountInput.value = '';
+                    customProductInput.value = '';
+                }
             });
         });
         
@@ -648,8 +835,15 @@
         
         confirmCreditButton.addEventListener('click', processAddCredit);
         
-        // Gestisci il pulsante per una nuova operazione
-        newOperationButton.addEventListener('click', resetApp);
+    // Gestisci il pulsante per una nuova operazione
+    newOperationButton.addEventListener('click', resetApp);
+    
+    // Funzione per resettare le quantità dei prodotti a 1
+    function resetProductQuantities() {
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.value = 1;
+        });
+    }
     }
     
     // Polling per rilevare nuovi codici a barre
@@ -687,7 +881,7 @@
                     
                     // Mostra un messaggio solo se non stiamo già visualizzando un dipendente
                     if (!employeeCard.classList.contains('active')) {
-                        showToast(`Codice letto (${data.barcode}) ma dipendente non trovato.`, 'warning');
+                        showToast(`Codice letto (${data.barcode}) ma utente non trovato.`, 'warning');
                     }
                 } else {
                     // Nessun codice letto ma lo scanner è connesso
@@ -740,7 +934,7 @@
         })
         .catch(error => {
             console.error("Errore:", error);
-            showToast("Errore durante la ricerca del dipendente.", 'danger');
+            showToast("Errore durante la ricerca del utente.", 'danger');
         });
     }
     
@@ -767,22 +961,55 @@
     // Elabora la richiesta di deduzione di credito
     function processDeduction() {
         if (!currentEmployee) {
-            showToast('Nessun dipendente selezionato.', 'danger');
+            showToast('Nessun utente selezionato.', 'danger');
             return;
         }
         
-        let productId = null;
-        let amount = null;
+        // Ottieni tutti i prodotti selezionati con le loro quantità
+        const selectedProducts = [];
+        let totalAmount = 0;
+        let productDescription = '';
+        
+        // Raccogli i prodotti selezionati
+        document.querySelectorAll('.product-item.selected').forEach(item => {
+            const productId = item.dataset.productId;
+            const productName = item.dataset.productName;
+            const productPrice = parseFloat(item.dataset.productPrice);
+            const quantityInput = item.querySelector('.quantity-input');
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            if (quantity > 0) {
+                selectedProducts.push({
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    quantity: quantity
+                });
+                
+                totalAmount += productPrice * quantity;
+                
+                // Aggiungi alla descrizione
+                if (productDescription) {
+                    productDescription += ', ';
+                }
+                productDescription += `${productName} (${quantity})`;
+            }
+        });
+        
+        // Controlla se è stato inserito un importo personalizzato
+        let customAmount = null;
         let customProduct = null;
         
-        // Determina se stiamo usando un prodotto predefinito o un importo personalizzato
-        if (selectedProduct) {
-            productId = selectedProduct.id;
-        } else if (customAmountInput.value) {
-            amount = parseFloat(customAmountInput.value);
-            customProduct = customProductInput.value;
-        } else {
-            showToast('Seleziona un prodotto o inserisci un importo personalizzato.', 'warning');
+        if (customAmountInput.value) {
+            customAmount = parseFloat(customAmountInput.value);
+            customProduct = customProductInput.value || 'Importo personalizzato';
+            totalAmount = customAmount;
+            productDescription = customProduct;
+        }
+        
+        // Verifica che sia stato selezionato almeno un prodotto o inserito un importo
+        if (selectedProducts.length === 0 && !customAmount) {
+            showToast('Seleziona almeno un prodotto o inserisci un importo personalizzato.', 'warning');
             return;
         }
         
@@ -790,10 +1017,12 @@
         const formData = new FormData();
         formData.append('employee_id', currentEmployee.id);
         
-        if (productId) {
-            formData.append('product_id', productId);
+        if (selectedProducts.length > 0) {
+            // Invia i prodotti selezionati come JSON
+            formData.append('products', JSON.stringify(selectedProducts));
         } else {
-            formData.append('custom_amount', amount);
+            // Invia l'importo personalizzato
+            formData.append('custom_amount', customAmount);
             formData.append('custom_product', customProduct);
         }
         
@@ -808,18 +1037,24 @@
                 // Aggiorna il credito del dipendente
                 currentEmployee.credit = data.new_credit;
                 
+                // Riproduci il suono di acquisto
+                purchaseSound.play();
+                
                 // Mostra la conferma
                 showConfirmation(
                     'Acquisto Completato',
                     data.message,
                     `${currentEmployee.first_name} ${currentEmployee.last_name}`,
-                    selectedProduct ? selectedProduct.name : customProduct || 'Importo personalizzato',
-                    selectedProduct ? `-€ ${selectedProduct.price.toFixed(2)}` : `-€ ${amount.toFixed(2)}`,
+                    productDescription,
+                    `-€ ${totalAmount.toFixed(2)}`,
                     `€ ${data.new_credit.toFixed(2)}`
                 );
             } else {
+                // Riproduci il suono di errore
+                errorSound.play();
+                
                 showToast(data.message, 'danger');
-            }
+               }
         })
         .catch(error => {
             console.error("Errore:", error);
@@ -830,7 +1065,7 @@
     // Elabora la richiesta di aggiunta credito
     function processAddCredit() {
         if (!currentEmployee) {
-            showToast('Nessun dipendente selezionato.', 'danger');
+            showToast('Nessun utente selezionato.', 'danger');
             return;
         }
         
@@ -869,6 +1104,9 @@
                 // Aggiorna il credito del dipendente
                 currentEmployee.credit = data.new_credit;
                 
+                // Riproduci il suono di ricarica
+                reloadSound.play();
+                
                 // Mostra la conferma
                 showConfirmation(
                     'Ricarica Completata',
@@ -879,6 +1117,9 @@
                     `€ ${data.new_credit.toFixed(2)}`
                 );
             } else {
+                // Riproduci il suono di errore
+                errorSound.play();
+                
                 showToast(data.message, 'danger');
             }
         })
@@ -949,6 +1190,9 @@
         selectedProduct = null;
         customAmountInput.value = '';
         customProductInput.value = '';
+        
+        // Reset delle quantità a 1
+        resetProductQuantities();
     }
     
     function hideProductSelection() {
@@ -1044,7 +1288,69 @@
         });
     }
     
+    // Funzione di ricerca per la tabella dipendenti
+    function setupEmployeeSearch() {
+        const searchEmployee = document.getElementById('searchEmployee');
+        const employeeRows = document.querySelectorAll('.employee-row');
+        
+        // Funzione per filtrare le righe
+        function filterRows() {
+            const searchTerm = searchEmployee.value.toLowerCase();
+            
+            employeeRows.forEach(row => {
+                const firstName = row.dataset.firstName.toLowerCase();
+                const lastName = row.dataset.lastName.toLowerCase();
+                const fullName = `${firstName} ${lastName}`.toLowerCase();
+                const reverseName = `${lastName} ${firstName}`.toLowerCase();
+                
+                // Mostra la riga se il termine di ricerca è contenuto nel nome, cognome o in entrambi
+                if (firstName.includes(searchTerm) || 
+                    lastName.includes(searchTerm) || 
+                    fullName.includes(searchTerm) || 
+                    reverseName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Aggiungi event listener per l'input di ricerca
+        searchEmployee.addEventListener('input', filterRows);
+        
+        // Gestisci la selezione di un dipendente dalla tabella
+        document.querySelectorAll('.select-employee-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const employeeId = this.dataset.employeeId;
+                
+                // Simula una scansione del codice a barre
+                fetch("{{ url_for('scan_barcode') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `employee_id=${employeeId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        processEmployeeData(data.employee);
+                    } else {
+                        showToast(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error("Errore:", error);
+                    showToast("Errore durante la selezione dell'utente.", 'danger');
+                });
+            });
+        });
+    }
+    
     // Inizializza l'app al caricamento del documento
-    document.addEventListener('DOMContentLoaded', initApp);
+    document.addEventListener('DOMContentLoaded', function() {
+        initApp();
+        setupEmployeeSearch();
+    });
 </script>
 {% endblock %}

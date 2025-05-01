@@ -1,0 +1,5 @@
+This is a placeholder file for the reload sound.
+Please replace this file with an actual MP3 sound file named "reload.mp3".
+
+The reload sound should be a cheerful, uplifting sound (like coins dropping or a success jingle)
+that plays when credit is successfully added to an account.

@@ -552,10 +552,13 @@
                                 <div>{{ transaction.employee_name }}</div>
                             </td>
                             <td class="transaction-product">
-                                {{ transaction.product_name if transaction.product_name else '-' }}
+                                {{ transaction.product_name }}
+                                {% if transaction.transaction_type == 'debit' and '(x' not in transaction.product_name %}
+                                    (x1)
+                                {% endif %}
                             </td>
                             <td class="transaction-operator">
-                                {{ transaction.operator_name if transaction.operator_name else '-' }}
+                                {{ transaction.operator_name }}
                             </td>
                         </tr>
                         {% endfor %}

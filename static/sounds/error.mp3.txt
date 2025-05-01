@@ -1,0 +1,5 @@
+This is a placeholder file for the error sound.
+Please replace this file with an actual MP3 sound file named "error.mp3".
+
+The error sound should be a short, attention-grabbing sound (like a buzzer or alert tone)
+that plays when an error occurs (e.g., insufficient credit).
