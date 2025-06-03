@@ -283,8 +283,9 @@
         let pollTimer = null;
         
         function startBarcodePoll() {
-            // Poll every 2 seconds
-            pollTimer = setInterval(checkForBarcode, 2000);
+            checkForBarcode();
+            // Ridotto a 0.5 secondi per maggiore reattività
+            pollTimer = setInterval(checkForBarcode, 500);
         }
         
         function stopBarcodePoll() {

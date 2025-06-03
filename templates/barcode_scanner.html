@@ -1104,8 +1104,8 @@
         // Prima chiamata immediata
         checkForBarcode();
         
-        // Poi ogni 2 secondi
-        pollTimer = setInterval(checkForBarcode, 2000);
+        // Poi ogni 0.5 secondi (ridotto da 2 secondi per maggiore reattività)
+        pollTimer = setInterval(checkForBarcode, 500);
     }
     
     function stopBarcodePoll() {

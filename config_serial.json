@@ -24,6 +24,11 @@
         "lowercase": false,
         "strip_spaces": true
     },
+    "ui": {
+        "polling_interval_ms": 500,
+        "scanner_timeout_ms": 5000,
+        "auto_proceed": true
+    },
     "logging": {
         "enabled": true,
         "log_file": "scanner.log",
