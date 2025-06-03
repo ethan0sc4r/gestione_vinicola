@@ -8059,3 +8059,5 @@ venv/lib/python3.10/site-packages/xlsxwriter/__pycache__/xmlwriter.cpython-310.p
 /instance
 /.vscode
 vinicola.log
+instance/vinicola.db
+/instance

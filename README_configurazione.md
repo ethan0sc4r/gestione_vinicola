@@ -4,6 +4,16 @@
 
 L'applicazione ora utilizza un file di configurazione JSON esterno (`config_serial.json`) che rimane modificabile anche dopo la compilazione con PyInstaller.
 
+## ✅ Funzionamento completamente OFFLINE
+
+L'applicazione è stata configurata per funzionare **completamente offline** senza connessione internet:
+
+- ✅ **Bootstrap CSS/JS**: File locali in `static/css/bootstrap.min.css` e `static/js/bootstrap.bundle.min.js`
+- ✅ **Font Awesome**: File locale in `static/css/all.min.css`
+- ✅ **jQuery**: File locale in `static/js/jquery-3.6.0.min.js`
+- ✅ **Template**: Tutti i template HTML inclusi
+- ✅ **Configurazione**: File JSON modificabile esternamente
+
 ## Compilazione dell'applicazione
 
 ### Metodo 1: Script automatico (Windows) - CONSIGLIATO
@@ -32,14 +42,20 @@ verify_build.bat
 
 ```
 dist/
-├── app.exe                  (Eseguibile principale)
-├── config_serial.json       (File di configurazione MODIFICABILE)
-├── templates/               (Template HTML di Flask)
+├── app.exe                     (Eseguibile principale)
+├── config_serial.json          (File di configurazione MODIFICABILE)
+├── templates/                  (Template HTML di Flask)
 │   ├── barcode_scanner.html
 │   ├── dashboard.html
 │   ├── login.html
 │   └── [altri template...]
-├── static/                  (File statici: CSS, JS, immagini)
+├── static/                     (File statici OFFLINE)
+│   ├── css/
+│   │   ├── bootstrap.min.css   (Bootstrap CSS offline)
+│   │   └── all.min.css         (Font Awesome offline)
+│   ├── js/
+│   │   ├── bootstrap.bundle.min.js (Bootstrap JS offline)
+│   │   └── jquery-3.6.0.min.js    (jQuery offline)
 │   ├── logo.png
 │   └── sounds/
 └── [altri file di PyInstaller]
@@ -110,6 +126,11 @@ Il file si trova nella stessa cartella dell'eseguibile (`dist/config_serial.json
 
 ## Risoluzione problemi
 
+### Template non visualizzati correttamente senza internet
+- ✅ **RISOLTO**: Tutti i file CSS/JS sono ora locali
+- Verifica che i file in `dist/static/css/` e `dist/static/js/` esistano
+- Esegui `verify_build.bat` per controllare tutti i file
+
 ### Template non trovati (TemplateNotFound)
 - Verifica che la cartella `dist/templates/` esista e contenga i file HTML
 - Esegui `verify_build.bat` per controllare i file inclusi
@@ -129,13 +150,14 @@ Il file si trova nella stessa cartella dell'eseguibile (`dist/config_serial.json
 3. Prova velocità di comunicazione diverse (9600, 19200, 38400, 115200)
 
 ### File statici non caricati
-- Verifica che la cartella `dist/static/` esista
+- ✅ **RISOLTO**: Tutti i file sono ora locali
+- Verifica che la cartella `dist/static/` esista con tutti i file CSS/JS
 - Controlla che il logo e i suoni siano presenti
 
 ## Script di utilità
 
-- **`build.bat`** - Compila l'applicazione includendo tutti i file necessari
-- **`verify_build.bat`** - Verifica che tutti i file siano stati inclusi correttamente
+- **`build.bat`** - Compila l'applicazione includendo tutti i file necessari e verifica i file offline
+- **`verify_build.bat`** - Verifica che tutti i file siano stati inclusi correttamente (include controllo file offline)
 
 ## Backup della configurazione
 
@@ -149,4 +171,23 @@ copy config_serial.json config_serial_backup.json
 
 - PyInstaller include automaticamente tutte le dipendenze Python
 - I template HTML e file statici sono inclusi manualmente tramite `--add-data`
-- Il file di configurazione JSON rimane sempre esterno e modificabile 
+- Il file di configurazione JSON rimane sempre esterno e modificabile
+- **Tutti i file CSS/JS sono locali - nessuna connessione internet richiesta**
+- Bootstrap 5.2.3, Font Awesome e jQuery funzionano completamente offline
+
+## File offline inclusi
+
+| File | Descrizione | Percorso |
+|------|-------------|----------|
+| `bootstrap.min.css` | Bootstrap CSS completo | `static/css/bootstrap.min.css` |
+| `all.min.css` | Font Awesome completo | `static/css/all.min.css` |
+| `bootstrap.bundle.min.js` | Bootstrap JS + Popper | `static/js/bootstrap.bundle.min.js` |
+| `jquery-3.6.0.min.js` | jQuery completo | `static/js/jquery-3.6.0.min.js` |
+
+## 🎯 Vantaggi della versione offline
+
+- ✅ **Nessuna dipendenza da internet**
+- ✅ **Velocità di caricamento superiore**
+- ✅ **Funziona in ambienti isolati**
+- ✅ **Affidabilità totale**
+- ✅ **Configurazione sempre modificabile** 
