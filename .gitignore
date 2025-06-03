@@ -8053,3 +8053,9 @@ venv/lib/python3.10/site-packages/xlsxwriter/__pycache__/vml.cpython-310.pyc
 venv/lib/python3.10/site-packages/xlsxwriter/__pycache__/workbook.cpython-310.pyc
 venv/lib/python3.10/site-packages/xlsxwriter/__pycache__/worksheet.cpython-310.pyc
 venv/lib/python3.10/site-packages/xlsxwriter/__pycache__/xmlwriter.cpython-310.pyc
+/venv
+/build
+/dist
+/instance
+/.vscode
+vinicola.log

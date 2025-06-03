@@ -203,6 +203,11 @@
         color: var(--danger-color);
     }
     
+    .transaction-type-admin {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+    
     .transaction-amount {
         font-weight: 600;
     }
@@ -590,6 +595,7 @@
                         <option value="all">Tutte le transazioni</option>
                         <option value="credit">Solo ricariche</option>
                         <option value="debit">Solo acquisti</option>
+                        <option value="admin_adjustment">Solo regolazioni admin</option>
                     </select>
                 </div>
             </div>
@@ -615,17 +621,19 @@
                                 <div class="transaction-time">{{ transaction.timestamp.strftime('%H:%M:%S') }}</div>
                             </td>
                             <td>
-                                <span class="transaction-type {% if transaction.transaction_type == 'credit' %}transaction-type-credit{% else %}transaction-type-debit{% endif %}">
+                                <span class="transaction-type {% if transaction.transaction_type == 'credit' %}transaction-type-credit{% elif transaction.transaction_type == 'admin_adjustment' %}transaction-type-admin{% else %}transaction-type-debit{% endif %}">
                                     {% if transaction.transaction_type == 'credit' %}
                                         <i class="fas fa-plus-circle me-1"></i> Ricarica
+                                    {% elif transaction.transaction_type == 'admin_adjustment' %}
+                                        <i class="fas fa-cog me-1"></i> Regolazione Admin
                                     {% else %}
                                         <i class="fas fa-minus-circle me-1"></i> Acquisto
                                     {% endif %}
                                 </span>
                             </td>
                             <td>
-                                <span class="transaction-amount {% if transaction.transaction_type == 'credit' %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
-                                    {% if transaction.transaction_type == 'credit' %}
+                                <span class="transaction-amount {% if transaction.transaction_type == 'credit' or (transaction.transaction_type == 'admin_adjustment' and transaction.amount > 0) %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
+                                    {% if transaction.transaction_type == 'credit' or (transaction.transaction_type == 'admin_adjustment' and transaction.amount > 0) %}
                                         +€ {{ "%.2f"|format(transaction.amount) }}
                                     {% else %}
                                         -€ {{ "%.2f"|format(transaction.amount|abs) }}
@@ -695,29 +703,39 @@
             
             if (isPeriodReport) {
                 // Seleziona il radio button del report di periodo
-                document.getElementById('periodReport').checked = true;
+                const periodReportRadio = document.getElementById('periodReport');
+                if (periodReportRadio) {
+                    periodReportRadio.checked = true;
+                }
                 
                 // Mostra i controlli del periodo e nascondi quelli giornalieri
-                dailyControls.style.display = 'none';
-                periodControls.style.display = 'flex';
+                if (dailyControls && periodControls) {
+                    dailyControls.style.display = 'none';
+                    periodControls.style.display = 'flex';
+                }
                 
                 // Imposta le date di inizio e fine
-                if (urlParams.get('start_date')) {
+                if (urlParams.get('start_date') && startDateInput) {
                     startDateInput.value = urlParams.get('start_date');
                 }
-                if (urlParams.get('end_date')) {
+                if (urlParams.get('end_date') && endDateInput) {
                     endDateInput.value = urlParams.get('end_date');
                 }
             } else {
                 // Seleziona il radio button del report giornaliero
-                document.getElementById('dailyReport').checked = true;
+                const dailyReportRadio = document.getElementById('dailyReport');
+                if (dailyReportRadio) {
+                    dailyReportRadio.checked = true;
+                }
                 
                 // Mostra i controlli giornalieri e nascondi quelli del periodo
-                dailyControls.style.display = 'flex';
-                periodControls.style.display = 'none';
+                if (dailyControls && periodControls) {
+                    dailyControls.style.display = 'flex';
+                    periodControls.style.display = 'none';
+                }
                 
                 // Imposta la data del report
-                if (urlParams.get('date')) {
+                if (urlParams.get('date') && reportDateInput) {
                     reportDateInput.value = urlParams.get('date');
                 }
             }
@@ -730,96 +748,129 @@
         reportTypeRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 if (this.value === 'daily') {
-                    dailyControls.style.display = 'flex';
-                    periodControls.style.display = 'none';
+                    if (dailyControls && periodControls) {
+                        dailyControls.style.display = 'flex';
+                        periodControls.style.display = 'none';
+                    }
                 } else {
-                    dailyControls.style.display = 'none';
-                    periodControls.style.display = 'flex';
+                    if (dailyControls && periodControls) {
+                        dailyControls.style.display = 'none';
+                        periodControls.style.display = 'flex';
+                    }
                 }
             });
         });
         
         // Filtro tipo transazione
-        typeFilter.addEventListener('change', function() {
-            const type = this.value;
-            const rows = document.querySelectorAll('.transactions-table tbody tr');
-            
-            rows.forEach(row => {
-                const rowType = row.getAttribute('data-type');
-                if (type === 'all' || type === rowType) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+        if (typeFilter) {
+            typeFilter.addEventListener('change', function() {
+                const type = this.value;
+                const rows = document.querySelectorAll('.transactions-table tbody tr');
+                
+                rows.forEach(row => {
+                    const rowType = row.getAttribute('data-type');
+                    if (type === 'all' || type === rowType) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             });
-        });
+        }
         
         // Navigazione date per report giornaliero
         function changeDate(days) {
+            if (!reportDateInput) return;
+            
             const currentDate = new Date(reportDateInput.value);
             currentDate.setDate(currentDate.getDate() + days);
             reportDateInput.value = currentDate.toISOString().split('T')[0];
         }
         
-        prevDayBtn.addEventListener('click', function() {
-            changeDate(-1);
-        });
+        if (prevDayBtn) {
+            prevDayBtn.addEventListener('click', function() {
+                changeDate(-1);
+            });
+        }
         
-        nextDayBtn.addEventListener('click', function() {
-            changeDate(1);
-        });
+        if (nextDayBtn) {
+            nextDayBtn.addEventListener('click', function() {
+                changeDate(1);
+            });
+        }
         
         // Aggiornamento report
-        updateReportBtn.addEventListener('click', function() {
-            const reportType = document.querySelector('input[name="reportType"]:checked').value;
-            
-            if (reportType === 'daily') {
-                const date = reportDateInput.value;
-                window.location.href = "{{ url_for('admin_reports') }}?date=" + date;
-            } else {
-                const startDate = startDateInput.value;
-                const endDate = endDateInput.value;
-                window.location.href = "{{ url_for('admin_reports') }}?start_date=" + startDate + "&end_date=" + endDate;
-            }
-        });
+        if (updateReportBtn) {
+            updateReportBtn.addEventListener('click', function() {
+                const reportTypeChecked = document.querySelector('input[name="reportType"]:checked');
+                if (!reportTypeChecked) return;
+                
+                const reportType = reportTypeChecked.value;
+                
+                if (reportType === 'daily') {
+                    const date = reportDateInput ? reportDateInput.value : '';
+                    window.location.href = "{{ url_for('admin_reports') }}?date=" + date;
+                } else {
+                    const startDate = startDateInput ? startDateInput.value : '';
+                    const endDate = endDateInput ? endDateInput.value : '';
+                    window.location.href = "{{ url_for('admin_reports') }}?start_date=" + startDate + "&end_date=" + endDate;
+                }
+            });
+        }
         
         // Formattazione date per la vista
         [reportDateInput, startDateInput, endDateInput].forEach(input => {
-            input.addEventListener('change', function() {
-                const selectedDate = new Date(this.value);
-                if (!isNaN(selectedDate.getTime())) {
-                    this.value = selectedDate.toISOString().split('T')[0];
-                }
-            });
+            if (input) {
+                input.addEventListener('change', function() {
+                    const selectedDate = new Date(this.value);
+                    if (!isNaN(selectedDate.getTime())) {
+                        this.value = selectedDate.toISOString().split('T')[0];
+                    }
+                });
+            }
         });
         
         // Stampa report
-        printReportBtn.addEventListener('click', function() {
-            // Aggiorna il titolo del report in base al tipo
-            const reportType = document.querySelector('input[name="reportType"]:checked').value;
-            const reportTitle = document.querySelector('#printHeader h2');
-            
-            if (reportType === 'daily') {
-                reportTitle.textContent = "{{ app_name }} - Report Giornaliero";
-                document.querySelector('#printHeader h3').textContent = "{{ report_date.strftime('%d/%m/%Y') }}";
-            } else {
-                reportTitle.textContent = "{{ app_name }} - Report Periodo";
-                document.querySelector('#printHeader h3').textContent = 
-                    "Dal " + new Date(startDateInput.value).toLocaleDateString('it-IT') + 
-                    " al " + new Date(endDateInput.value).toLocaleDateString('it-IT');
-            }
-            
-            // Mostra l'intestazione di stampa
-            printHeader.style.display = 'block';
-            
-            // Stampa
-            window.print();
-            
-            // Nascondi di nuovo l'intestazione di stampa
-            setTimeout(() => {
-                printHeader.style.display = 'none';
-            }, 1000);
-        });
+        if (printReportBtn) {
+            printReportBtn.addEventListener('click', function() {
+                // Aggiorna il titolo del report in base al tipo
+                const reportTypeChecked = document.querySelector('input[name="reportType"]:checked');
+                if (!reportTypeChecked) return;
+                
+                const reportType = reportTypeChecked.value;
+                const reportTitleElement = document.querySelector('#printHeader h2');
+                const reportSubtitleElement = document.querySelector('#printHeader h3');
+                
+                if (reportTitleElement && reportSubtitleElement) {
+                    if (reportType === 'daily') {
+                        reportTitleElement.textContent = "{{ app_name }} - Report Giornaliero";
+                        reportSubtitleElement.textContent = "{{ report_date.strftime('%d/%m/%Y') }}";
+                    } else {
+                        reportTitleElement.textContent = "{{ app_name }} - Report Periodo";
+                        if (startDateInput && endDateInput) {
+                            reportSubtitleElement.textContent = 
+                                "Dal " + new Date(startDateInput.value).toLocaleDateString('it-IT') + 
+                                " al " + new Date(endDateInput.value).toLocaleDateString('it-IT');
+                        }
+                    }
+                }
+                
+                // Mostra l'intestazione di stampa
+                if (printHeader) {
+                    printHeader.style.display = 'block';
+                }
+                
+                // Stampa
+                window.print();
+                
+                // Nascondi di nuovo l'intestazione di stampa
+                setTimeout(() => {
+                    if (printHeader) {
+                        printHeader.style.display = 'none';
+                    }
+                }, 1000);
+            });
+        }
     });
 </script>
 {% endblock %}

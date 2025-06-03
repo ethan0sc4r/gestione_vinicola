@@ -273,6 +273,9 @@
                                 <a href="{{ url_for('admin_edit_employee', id=employee.id) }}" class="btn btn-sm btn-outline-primary" title="Modifica">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#creditModal{{ employee.id }}" title="Modifica Credito">
+                                    <i class="fas fa-euro-sign"></i>
+                                </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ employee.id }}" title="Elimina">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
@@ -300,6 +303,58 @@
                                             <form action="{{ url_for('delete_employee', id=employee.id) }}" method="POST" style="display: inline;">
                                                 <button type="submit" class="btn btn-danger">Elimina</button>
                                             </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Credit Adjustment Modal -->
+                            <div class="modal fade" id="creditModal{{ employee.id }}" tabindex="-1" aria-labelledby="creditModalLabel{{ employee.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="creditModalLabel{{ employee.id }}">
+                                                <i class="fas fa-euro-sign me-2"></i>Modifica Credito - {{ employee.first_name }} {{ employee.last_name }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info mb-4">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Attenzione:</strong> Questa operazione modifica direttamente il credito senza influire sulla cassa e verrà registrata nei log.
+                                            </div>
+                                            
+                                            <form id="creditForm{{ employee.id }}">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Credito Attuale</label>
+                                                    <div class="form-control-plaintext fw-bold">€ {{ "%.2f"|format(employee.credit) }}</div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="newCredit{{ employee.id }}" class="form-label">Nuovo Credito <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">€</span>
+                                                        <input type="number" class="form-control" id="newCredit{{ employee.id }}" step="0.01" required value="{{ "%.2f"|format(employee.credit) }}">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="adjustmentReason{{ employee.id }}" class="form-label">Motivo della Modifica <span class="text-danger">*</span></label>
+                                                    <textarea class="form-control" id="adjustmentReason{{ employee.id }}" rows="3" required placeholder="Inserisci il motivo della modifica del credito..."></textarea>
+                                                </div>
+                                                
+                                                <div class="difference-display" id="differenceDisplay{{ employee.id }}" style="display: none;">
+                                                    <div class="alert alert-secondary">
+                                                        <strong>Differenza:</strong> <span id="differenceAmount{{ employee.id }}"></span>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                                            <button type="button" class="btn btn-success" onclick="adjustCredit({{ employee.id }})">
+                                                <i class="fas fa-save me-1"></i> Salva Modifica
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -350,6 +405,144 @@
                 row.style.display = isVisible ? '' : 'none';
             });
         });
+        
+        // Aggiungi listener per calcolare la differenza quando cambia il nuovo credito
+        document.querySelectorAll('[id^="newCredit"]').forEach(input => {
+            const employeeId = input.id.replace('newCredit', '');
+            const originalCredit = parseFloat(input.value);
+            
+            input.addEventListener('input', function() {
+                const newCredit = parseFloat(this.value) || 0;
+                const difference = newCredit - originalCredit;
+                const differenceDisplay = document.getElementById('differenceDisplay' + employeeId);
+                const differenceAmount = document.getElementById('differenceAmount' + employeeId);
+                
+                if (Math.abs(difference) > 0.001) { // Evita problemi di precisione floating point
+                    const sign = difference > 0 ? '+' : '';
+                    const color = difference > 0 ? 'text-success' : 'text-danger';
+                    differenceAmount.innerHTML = `<span class="${color}">${sign}€ ${difference.toFixed(2)}</span>`;
+                    differenceDisplay.style.display = 'block';
+                } else {
+                    differenceDisplay.style.display = 'none';
+                }
+            });
+        });
     });
+    
+    // Funzione per regolare il credito
+    function adjustCredit(employeeId) {
+        const newCreditInput = document.getElementById('newCredit' + employeeId);
+        const reasonInput = document.getElementById('adjustmentReason' + employeeId);
+        
+        const newCredit = parseFloat(newCreditInput.value);
+        const reason = reasonInput.value.trim();
+        
+        // Validazione
+        if (isNaN(newCredit)) {
+            showToast('Inserisci un importo valido', 'danger');
+            return;
+        }
+        
+        if (!reason) {
+            showToast('Inserisci il motivo della modifica', 'danger');
+            return;
+        }
+        
+        // Conferma operazione
+        if (!confirm('Sei sicuro di voler modificare il credito di questo dipendente?')) {
+            return;
+        }
+        
+        // Disabilita il pulsante per evitare doppi click
+        const saveBtn = event.target;
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvataggio...';
+        
+        // Invia richiesta al server
+        fetch('/admin/employee/' + employeeId + '/adjust_credit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                new_credit: newCredit,
+                reason: reason
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                // Chiudi il modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('creditModal' + employeeId));
+                modal.hide();
+                // Ricarica la pagina per aggiornare i dati
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Errore durante il salvataggio', 'danger');
+        })
+        .finally(() => {
+            // Riabilita il pulsante
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save me-1"></i> Salva Modifica';
+        });
+    }
+    
+    // Funzione per mostrare i toast
+    function showToast(message, type = 'info') {
+        // Crea un elemento toast se non esiste
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = 1055;
+            document.body.appendChild(toastContainer);
+        }
+        
+        // Crea il toast
+        const toastId = 'toast-' + Date.now();
+        const toastElement = document.createElement('div');
+        toastElement.id = toastId;
+        toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+        toastElement.role = 'alert';
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+        
+        // Imposta il contenuto del toast
+        toastElement.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Aggiungi il toast al container
+        toastContainer.appendChild(toastElement);
+        
+        // Inizializza il toast con Bootstrap
+        const toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 5000
+        });
+        
+        // Mostra il toast
+        toast.show();
+        
+        // Rimuovi il toast dal DOM quando è stato nascosto
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.remove();
+        });
+    }
 </script>
 {% endblock %}

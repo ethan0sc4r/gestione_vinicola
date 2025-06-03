@@ -1,0 +1,45 @@
+{
+    "serial": {
+        "port": "/dev/ttyUSB0",
+        "baudrate": 9600,
+        "timeout": 1,
+        "bytesize": 8,
+        "parity": "N",
+        "stopbits": 1,
+        "encoding": "utf-8",
+        "errors": "replace",
+        "terminators": ["\r", "\n", "\r\n"],
+        "rtscts": false,
+        "dsrdtr": false,
+        "xonxoff": false
+    },
+    "reader": {
+        "polling_interval": 0.1,
+        "read_buffer_size": 1024,
+        "max_history_size": 5,
+        "duplicate_timeout": 3.0,
+        "ignore_prefix": "",
+        "ignore_suffix": "",
+        "uppercase": false,
+        "lowercase": false,
+        "strip_spaces": true
+    },
+    "logging": {
+        "enabled": true,
+        "log_file": "scanner.log",
+        "log_level": "INFO",
+        "log_events": {
+            "connection": true,
+            "read_success": true,
+            "read_error": true,
+            "employee_found": true,
+            "employee_not_found": true
+        }
+    },
+    "error_recovery": {
+        "auto_reconnect": true,
+        "max_reconnect_attempts": 5,
+        "reconnect_delay": 3.0,
+        "reset_on_error": true
+    }
+} 

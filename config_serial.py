@@ -3,113 +3,152 @@
 
 """
 Modulo di configurazione per il lettore di codici a barre seriale.
+Carica la configurazione dal file config_serial.json esterno.
 """
 
-# Impostazioni porta seriale
-SERIAL_PORT = {
-    # Porta seriale - modificare in base alla configurazione del sistema
-    'port': '/dev/ttyUSB0',  # Linux (tipicamente /dev/ttyUSB0 o /dev/ttyACM0)
-    # 'port': 'COM1',        # Windows (tipicamente COM1, COM2, ecc.)
-    
-    # Parametri di comunicazione - modificare in base al lettore utilizzato
-    'baudrate': 9600,        # Velocità di comunicazione (tipicamente 9600 baud)
-    'timeout': 1,            # Timeout in secondi
-    'bytesize': 8,           # Dimensione dei dati (tipicamente 8 bit)
-    'parity': 'N',           # Parità: N(none), E(even), O(odd), M(mark), S(space)
-    'stopbits': 1,           # Bit di stop (tipicamente 1)
-    
-    # Impostazioni di decodifica
-    'encoding': 'utf-8',     # Codifica dei caratteri
-    'errors': 'replace',     # Gestione errori di decodifica
-    
-    # Caratteri terminatori - modificare in base al lettore
-    'terminators': ['\r', '\n', '\r\n'],  # Caratteri che indicano la fine del codice
-    
-    # Impostazioni avanzate
-    'rtscts': False,         # Controllo di flusso hardware RTS/CTS
-    'dsrdtr': False,         # Controllo di flusso hardware DSR/DTR
-    'xonxoff': False,        # Controllo di flusso software XON/XOFF
-}
+import json
+import os
+import sys
 
-# Impostazioni per la gestione del lettore
-READER_SETTINGS = {
-    # Intervallo di polling per la lettura (secondi)
-    'polling_interval': 0.1,
+def get_config_path():
+    """
+    Determina il percorso del file di configurazione.
+    Se l'app è compilata con PyInstaller, cerca nella cartella dell'eseguibile.
+    Altrimenti cerca nella cartella dello script.
+    """
+    if getattr(sys, 'frozen', False):
+        # Se l'applicazione è compilata con PyInstaller
+        application_path = os.path.dirname(sys.executable)
+    else:
+        # Se l'applicazione è in modalità sviluppo
+        application_path = os.path.dirname(os.path.abspath(__file__))
     
-    # Dimensione massima del buffer di lettura
-    'read_buffer_size': 1024,
-    
-    # Numero massimo di codici da memorizzare nella cronologia
-    'max_history_size': 5,
-    
-    # Tempo minimo tra due letture consecutive dello stesso codice (secondi)
-    'duplicate_timeout': 3.0,
-    
-    # Prefisso/suffisso da ignorare nel codice letto (alcuni lettori aggiungono caratteri)
-    'ignore_prefix': '',
-    'ignore_suffix': '',
-    
-    # Trasformazioni da applicare al codice letto
-    'uppercase': False,      # Converti in maiuscolo
-    'lowercase': False,      # Converti in minuscolo
-    'strip_spaces': True,    # Rimuovi spazi iniziali e finali
-}
+    return os.path.join(application_path, 'config_serial.json')
 
-# Configurazione del sistema di logging
-LOGGING = {
-    'enabled': True,         # Abilita il logging degli eventi del lettore
-    'log_file': 'scanner.log',  # File di log
-    'log_level': 'INFO',     # Livello di logging: DEBUG, INFO, WARNING, ERROR, CRITICAL
-    
-    # Eventi da registrare
-    'log_events': {
-        'connection': True,      # Connessione/disconnessione
-        'read_success': True,    # Lettura codice avvenuta con successo
-        'read_error': True,      # Errori di lettura
-        'employee_found': True,  # Dipendente trovato
-        'employee_not_found': True,  # Dipendente non trovato
+def create_default_config():
+    """Crea un file di configurazione predefinito se non esiste."""
+    default_config = {
+        "serial": {
+            "port": "/dev/ttyUSB0",
+            "baudrate": 9600,
+            "timeout": 1,
+            "bytesize": 8,
+            "parity": "N",
+            "stopbits": 1,
+            "encoding": "utf-8",
+            "errors": "replace",
+            "terminators": ["\r", "\n", "\r\n"],
+            "rtscts": False,
+            "dsrdtr": False,
+            "xonxoff": False
+        },
+        "reader": {
+            "polling_interval": 0.1,
+            "read_buffer_size": 1024,
+            "max_history_size": 5,
+            "duplicate_timeout": 3.0,
+            "ignore_prefix": "",
+            "ignore_suffix": "",
+            "uppercase": False,
+            "lowercase": False,
+            "strip_spaces": True
+        },
+        "logging": {
+            "enabled": True,
+            "log_file": "scanner.log",
+            "log_level": "INFO",
+            "log_events": {
+                "connection": True,
+                "read_success": True,
+                "read_error": True,
+                "employee_found": True,
+                "employee_not_found": True
+            }
+        },
+        "error_recovery": {
+            "auto_reconnect": True,
+            "max_reconnect_attempts": 5,
+            "reconnect_delay": 3.0,
+            "reset_on_error": True
+        }
     }
-}
+    return default_config
 
-# Procedure di recupero in caso di errore
-ERROR_RECOVERY = {
-    'auto_reconnect': True,      # Tenta di riconnettere automaticamente in caso di disconnessione
-    'max_reconnect_attempts': 5,  # Numero massimo di tentativi di riconnessione
-    'reconnect_delay': 3.0,      # Attesa tra i tentativi (secondi)
-    'reset_on_error': True,      # Resetta il lettore in caso di errori persistenti
-}
-
-# Funzione per caricare la configurazione
 def load_config():
-    """Carica e restituisce la configurazione del lettore seriale."""
-    config = {
-        'serial': SERIAL_PORT,
-        'reader': READER_SETTINGS,
-        'logging': LOGGING,
-        'error_recovery': ERROR_RECOVERY
-    }
+    """Carica e restituisce la configurazione del lettore seriale dal file JSON."""
+    config_path = get_config_path()
+    
+    try:
+        # Prova a caricare il file di configurazione
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            print(f"Configurazione caricata da: {config_path}")
+        else:
+            # Se il file non esiste, crea quello predefinito
+            config = create_default_config()
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=4, ensure_ascii=False)
+            print(f"File di configurazione creato: {config_path}")
+            
+    except Exception as e:
+        print(f"Errore nel caricamento della configurazione: {e}")
+        print("Uso configurazione predefinita")
+        config = create_default_config()
+    
     return config
+
+def save_config(config):
+    """Salva la configurazione nel file JSON."""
+    config_path = get_config_path()
+    try:
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=4, ensure_ascii=False)
+        print(f"Configurazione salvata in: {config_path}")
+        return True
+    except Exception as e:
+        print(f"Errore nel salvataggio della configurazione: {e}")
+        return False
+
+# Backward compatibility - mantiene le variabili originali per compatibilità
+def _load_legacy_vars():
+    """Carica le variabili per compatibilità con il codice esistente."""
+    config = load_config()
+    
+    global SERIAL_PORT, READER_SETTINGS, LOGGING, ERROR_RECOVERY
+    SERIAL_PORT = config['serial']
+    READER_SETTINGS = config['reader']
+    LOGGING = config['logging']
+    ERROR_RECOVERY = config['error_recovery']
+
+# Carica le variabili all'importazione del modulo
+_load_legacy_vars()
 
 # Istruzioni per l'utilizzo
 """
-Per utilizzare questa configurazione:
+Per utilizzare questa configurazione con PyInstaller:
 
-1. Salva questo file come 'config_serial.py' nella cartella principale del progetto
-2. Nel file app.py, importa la configurazione:
+1. Il file config_serial.json verrà cercato nella stessa cartella dell'eseguibile
+2. Se non esiste, verrà creato automaticamente con i valori predefiniti
+3. Puoi modificare il file JSON direttamente per cambiare le impostazioni
+4. Le modifiche saranno rilevate automaticamente al riavvio dell'applicazione
+
+Per la compilazione con PyInstaller:
+1. Aggiungi questo al tuo file .spec o usa il comando:
    
+   pyinstaller --add-data "config_serial.json;." app.py
+   
+   Oppure su Linux/Mac:
+   pyinstaller --add-data "config_serial.json:." app.py
+
+2. Il file JSON sarà copiato insieme all'eseguibile e rimarrà modificabile
+
+Uso nel codice:
    from config_serial import load_config
    
-   # Ottieni la configurazione
-   serial_config = load_config()
+   # Ottieni la configurazione sempre aggiornata
+   config = load_config()
    
-   # Configura il lettore usando i parametri
-   port = serial_config['serial']['port']
-   baudrate = serial_config['serial']['baudrate']
-   # ...etc
-   
-3. Assicurati di avere il pacchetto pyserial installato:
-   
-   pip install pyserial
-   
-4. Modifica i parametri in questo file in base alle specifiche del tuo lettore di codici a barre
+   # Oppure usa le variabili globali (compatibilità)
+   from config_serial import SERIAL_PORT, READER_SETTINGS
 """

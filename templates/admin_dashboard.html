@@ -235,6 +235,81 @@
             width: 100%;
         }
     }
+    
+    /* Stili per il prelievo cassa */
+    .withdraw-presets {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .preset-button {
+        background-color: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
+        user-select: none;
+    }
+    
+    .preset-button:hover {
+        background-color: #e9ecef;
+        border-color: #ced4da;
+        transform: translateY(-1px);
+    }
+    
+    .preset-button.selected {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    }
+    
+    .preset-button i {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .custom-amount-group .input-group {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid #e9ecef;
+        transition: border-color 0.2s;
+    }
+    
+    .custom-amount-group .input-group:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
+    }
+    
+    .custom-amount-group .input-group-text {
+        background-color: #f8f9fa;
+        border: none;
+        font-weight: 600;
+    }
+    
+    .custom-amount-group .form-control {
+        border: none;
+        padding: 0.75rem 1rem;
+    }
+    
+    .custom-amount-group .form-control:focus {
+        box-shadow: none;
+    }
+    
+    .selected-amount-display .alert-success {
+        border: none;
+        background-color: rgba(52, 199, 89, 0.1);
+        color: #34c759;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+    }
 </style>
 {% endblock %}
 
@@ -392,8 +467,44 @@
             <div class="modal-body">
                 <div class="alert alert-info mb-3">
                     <i class="fas fa-info-circle me-2"></i>
-                    Stai per prelevare <strong>€ {{ "%.2f"|format(cash_balance) }}</strong> dalla cassa.
-                    Questa operazione azzererà il saldo della cassa.
+                    Saldo attuale della cassa: <strong id="currentCashBalance">€ {{ "%.2f"|format(cash_balance) }}</strong>
+                </div>
+                
+                <!-- Selezione importo da prelevare -->
+                <div class="mb-3">
+                    <label class="form-label">Importo da prelevare</label>
+                    <div class="withdraw-presets mb-3">
+                        <div class="preset-button" data-type="full">
+                            <i class="fas fa-coins me-1"></i>
+                            Tutto (€ {{ "%.2f"|format(cash_balance) }})
+                        </div>
+                        <div class="preset-button" data-amount="50">€ 50.00</div>
+                        <div class="preset-button" data-amount="100">€ 100.00</div>
+                        <div class="preset-button" data-amount="200">€ 200.00</div>
+                        <div class="preset-button" data-amount="500">€ 500.00</div>
+                        <div class="preset-button" data-type="custom">
+                            <i class="fas fa-keyboard me-1"></i>
+                            Personalizzato
+                        </div>
+                    </div>
+                    
+                    <!-- Campo importo personalizzato (nascosto inizialmente) -->
+                    <div class="custom-amount-group" id="customWithdrawAmountGroup" style="display: none;">
+                        <label for="customWithdrawAmount" class="form-label">Specifica l'importo (da €0.01 a €{{ "%.2f"|format(cash_balance) }})</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control" id="customWithdrawAmount" 
+                                   step="0.01" min="0.01" max="{{ "%.2f"|format(cash_balance) }}" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Importo selezionato -->
+                <div class="selected-amount-display mb-3" id="selectedAmountDisplay" style="display: none;">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Importo selezionato: <strong id="selectedAmountText">€ 0.00</strong>
+                    </div>
                 </div>
                 
                 <div class="form-check mb-3">
@@ -476,21 +587,155 @@
         const confirmWithdrawCheckbox = document.getElementById('confirmWithdraw');
         const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
         
+        // Elementi per il prelievo dalla cassa
+        const presetButtons = document.querySelectorAll('.preset-button');
+        const customAmountGroup = document.getElementById('customWithdrawAmountGroup');
+        const customAmountInput = document.getElementById('customWithdrawAmount');
+        const selectedAmountDisplay = document.getElementById('selectedAmountDisplay');
+        const selectedAmountText = document.getElementById('selectedAmountText');
+        
+        // Variabili di stato per il prelievo
+        let selectedWithdrawAmount = null;
+        const maxCashBalance = {{ cash_balance }};
+        
+        // Verifica che gli elementi essenziali esistano prima di aggiungere event listener
+        if (!withdrawCashBtn) {
+            console.error('Elemento withdrawCashBtn non trovato');
+            return;
+        }
+        
+        if (!confirmWithdrawBtn) {
+            console.error('Elemento confirmWithdrawBtn non trovato');
+            return;
+        }
+        
+        if (!confirmWithdrawCheckbox) {
+            console.error('Elemento confirmWithdrawCheckbox non trovato');
+            return;
+        }
+        
         // Gestione del prelievo dalla cassa
         withdrawCashBtn.addEventListener('click', function() {
+            // Reset della selezione quando si apre il modal
+            resetWithdrawSelection();
             withdrawCashModal.show();
         });
         
-        // Abilita/disabilita il pulsante di conferma prelievo in base alla checkbox
-        confirmWithdrawCheckbox.addEventListener('change', function() {
-            confirmWithdrawBtn.disabled = !this.checked;
+        // Funzione per resettare la selezione
+        function resetWithdrawSelection() {
+            selectedWithdrawAmount = null;
+            presetButtons.forEach(btn => btn.classList.remove('selected'));
+            if (customAmountGroup) {
+                customAmountGroup.style.display = 'none';
+            }
+            if (customAmountInput) {
+                customAmountInput.value = '';
+            }
+            if (selectedAmountDisplay) {
+                selectedAmountDisplay.style.display = 'none';
+            }
+            confirmWithdrawCheckbox.checked = false;
+            updateWithdrawButton();
+        }
+        
+        // Gestione dei preset di importo
+        presetButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Rimuovi la selezione da tutti i pulsanti
+                presetButtons.forEach(btn => btn.classList.remove('selected'));
+                
+                // Seleziona questo pulsante
+                this.classList.add('selected');
+                
+                const type = this.dataset.type;
+                const amount = this.dataset.amount;
+                
+                if (type === 'full') {
+                    // Preleva tutto
+                    selectedWithdrawAmount = maxCashBalance;
+                    if (customAmountGroup) {
+                        customAmountGroup.style.display = 'none';
+                    }
+                } else if (type === 'custom') {
+                    // Mostra il campo personalizzato
+                    selectedWithdrawAmount = null;
+                    if (customAmountGroup) {
+                        customAmountGroup.style.display = 'block';
+                    }
+                    if (customAmountInput) {
+                        customAmountInput.focus();
+                    }
+                } else if (amount) {
+                    // Preset specifico
+                    const presetAmount = parseFloat(amount);
+                    if (presetAmount <= maxCashBalance) {
+                        selectedWithdrawAmount = presetAmount;
+                        if (customAmountGroup) {
+                            customAmountGroup.style.display = 'none';
+                        }
+                    } else {
+                        // Se il preset supera il saldo, deseleziona
+                        this.classList.remove('selected');
+                        selectedWithdrawAmount = null;
+                        showToast(`L'importo €${presetAmount.toFixed(2)} supera il saldo disponibile (€${maxCashBalance.toFixed(2)})`, 'warning');
+                    }
+                }
+                
+                updateWithdrawDisplay();
+                updateWithdrawButton();
+            });
         });
+        
+        // Gestione dell'importo personalizzato
+        if (customAmountInput) {
+            customAmountInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (!isNaN(value) && value >= 0.01 && value <= maxCashBalance) {
+                    selectedWithdrawAmount = value;
+                } else {
+                    selectedWithdrawAmount = null;
+                }
+                
+                updateWithdrawDisplay();
+                updateWithdrawButton();
+            });
+        }
+        
+        // Funzione per aggiornare la visualizzazione dell'importo selezionato
+        function updateWithdrawDisplay() {
+            if (selectedWithdrawAmount !== null && selectedAmountText && selectedAmountDisplay) {
+                selectedAmountText.textContent = `€ ${selectedWithdrawAmount.toFixed(2)}`;
+                selectedAmountDisplay.style.display = 'block';
+            } else if (selectedAmountDisplay) {
+                selectedAmountDisplay.style.display = 'none';
+            }
+        }
+        
+        // Funzione per aggiornare lo stato del pulsante di conferma
+        function updateWithdrawButton() {
+            const hasAmount = selectedWithdrawAmount !== null && selectedWithdrawAmount > 0;
+            const isConfirmed = confirmWithdrawCheckbox.checked;
+            confirmWithdrawBtn.disabled = !(hasAmount && isConfirmed);
+        }
+        
+        // Abilita/disabilita il pulsante di conferma prelievo in base alla checkbox
+        confirmWithdrawCheckbox.addEventListener('change', updateWithdrawButton);
         
         // Gestione della conferma del prelievo
         confirmWithdrawBtn.addEventListener('click', function() {
+            if (selectedWithdrawAmount === null || selectedWithdrawAmount <= 0) {
+                showToast('Seleziona un importo da prelevare.', 'warning');
+                return;
+            }
+            
             // Disabilita il pulsante durante la richiesta
             confirmWithdrawBtn.disabled = true;
             confirmWithdrawBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Elaborazione...';
+            
+            // Prepara i dati da inviare
+            const requestData = {
+                amount: selectedWithdrawAmount
+            };
             
             // Richiesta al server
             fetch("{{ url_for('admin_withdraw_cash') }}", {
@@ -498,7 +743,8 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
+                body: JSON.stringify(requestData)
             })
             .then(response => {
                 if (!response.ok) {
@@ -513,13 +759,17 @@
                 if (data.success) {
                     // Aggiorna il saldo visualizzato
                     const cashBalanceElement = document.querySelector('.stat-card:nth-child(4) .stat-value');
-                    cashBalanceElement.textContent = '€ 0.00';
+                    if (cashBalanceElement) {
+                        cashBalanceElement.textContent = `€ ${data.new_balance.toFixed(2)}`;
+                    }
                     
-                    // Disabilita il pulsante di prelievo
-                    withdrawCashBtn.disabled = true;
+                    // Disabilita il pulsante di prelievo se il saldo è zero
+                    if (data.new_balance <= 0) {
+                        withdrawCashBtn.disabled = true;
+                    }
                     
                     // Notifica
-                    showToast('Prelievo effettuato con successo!', 'success');
+                    showToast(`Prelievo di €${data.amount.toFixed(2)} effettuato con successo!`, 'success');
                 } else {
                     // Notifica errore
                     showToast('Errore durante il prelievo: ' + data.message, 'danger');
@@ -543,95 +793,114 @@
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
+            })
+            .finally(() => {
+                // Ripristina il pulsante
+                confirmWithdrawBtn.disabled = false;
+                confirmWithdrawBtn.innerHTML = '<i class="fas fa-check me-1"></i> Conferma Prelievo';
             });
         });
         
         // Gestione della rigenerazione delle password
-        regenerateBtn.addEventListener('click', function() {
-            // Disabilita il pulsante durante la richiesta
-            regenerateBtn.disabled = true;
-            regenerateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Rigenerazione...';
-            
-            // Richiesta al server
-            fetch("{{ url_for('admin_regenerate_passwords') }}", {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Aggiorna la lista delle password nel modal
-                    const passwordsListModal = document.getElementById('passwordsListModal');
-                    const passwordsPrintTable = document.getElementById('passwordsPrintTable');
-                    
-                    // Pulisci le liste
-                    passwordsListModal.innerHTML = '';
-                    passwordsPrintTable.innerHTML = '';
-                    
-                    // Popola con le nuove password
-                    Object.entries(data.passwords).forEach(([username, password]) => {
-                        // Aggiungi alla lista del modal
-                        const passwordItem = document.createElement('div');
-                        passwordItem.className = 'password-item';
-                        passwordItem.innerHTML = `
-                            <div class="password-username">${username}</div>
-                            <div class="password-value">${password}</div>
-                        `;
-                        passwordsListModal.appendChild(passwordItem);
+        if (regenerateBtn) {
+            regenerateBtn.addEventListener('click', function() {
+                // Disabilita il pulsante durante la richiesta
+                regenerateBtn.disabled = true;
+                regenerateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Rigenerazione...';
+                
+                // Richiesta al server
+                fetch("{{ url_for('admin_regenerate_passwords') }}", {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Aggiorna la lista delle password nel modal
+                        const passwordsListModal = document.getElementById('passwordsListModal');
+                        const passwordsPrintTable = document.getElementById('passwordsPrintTable');
                         
-                        // Aggiungi alla tabella di stampa
-                        const printRow = document.createElement('tr');
-                        printRow.innerHTML = `
-                            <td>${username}</td>
-                            <td>${password}</td>
-                        `;
-                        passwordsPrintTable.appendChild(printRow);
-                    });
-                    
-                    // Aggiorna la UI nella pagina principale
-                    const operatorElements = document.querySelectorAll('.operator-card');
-                    operatorElements.forEach(element => {
-                        const usernameElement = element.querySelector('.operator-username');
-                        const passwordElement = element.querySelector('.operator-password');
-                        const username = usernameElement.textContent;
-                        if (data.passwords[username]) {
-                            passwordElement.textContent = data.passwords[username];
-                            
-                            // Aggiungi un effetto di evidenziazione
-                            passwordElement.classList.add('bg-warning');
-                            setTimeout(() => {
-                                passwordElement.classList.remove('bg-warning');
-                            }, 2000);
+                        // Pulisci le liste
+                        if (passwordsListModal) {
+                            passwordsListModal.innerHTML = '';
                         }
-                    });
+                        if (passwordsPrintTable) {
+                            passwordsPrintTable.innerHTML = '';
+                        }
+                        
+                        // Popola con le nuove password
+                        Object.entries(data.passwords).forEach(([username, password]) => {
+                            // Aggiungi alla lista del modal
+                            if (passwordsListModal) {
+                                const passwordItem = document.createElement('div');
+                                passwordItem.className = 'password-item';
+                                passwordItem.innerHTML = `
+                                    <div class="password-username">${username}</div>
+                                    <div class="password-value">${password}</div>
+                                `;
+                                passwordsListModal.appendChild(passwordItem);
+                            }
+                            
+                            // Aggiungi alla tabella di stampa
+                            if (passwordsPrintTable) {
+                                const printRow = document.createElement('tr');
+                                printRow.innerHTML = `
+                                    <td>${username}</td>
+                                    <td>${password}</td>
+                                `;
+                                passwordsPrintTable.appendChild(printRow);
+                            }
+                        });
+                        
+                        // Aggiorna la UI nella pagina principale
+                        const operatorElements = document.querySelectorAll('.operator-card');
+                        operatorElements.forEach(element => {
+                            const usernameElement = element.querySelector('.operator-username');
+                            const passwordElement = element.querySelector('.operator-password');
+                            if (usernameElement && passwordElement) {
+                                const username = usernameElement.textContent;
+                                if (data.passwords[username]) {
+                                    passwordElement.textContent = data.passwords[username];
+                                    
+                                    // Aggiungi un effetto di evidenziazione
+                                    passwordElement.classList.add('bg-warning');
+                                    setTimeout(() => {
+                                        passwordElement.classList.remove('bg-warning');
+                                    }, 2000);
+                                }
+                            }
+                        });
+                        
+                        // Mostra il modal
+                        passwordsModal.show();
+                        
+                        // Notifica
+                        showToast('Password rigenerate con successo!', 'success');
+                    } else {
+                        showToast('Errore durante la rigenerazione delle password.', 'danger');
+                    }
                     
-                    // Mostra il modal
-                    passwordsModal.show();
+                    // Riabilita il pulsante
+                    regenerateBtn.disabled = false;
+                    regenerateBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Password';
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    showToast('Errore di connessione.', 'danger');
                     
-                    // Notifica
-                    showToast('Password rigenerate con successo!', 'success');
-                } else {
-                    showToast('Errore durante la rigenerazione delle password.', 'danger');
-                }
-                
-                // Riabilita il pulsante
-                regenerateBtn.disabled = false;
-                regenerateBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Password';
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                showToast('Errore di connessione.', 'danger');
-                
-                // Riabilita il pulsante
-                regenerateBtn.disabled = false;
-                regenerateBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Password';
+                    // Riabilita il pulsante
+                    regenerateBtn.disabled = false;
+                    regenerateBtn.innerHTML = '<i class="fas fa-key me-1"></i> Rigenera Password';
+                });
             });
-        });
+        }
         
         // Gestione della stampa
         const printPasswordsBtn = document.getElementById('printPasswordsBtn');
-        printPasswordsBtn.addEventListener('click', function() {
-            window.print();
-        });
+        if (printPasswordsBtn) {
+            printPasswordsBtn.addEventListener('click', function() {
+                window.print();
+            });
+        }
         
         // Funzione per mostrare i toast
         function showToast(message, type = 'info') {

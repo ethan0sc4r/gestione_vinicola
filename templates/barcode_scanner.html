@@ -467,6 +467,9 @@
                         </span>
                         <input type="text" class="form-control" id="searchEmployee" placeholder="Cerca utente...">
                     </div>
+                    <button type="button" class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#newEmployeeModal">
+                        <i class="fas fa-user-plus me-1"></i> Nuovo Operatore
+                    </button>
                 </div>
             </div>
             
@@ -748,6 +751,121 @@
 <a href="{{ url_for('admin_login') }}" class="admin-link">
     <i class="fas fa-cog me-1"></i> Amministrazione
 </a>
+
+<!-- Modal per Nuovo Operatore -->
+<div class="modal fade" id="newEmployeeModal" tabindex="-1" aria-labelledby="newEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newEmployeeModalLabel">
+                    <i class="fas fa-user-plus me-2"></i> Nuovo Operatore
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Attenzione:</strong> Per aggiungere un nuovo operatore è necessaria la password di un operatore autorizzato.
+                </div>
+                
+                <form id="newEmployeeForm" action="{{ url_for('admin_new_employee') }}" method="POST">
+                    <input type="hidden" name="redirect_to" value="barcode_scanner">
+                    
+                    <!-- Informazioni Personali -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-user me-2"></i> Informazioni Personali
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="new_first_name" class="form-label">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_first_name" name="first_name" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="new_last_name" class="form-label">Cognome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_last_name" name="last_name" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="new_rank" class="form-label">Grado/Ruolo <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_rank" name="rank" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informazioni Codice -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-barcode me-2"></i> Codice Identificativo
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="new_code" class="form-label">Codice Badge <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="new_code" name="code" required placeholder="Inserisci o genera codice">
+                                    <button class="btn btn-outline-secondary" type="button" id="generateNewCode">
+                                        <i class="fas fa-random"></i> Genera
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Codice utilizzato per identificare l'operatore durante la scansione
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Impostazioni Credito -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-euro-sign me-2"></i> Impostazioni Credito
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="new_credit_limit" class="form-label">Limite di Credito Negativo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">€</span>
+                                    <input type="number" class="form-control" id="new_credit_limit" name="credit_limit" value="0" min="0" step="0.01">
+                                </div>
+                                <div class="form-text">
+                                    Massimo importo di credito negativo consentito (0 = nessun credito negativo)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Validazione Operatore -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-shield-alt me-2"></i> Validazione Operatore
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="new_operator_password" class="form-label">Password Operatore <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="new_operator_password" name="operator_password" required placeholder="Inserisci password operatore">
+                                <div class="form-text">
+                                    È necessaria la password di un operatore per aggiungere nuovi dipendenti
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Annulla
+                </button>
+                <button type="button" class="btn btn-success" id="saveNewEmployeeBtn">
+                    <i class="fas fa-save me-1"></i> Salva Operatore
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -807,7 +925,7 @@
     let pollTimer = null;
     let purchaseData = null; // Dati dell'acquisto corrente
     
-    // Inizializza l'applicazione
+    // Inizializza l'app
     function initApp() {
         // Inizia a fare polling per rilevare codici a barre scansionati
         startBarcodePoll();
@@ -1643,6 +1761,97 @@
     document.addEventListener('DOMContentLoaded', function() {
         initApp();
         setupEmployeeSearch();
+        setupNewEmployeeModal();
     });
+    
+    // Gestione del modal per nuovo operatore
+    function setupNewEmployeeModal() {
+        const newEmployeeModal = new bootstrap.Modal(document.getElementById('newEmployeeModal'));
+        const newEmployeeForm = document.getElementById('newEmployeeForm');
+        const saveNewEmployeeBtn = document.getElementById('saveNewEmployeeBtn');
+        const generateNewCodeBtn = document.getElementById('generateNewCode');
+        const newCodeInput = document.getElementById('new_code');
+        
+        // Gestione generazione codice automatico
+        if (generateNewCodeBtn && newCodeInput) {
+            generateNewCodeBtn.addEventListener('click', function() {
+                // Genera un codice alfanumerico di 8 caratteri
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 8; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                newCodeInput.value = code;
+            });
+        }
+        
+        // Gestione del pulsante salva
+        if (saveNewEmployeeBtn && newEmployeeForm) {
+            saveNewEmployeeBtn.addEventListener('click', function() {
+                // Validazione campi obbligatori
+                const firstName = document.getElementById('new_first_name').value.trim();
+                const lastName = document.getElementById('new_last_name').value.trim();
+                const rank = document.getElementById('new_rank').value.trim();
+                const code = document.getElementById('new_code').value.trim();
+                const operatorPassword = document.getElementById('new_operator_password').value.trim();
+                
+                if (!firstName || !lastName || !rank || !code || !operatorPassword) {
+                    showToast('Tutti i campi obbligatori devono essere compilati', 'danger');
+                    return;
+                }
+                
+                if (code.length === 0) {
+                    showToast('Inserisci un codice valido', 'danger');
+                    return;
+                }
+                
+                if (!operatorPassword) {
+                    showToast('Inserisci la password operatore', 'danger');
+                    return;
+                }
+                
+                // Validazione form nativa
+                if (newEmployeeForm.checkValidity()) {
+                    // Disabilita il pulsante durante l'invio
+                    saveNewEmployeeBtn.disabled = true;
+                    saveNewEmployeeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvataggio...';
+                    
+                    // Invia il form
+                    newEmployeeForm.submit();
+                } else {
+                    // Trigger validazione nativa del browser
+                    newEmployeeForm.reportValidity();
+                }
+            });
+        }
+        
+        // Reset del form quando il modal viene chiuso
+        document.getElementById('newEmployeeModal').addEventListener('hidden.bs.modal', function() {
+            if (newEmployeeForm) {
+                newEmployeeForm.reset();
+                // Pulisci manualmente i campi che potrebbero non essere resettati automaticamente
+                document.getElementById('new_first_name').value = '';
+                document.getElementById('new_last_name').value = '';
+                document.getElementById('new_rank').value = '';
+                document.getElementById('new_code').value = '';
+                document.getElementById('new_credit_limit').value = '0';
+                document.getElementById('new_operator_password').value = '';
+            }
+            
+            // Riabilita il pulsante salva
+            if (saveNewEmployeeBtn) {
+                saveNewEmployeeBtn.disabled = false;
+                saveNewEmployeeBtn.innerHTML = '<i class="fas fa-save me-1"></i> Salva Operatore';
+            }
+        });
+        
+        // Focus automatico sul primo campo quando si apre il modal
+        document.getElementById('newEmployeeModal').addEventListener('shown.bs.modal', function() {
+            const operatorPasswordInput = document.getElementById('new_operator_password');
+            if (operatorPasswordInput) {
+                operatorPasswordInput.focus();
+            }
+        });
+    }
 </script>
 {% endblock %}

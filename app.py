@@ -1268,7 +1268,7 @@ def admin_dashboard():
 
 @app.route('/admin/withdraw_cash', methods=['POST'])
 def admin_withdraw_cash():
-    """Preleva il denaro dalla cassa e azzera il saldo."""
+    """Preleva il denaro dalla cassa (tutto o parte del saldo)."""
     if session.get('admin_logged_in') != True:
         return jsonify({
             'success': False,
@@ -1276,6 +1276,10 @@ def admin_withdraw_cash():
         })
     
     try:
+        # Ottieni i dati dalla richiesta
+        data = request.json or {}
+        withdrawal_amount = data.get('amount')
+        
         # Trova l'utente "cassa"
         cash_register = Employee.query.filter_by(code='CASSA').first()
         
@@ -1294,16 +1298,46 @@ def admin_withdraw_cash():
                 'message': 'Il saldo della cassa è già zero o negativo.'
             })
         
+        # Se non viene specificato un importo, preleva tutto
+        if withdrawal_amount is None:
+            withdrawal_amount = current_balance
+        else:
+            # Converte l'importo in float e verifica che sia valido
+            try:
+                withdrawal_amount = float(withdrawal_amount)
+            except (ValueError, TypeError):
+                return jsonify({
+                    'success': False,
+                    'message': 'Importo non valido.'
+                })
+            
+            # Verifica che l'importo sia maggiore di 0.01 (1 centesimo)
+            if withdrawal_amount < 0.01:
+                return jsonify({
+                    'success': False,
+                    'message': 'L\'importo minimo da prelevare è €0.01.'
+                })
+            
+            # Verifica che l'importo non superi il saldo disponibile
+            if withdrawal_amount > current_balance:
+                return jsonify({
+                    'success': False,
+                    'message': f'Importo superiore al saldo disponibile (€{current_balance:.2f}).'
+                })
+        
+        # Calcola il nuovo saldo
+        new_balance = current_balance - withdrawal_amount
+        
         # Crea una transazione per il prelievo
         transaction = Transaction(
             employee_id=cash_register.id,
-            amount=-current_balance,  # Negativo perché stiamo sottraendo
+            amount=-withdrawal_amount,  # Negativo perché stiamo sottraendo
             transaction_type='debit',
             custom_product_name="Prelievo cassa da amministratore"
         )
         
-        # Aggiorna il saldo della cassa a zero
-        cash_register.update_credit(Decimal('0'))
+        # Aggiorna il saldo della cassa
+        cash_register.update_credit(Decimal(str(new_balance)))
         
         # Salva la transazione
         db.session.add(transaction)
@@ -1311,8 +1345,9 @@ def admin_withdraw_cash():
         
         return jsonify({
             'success': True,
-            'message': f'Prelievo di €{current_balance:.2f} effettuato con successo.',
-            'amount': current_balance
+            'message': f'Prelievo di €{withdrawal_amount:.2f} effettuato con successo.',
+            'amount': withdrawal_amount,
+            'new_balance': new_balance
         })
         
     except Exception as e:
@@ -1734,12 +1769,36 @@ def admin_new_employee():
         last_name = request.form.get('last_name')
         rank = request.form.get('rank')
         credit_limit = request.form.get('credit_limit', '0')
+        operator_password = request.form.get('operator_password')
+        redirect_to = request.form.get('redirect_to', '')
         
         try:
+            # Verifica che tutti i campi obbligatori siano presenti
+            if not all([code, first_name, last_name, rank]):
+                flash('Tutti i campi obbligatori devono essere compilati.', 'danger')
+                if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                    return redirect(url_for('barcode_scanner'))
+                return redirect(url_for('admin_new_employee'))
+            
+            # Se viene dalla pagina barcode_scanner, verifica la password operatore
+            if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                if not operator_password:
+                    flash('Password operatore richiesta per aggiungere un nuovo dipendente.', 'danger')
+                    return redirect(url_for('barcode_scanner'))
+                
+                # Verifica che la password dell'operatore sia valida
+                operator = Operator.query.filter_by(password=operator_password, active=True).first()
+                if not operator:
+                    flash('Password operatore non valida.', 'danger')
+                    return redirect(url_for('barcode_scanner'))
+            
             # Controlla se il codice già esiste
             existing = Employee.query.filter_by(code=code).first()
             if existing:
                 flash('Esiste già un dipendente con questo codice.', 'danger')
+                # Determina dove reindirizzare in caso di errore
+                if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                    return redirect(url_for('barcode_scanner'))
                 return redirect(url_for('admin_new_employee'))
             
             # Crea il nuovo dipendente
@@ -1757,10 +1816,18 @@ def admin_new_employee():
             db.session.commit()
             
             flash('Dipendente aggiunto con successo.', 'success')
-            return redirect(url_for('admin_employees'))
+            
+            # Determina dove reindirizzare dopo il successo
+            if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                return redirect(url_for('barcode_scanner'))
+            else:
+                return redirect(url_for('admin_employees'))
             
         except Exception as e:
             flash(f'Errore: {str(e)}', 'danger')
+            # Determina dove reindirizzare in caso di errore
+            if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                return redirect(url_for('barcode_scanner'))
             return redirect(url_for('admin_new_employee'))
     
     # In caso di GET request, mostra il form
@@ -1796,6 +1863,89 @@ def admin_edit_employee(id):
             flash(f'Errore: {str(e)}', 'danger')
     
     return render_template('admin_edit_employee.html', employee=employee)
+
+
+@app.route('/admin/employee/<int:id>/adjust_credit', methods=['POST'])
+def admin_adjust_credit(id):
+    """Modifica direttamente il credito di un dipendente (solo per amministratori)."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Non sei autorizzato a eseguire questa operazione.'
+        })
+    
+    try:
+        # Ottieni i dati dalla richiesta
+        data = request.json
+        new_credit = data.get('new_credit')
+        reason = data.get('reason')
+        
+        if new_credit is None:
+            return jsonify({
+                'success': False,
+                'message': 'Nuovo credito non specificato.'
+            })
+        
+        if not reason or not reason.strip():
+            return jsonify({
+                'success': False,
+                'message': 'Motivo della modifica obbligatorio.'
+            })
+        
+        # Trova il dipendente
+        employee = Employee.query.get_or_404(id)
+        
+        # Salva il credito precedente per il calcolo della differenza
+        old_credit = employee.credit
+        new_credit_decimal = Decimal(str(new_credit))
+        difference = new_credit_decimal - old_credit
+        
+        # Se non c'è differenza, non fare nulla
+        if abs(difference) < Decimal('0.01'):
+            return jsonify({
+                'success': False,
+                'message': 'Il nuovo credito è identico a quello attuale.'
+            })
+        
+        # Aggiorna il credito del dipendente
+        employee.update_credit(new_credit_decimal)
+        
+        # Registra la transazione amministrativa
+        # IMPORTANTE: Questa transazione NON influisce sulla cassa
+        transaction = Transaction(
+            employee_id=employee.id,
+            amount=difference,  # La differenza (positiva o negativa)
+            transaction_type='admin_adjustment',  # Tipo speciale per distinguerla
+            custom_product_name=f"Regolazione amministrativa: {reason.strip()}"
+        )
+        
+        db.session.add(transaction)
+        db.session.commit()
+        
+        # Messaggio di successo
+        sign = '+' if difference > 0 else ''
+        message = f'Credito modificato con successo. Variazione: {sign}€{float(difference):.2f}'
+        
+        return jsonify({
+            'success': True,
+            'message': message,
+            'old_credit': float(old_credit),
+            'new_credit': float(new_credit_decimal),
+            'difference': float(difference)
+        })
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'message': 'Valore del credito non valido.'
+        })
+    except Exception as e:
+        logger.error(f"Error in admin_adjust_credit: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante la modifica: {str(e)}'
+        })
 
 
 @app.route('/admin/product/new', methods=['GET', 'POST'])
