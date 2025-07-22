@@ -29,7 +29,7 @@ def create_default_config():
     """Crea un file di configurazione predefinito se non esiste."""
     default_config = {
         "serial": {
-            "port": "/dev/ttyUSB0",
+            "port": "COM5",
             "baudrate": 9600,
             "timeout": 1,
             "bytesize": 8,

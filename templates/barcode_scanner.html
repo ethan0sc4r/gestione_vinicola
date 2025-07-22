@@ -922,13 +922,41 @@
     let currentEmployee = null;
     let selectedProduct = null;
     let selectedCreditAmount = null;
-    let pollTimer = null;
+    let socket = null; // Connessione SocketIO
     let purchaseData = null; // Dati dell'acquisto corrente
+    
+    // Inizializza l'app al caricamento del documento
+    document.addEventListener('DOMContentLoaded', function() {
+        initApp();
+        setupEmployeeSearch();
+        setupNewEmployeeModal();
+    });
+    
+    // Aggiorna lo stato visivo dello scanner
+    function updateScannerStatus(status) {
+        scannerStatus.className = 'scanner-status';
+        
+        switch (status) {
+            case 'connected':
+                scannerStatus.classList.add('status-connected');
+                scannerStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i> Lettore connesso';
+                break;
+            case 'disconnected':
+                scannerStatus.classList.add('status-disconnected');
+                scannerStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Lettore disconnesso';
+                break;
+            case 'waiting':
+            default:
+                scannerStatus.classList.add('status-waiting');
+                scannerStatus.innerHTML = '<i class="fas fa-circle me-1"></i> In attesa di scansione...';
+                break;
+        }
+    }
     
     // Inizializza l'app
     function initApp() {
-        // Inizia a fare polling per rilevare codici a barre scansionati
-        startBarcodePoll();
+        // Inizializza SocketIO
+        initSocketIO();
         
         // Imposta lo stato dello scanner
         updateScannerStatus('waiting');
@@ -1099,85 +1127,121 @@
     }
     }
     
-    // Polling per rilevare nuovi codici a barre
-    function startBarcodePoll() {
-        // Prima chiamata immediata
-        checkForBarcode();
+    // Inizializza SocketIO
+    function initSocketIO() {
+        console.log('🔧 Inizializzazione SocketIO...');
+        showToast('🔧 Inizializzazione WebSocket...', 'info');
         
-        // Poi ogni 0.5 secondi (ridotto da 2 secondi per maggiore reattività)
-        pollTimer = setInterval(checkForBarcode, 500);
-    }
-    
-    function stopBarcodePoll() {
-        if (pollTimer) {
-            clearInterval(pollTimer);
-            pollTimer = null;
-        }
-    }
-    
-    // Controlla se c'è un nuovo codice a barre
-    function checkForBarcode() {
-        fetch("{{ url_for('get_serial_barcode') }}")
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Un codice è stato letto e un dipendente è stato trovato
-                    updateScannerStatus('connected');
+        // Connetti al server SocketIO
+        socket = io();
+        
+        console.log('📡 Tentativo di connessione WebSocket...');
+        
+        // Gestisci la connessione
+        socket.on('connect', function() {
+            console.log('✅ Connesso al server WebSocket');
+            console.log('Socket ID:', socket.id);
+            showToast('✅ WebSocket connesso!', 'success');
+            updateScannerStatus('connected');
+            // Richiedi lo stato dello scanner
+            console.log('📤 Richiesta stato scanner...');
+            socket.emit('request_scanner_status');
+        });
+        
+        // Gestisci la disconnessione
+        socket.on('disconnect', function(reason) {
+            console.log('❌ Disconnesso dal server WebSocket:', reason);
+            showToast('❌ WebSocket disconnesso: ' + reason, 'warning');
+            updateScannerStatus('disconnected');
+        });
+        
+        // Gestisci errori di connessione
+        socket.on('connect_error', function(error) {
+            console.error('🚨 Errore connessione WebSocket:', error);
+            showToast('🚨 Errore connessione WebSocket: ' + error.message, 'danger');
+        });
+        
+        // Gestisci i barcode scansionati
+        socket.on('barcode_scanned', function(data) {
+            console.log('📷 Barcode ricevuto via WebSocket:', data);
+            showToast('📷 Barcode ricevuto: ' + (data.barcode || 'N/A'), 'info');
+            
+            if (data.success) {
+                console.log('✅ Dipendente trovato:', data.employee);
+                showToast('✅ Dipendente: ' + data.employee.first_name + ' ' + data.employee.last_name, 'success');
+                
+                // Un codice è stato letto e un dipendente è stato trovato
+                updateScannerStatus('connected');
+                
+                // Se non stiamo già visualizzando un dipendente, vai direttamente alla fase di acquisto
+                if (!employeeCard.classList.contains('active') && productSelection.style.display !== 'block' && creditForm.style.display !== 'block') {
+                    console.log('🛒 Vai alla schermata di acquisto...');
                     
-                    // Se non stiamo già visualizzando un dipendente, vai direttamente alla fase di acquisto
-                    if (!employeeCard.classList.contains('active') && !productSelection.style.display === 'block' && !creditForm.style.display === 'block') {
-                        // Salva i dati del dipendente
-                        currentEmployee = data.employee;
-                        
-                        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
-                        employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
-                        employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
-                        employeeRank.textContent = data.employee.rank;
-                        creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
-                        creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
-                        
-                        // Vai direttamente alla schermata di acquisto
-                        hideScannerArea();
-                        showProductSelection();
-                    }
-                } else if (data.barcode) {
-                    // Un codice è stato letto ma non è stato trovato un dipendente
-                    updateScannerStatus('connected');
+                    // Salva i dati del dipendente
+                    currentEmployee = data.employee;
                     
-                    // Mostra un messaggio solo se non stiamo già visualizzando un dipendente
-                    if (!employeeCard.classList.contains('active')) {
-                        showToast(`Codice letto (${data.barcode}) ma utente non trovato.`, 'warning');
-                    }
+                    // Aggiorna la scheda del dipendente
+                    employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
+                    employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
+                    employeeRank.textContent = data.employee.rank;
+                    creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
+                    creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
+                    
+                    // Vai direttamente alla schermata di acquisto
+                    hideScannerArea();
+                    showProductSelection();
                 } else {
-                    // Nessun codice letto ma lo scanner è connesso
-                    updateScannerStatus('waiting');
+                    console.log('⚠️ Schermata già attiva, ignorando barcode');
                 }
-            })
-            .catch(error => {
-                console.error("Errore durante il polling:", error);
-                updateScannerStatus('disconnected');
-            });
-    }
-    
-    // Aggiorna lo stato visivo dello scanner
-    function updateScannerStatus(status) {
-        scannerStatus.className = 'scanner-status';
+            } else if (data.barcode) {
+                console.log('❌ Dipendente non trovato per barcode:', data.barcode);
+                showToast('❌ Dipendente non trovato per: ' + data.barcode, 'warning');
+                
+                // Un codice è stato letto ma non è stato trovato un dipendente
+                updateScannerStatus('connected');
+                
+                // Mostra un messaggio solo se non stiamo già visualizzando un dipendente
+                if (!employeeCard.classList.contains('active')) {
+                    showToast(`Codice letto (${data.barcode}) ma utente non trovato.`, 'warning');
+                }
+            }
+        });
         
-        switch (status) {
-            case 'connected':
-                scannerStatus.classList.add('status-connected');
-                scannerStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i> Lettore connesso';
-                break;
-            case 'disconnected':
-                scannerStatus.classList.add('status-disconnected');
-                scannerStatus.innerHTML = '<i class="fas fa-times-circle me-1"></i> Lettore disconnesso';
-                break;
-            case 'waiting':
-            default:
-                scannerStatus.classList.add('status-waiting');
-                scannerStatus.innerHTML = '<i class="fas fa-circle me-1"></i> In attesa di scansione...';
-                break;
-        }
+        // Gestisci gli errori dello scanner
+        socket.on('scanner_error', function(data) {
+            console.error('🚨 Errore scanner:', data.error);
+            showToast('🚨 Errore scanner: ' + data.error, 'danger');
+            updateScannerStatus('disconnected');
+        });
+        
+        // Gestisci lo stato dello scanner
+        socket.on('scanner_status', function(data) {
+            console.log('📊 Stato scanner ricevuto:', data);
+            showToast('📊 Stato scanner aggiornato', 'info');
+            updateScannerStatus(data.connected ? 'connected' : 'waiting');
+        });
+        
+        // Gestisci eventi generici
+        socket.on('connected', function(data) {
+            console.log('🎉 Messaggio di benvenuto:', data);
+            showToast('🎉 ' + data.data, 'success');
+        });
+        
+        // Debug generale per tutti gli eventi
+        socket.onAny((event, ...args) => {
+            console.log('🔍 Evento WebSocket ricevuto:', event, args);
+        });
+        
+        // Timeout per verificare la connessione
+        setTimeout(() => {
+            if (!socket.connected) {
+                console.error('⏰ Timeout connessione WebSocket');
+                showToast('⏰ Timeout connessione WebSocket', 'danger');
+            } else {
+                console.log('⏰ Connessione WebSocket verificata dopo 3 secondi');
+                showToast('⏰ WebSocket verificato!', 'success');
+            }
+        }, 3000);
     }
     
     // Processa un codice a barre (manuale o scansionato)
@@ -1208,7 +1272,7 @@
         // Salva i dati del dipendente
         currentEmployee = employee;
         
-        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
+        // Aggiorna la scheda del dipendente
         employeeAvatar.textContent = (employee.first_name[0] + employee.last_name[0]).toUpperCase();
         employeeName.textContent = `${employee.first_name} ${employee.last_name}`;
         employeeRank.textContent = employee.rank;
@@ -1498,9 +1562,11 @@
         // Mostra la conferma
         confirmation.style.display = 'block';
         
-        // Riattiva il polling dopo un po' per permettere di vedere la conferma
+        // Riconnetti automaticamente dopo un po'
         setTimeout(() => {
-            startBarcodePoll();
+            if (socket && !socket.connected) {
+                socket.connect();
+            }
         }, 5000);
     }
     
@@ -1515,13 +1581,11 @@
     
     function showScannerArea() {
         scannerArea.style.display = 'flex';
-        startBarcodePoll();
         manualBarcodeInput.focus();
     }
     
     function hideScannerArea() {
         scannerArea.style.display = 'none';
-        stopBarcodePoll();
     }
     
     function showEmployeeCard() {
@@ -1573,23 +1637,32 @@
     
     // Resetta l'app allo stato iniziale
     function resetApp() {
-        hideAll();
-        showScannerArea();
-        
-        // Reset delle variabili di stato
+        // Reset delle variabili
         currentEmployee = null;
         selectedProduct = null;
         selectedCreditAmount = null;
+        purchaseData = null;
         
-        // Pulisci gli input
+        // Reset degli input
         manualBarcodeInput.value = '';
         customAmountInput.value = '';
         customProductInput.value = '';
         customCreditInput.value = '';
         operatorPasswordInput.value = '';
         
-        // Focus sull'input manuale
-        manualBarcodeInput.focus();
+        // Reset delle selezioni
+        productItems.forEach(p => p.classList.remove('selected'));
+        creditPresets.forEach(p => p.classList.remove('selected'));
+        
+        // Reset delle quantità a 1
+        resetProductQuantities();
+        
+        // Reset della ricerca prodotti
+        resetProductSearch();
+        
+        // Mostra lo scanner e nasconde tutto il resto
+        hideAll();
+        showScannerArea();
     }
     
     // Funzione per mostrare i toast
@@ -1690,16 +1763,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Salva i dati del dipendente
-                        currentEmployee = data.employee;
-                        
-                        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
-                        employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
-                        employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
-                        employeeRank.textContent = data.employee.rank;
-                        creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
-                        creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
-                        
+                        processEmployeeData(data.employee);
                         // Vai direttamente alla schermata di ricarica
                         hideScannerArea();
                         showCreditForm();
@@ -1732,16 +1796,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Salva i dati del dipendente
-                        currentEmployee = data.employee;
-                        
-                        // Aggiorna la scheda del dipendente (anche se non la mostreremo)
-                        employeeAvatar.textContent = (data.employee.first_name[0] + data.employee.last_name[0]).toUpperCase();
-                        employeeName.textContent = `${data.employee.first_name} ${data.employee.last_name}`;
-                        employeeRank.textContent = data.employee.rank;
-                        creditAmount.textContent = `€ ${data.employee.credit.toFixed(2)}`;
-                        creditLimit.textContent = `Limite: € ${data.employee.credit_limit.toFixed(2)}`;
-                        
+                        processEmployeeData(data.employee);
                         // Vai direttamente alla schermata di acquisto
                         hideScannerArea();
                         showProductSelection();
@@ -1756,13 +1811,6 @@
             });
         });
     }
-    
-    // Inizializza l'app al caricamento del documento
-    document.addEventListener('DOMContentLoaded', function() {
-        initApp();
-        setupEmployeeSearch();
-        setupNewEmployeeModal();
-    });
     
     // Gestione del modal per nuovo operatore
     function setupNewEmployeeModal() {

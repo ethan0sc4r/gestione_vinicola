@@ -61,6 +61,7 @@ import pytz
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_socketio import SocketIO, emit
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Configurazione per lettore seriale
@@ -73,6 +74,37 @@ except ImportError:
     logger.warning("PySerial non disponibile, supporto lettore seriale disattivato")
     SERIAL_AVAILABLE = False
     serial = None
+
+# Importa configurazione seriale dal file JSON
+try:
+    from config_serial import load_config, save_config
+    serial_config = load_config()
+    SERIAL_CONFIG = serial_config['serial']
+    logger.info("Configurazione seriale caricata da config_serial.json")
+except ImportError:
+    logger.warning("config_serial.py non trovato, uso configurazione legacy")
+    # Configurazione di fallback usando variabili d'ambiente
+    SERIAL_CONFIG = {
+        'port': os.environ.get('SERIAL_PORT', 'COM5'),
+        'baudrate': int(os.environ.get('SERIAL_BAUDRATE', 9600)),
+        'bytesize': int(os.environ.get('SERIAL_BYTESIZE', 8)),
+        'parity': os.environ.get('SERIAL_PARITY', 'N'),
+        'stopbits': int(os.environ.get('SERIAL_STOPBITS', 1)),
+        'timeout': float(os.environ.get('SERIAL_TIMEOUT', 1.0))
+    }
+    save_config = None
+except Exception as e:
+    logger.error(f"Errore nel caricamento configurazione seriale: {e}")
+    # Configurazione di fallback
+    SERIAL_CONFIG = {
+        'port': 'COM5',
+        'baudrate': 9600,
+        'bytesize': 8,
+        'parity': 'N',
+        'stopbits': 1,
+        'timeout': 1.0
+    }
+    save_config = None
 
 # Inizializzazione dell'applicazione
 app = Flask(__name__)
@@ -93,19 +125,15 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Inizializza SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
+
 # Configurazione del lettore di codici a barre seriale
 serial_port = None
 barcode_thread = None
 barcode_data = []
 barcode_lock = threading.Lock()
-SERIAL_CONFIG = {
-    'port': os.environ.get('SERIAL_PORT', '/dev/ttyUSB0'),
-    'baudrate': int(os.environ.get('SERIAL_BAUDRATE', 9600)),
-    'bytesize': int(os.environ.get('SERIAL_BYTESIZE', 8)),
-    'parity': os.environ.get('SERIAL_PARITY', 'N'),
-    'stopbits': int(os.environ.get('SERIAL_STOPBITS', 1)),
-    'timeout': float(os.environ.get('SERIAL_TIMEOUT', 1.0))
-}
+last_barcode_time = 0  # Timestamp dell'ultimo barcode letto
 
 #######################
 # Definizione Modelli #
@@ -413,7 +441,7 @@ def setup_barcode_reader():
 
 def read_barcode_serial():
     """Funzione per leggere continuamente dal lettore di codici a barre."""
-    global serial_port, barcode_data, barcode_lock
+    global serial_port, barcode_data, barcode_lock, last_barcode_time
     
     buffer = ""
     
@@ -433,14 +461,53 @@ def read_barcode_serial():
                         # Pulisci il codice ricevuto
                         barcode = buffer.strip()
                         
-                        with barcode_lock:
-                            # Aggiungi il codice alla lista
-                            barcode_data.append(barcode)
-                            # Mantieni solo gli ultimi 5 codici letti
-                            if len(barcode_data) > 5:
-                                barcode_data.pop(0)
+                        if barcode:  # Solo se il barcode non è vuoto
+                            with barcode_lock:
+                                # Aggiungi il codice alla lista
+                                barcode_data.append(barcode)
+                                # Mantieni solo gli ultimi 5 codici letti
+                                if len(barcode_data) > 5:
+                                    barcode_data.pop(0)
+                                # Aggiorna il timestamp
+                                last_barcode_time = time.time()
                         
-                        logger.info(f"Codice a barre letto: {barcode}")
+                            logger.info(f"Codice a barre letto: {barcode}")
+                            
+                            # Cerca immediatamente il dipendente e invia via WebSocket
+                            with app.app_context():
+                                employee = Employee.query.filter_by(code=barcode).first()
+                                
+                                if employee:
+                                    # Verifica l'integrità del credito
+                                    if not employee.verify_credit_integrity():
+                                        employee.update_credit_hash()
+                                        db.session.commit()
+                                        logger.warning(f"Credit integrity issue fixed for {employee.first_name} {employee.last_name}")
+                                    
+                                    logger.info(f"📤 Invio dipendente via WebSocket: {employee.first_name} {employee.last_name}")
+                                    
+                                    # Invia immediatamente via WebSocket
+                                    socketio.emit('barcode_scanned', {
+                                        'success': True,
+                                        'barcode': barcode,
+                                        'timestamp': last_barcode_time,
+                                        'employee': employee.to_dict()
+                                    })
+                                    
+                                    logger.info(f"✅ Evento barcode_scanned inviato con successo")
+                                else:
+                                    logger.warning(f"❌ Dipendente non trovato per barcode: {barcode}")
+                                    
+                                    # Dipendente non trovato
+                                    socketio.emit('barcode_scanned', {
+                                        'success': False,
+                                        'message': 'Dipendente non trovato.',
+                                        'barcode': barcode,
+                                        'timestamp': last_barcode_time
+                                    })
+                                    
+                                    logger.info(f"⚠️ Evento barcode_scanned (non trovato) inviato")
+                        
                         buffer = ""
             
             # Piccola pausa per ridurre l'utilizzo della CPU
@@ -448,18 +515,24 @@ def read_barcode_serial():
             
         except Exception as e:
             logger.error(f"Errore lettura codice a barre: {str(e)}")
+            # Invia errore via WebSocket
+            logger.info(f"📤 Invio errore scanner via WebSocket: {str(e)}")
+            socketio.emit('scanner_error', {'error': str(e)})
+            logger.info(f"🚨 Evento scanner_error inviato")
             time.sleep(1)  # Pausa più lunga in caso di errore
 
 
 def get_last_barcode():
-    """Ottiene l'ultimo codice a barre letto."""
-    global barcode_data, barcode_lock
+    """Restituisce l'ultimo codice a barre letto dal lettore seriale."""
+    global barcode_data, barcode_lock, last_barcode_time
     
     with barcode_lock:
         if barcode_data:
-            return barcode_data[-1]
-    
-    return None
+            return {
+                'barcode': barcode_data[-1],
+                'timestamp': last_barcode_time
+            }
+        return None
 
 
 ##########################
@@ -959,7 +1032,8 @@ def barcode_scanner():
     Questa è la pagina principale che tutti gli utenti vedono.
     """
     # Ottieni l'ultimo codice a barre letto dal lettore seriale (se disponibile)
-    last_barcode = get_last_barcode()
+    last_barcode_info = get_last_barcode()
+    last_barcode = last_barcode_info['barcode'] if last_barcode_info else None
     
     # Ottieni la lista dei prodotti per la selezione rapida
     products = Product.query.filter_by(active=True).all()
@@ -984,7 +1058,7 @@ def get_serial_barcode():
     
     if last_barcode:
         # Se è stato letto un codice, cerca il dipendente
-        employee = Employee.query.filter_by(code=last_barcode).first()
+        employee = Employee.query.filter_by(code=last_barcode['barcode']).first()
         
         if employee:
             # Verifica l'integrità del credito
@@ -997,7 +1071,8 @@ def get_serial_barcode():
             # Ritorna i dati del dipendente
             return jsonify({
                 'success': True,
-                'barcode': last_barcode,
+                'barcode': last_barcode['barcode'],
+                'timestamp': last_barcode['timestamp'],
                 'employee': employee.to_dict()
             })
         else:
@@ -1005,14 +1080,16 @@ def get_serial_barcode():
             return jsonify({
                 'success': False,
                 'message': 'Dipendente non trovato.',
-                'barcode': last_barcode
+                'barcode': last_barcode['barcode'],
+                'timestamp': last_barcode['timestamp']
             })
     
     # Nessun codice letto
     return jsonify({
         'success': False,
         'message': 'Nessun codice letto.',
-        'barcode': None
+        'barcode': None,
+        'timestamp': None
     })
 
 
@@ -2223,10 +2300,12 @@ def api_system_stats():
 @login_required
 def api_serial_status():
     """API per verificare lo stato del lettore seriale."""
+    last_barcode = get_last_barcode()
     status = {
         'available': SERIAL_AVAILABLE,
         'connected': serial_port is not None and serial_port.is_open if serial_port else False,
-        'last_barcode': get_last_barcode(),
+        'last_barcode': last_barcode['barcode'] if last_barcode else None,
+        'last_barcode_timestamp': last_barcode['timestamp'] if last_barcode else None,
         'config': SERIAL_CONFIG
     }
     return jsonify(status)
@@ -2238,12 +2317,24 @@ def update_serial_config():
     """Aggiorna configurazione lettore seriale."""
     global SERIAL_CONFIG, serial_port
     
-    # Aggiorna la configurazione
+    # Aggiorna la configurazione in memoria
     SERIAL_CONFIG['port'] = request.form.get('serial_port', SERIAL_CONFIG['port'])
     SERIAL_CONFIG['baudrate'] = int(request.form.get('baud_rate', SERIAL_CONFIG['baudrate']))
     SERIAL_CONFIG['bytesize'] = int(request.form.get('data_bits', SERIAL_CONFIG['bytesize']))
     SERIAL_CONFIG['parity'] = request.form.get('parity', SERIAL_CONFIG['parity'])
     SERIAL_CONFIG['stopbits'] = int(request.form.get('stop_bits', SERIAL_CONFIG['stopbits']))
+    
+    # Salva la configurazione nel file JSON se la funzione è disponibile
+    if save_config:
+        try:
+            # Carica la configurazione attuale e aggiorna solo la sezione seriale
+            current_config = load_config()
+            current_config['serial'] = SERIAL_CONFIG
+            save_config(current_config)
+            logger.info("Configurazione seriale salvata in config_serial.json")
+        except Exception as e:
+            logger.error(f"Errore nel salvataggio configurazione: {e}")
+            flash('Configurazione aggiornata in memoria ma non salvata su file.', 'warning')
     
     # Riavvia il lettore
     if serial_port and serial_port.is_open:
@@ -2269,6 +2360,37 @@ def inject_app_info():
         'app_version': app.config['APP_VERSION'],
         'now': now
     }
+
+
+###########################
+# Gestori SocketIO       #
+###########################
+
+@socketio.on('connect')
+def handle_connect():
+    """Gestisce la connessione WebSocket."""
+    logger.info(f'🔗 Client connected')
+    emit('connected', {'data': 'Connected to scanner', 'server_time': datetime.now().isoformat()})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Gestisce la disconnessione WebSocket."""
+    logger.info(f'❌ Client disconnected')
+
+@socketio.on('request_scanner_status')
+def handle_scanner_status():
+    """Restituisce lo stato attuale dello scanner."""
+    logger.info(f'📤 Richiesta stato scanner')
+    last_barcode = get_last_barcode()
+    status = {
+        'available': SERIAL_AVAILABLE,
+        'connected': serial_port is not None and serial_port.is_open if serial_port else False,
+        'last_barcode': last_barcode['barcode'] if last_barcode else None,
+        'last_barcode_timestamp': last_barcode['timestamp'] if last_barcode else None,
+        'config': SERIAL_CONFIG
+    }
+    logger.info(f'📊 Invio stato scanner: {status}')
+    emit('scanner_status', status)
 
 
 if __name__ == '__main__':
@@ -2319,5 +2441,5 @@ if __name__ == '__main__':
     except Exception as e:
         logger.warning(f"Barcode reader not initialized: {str(e)}")
     
-    # Avvia il server
-    app.run(debug=True, host='0.0.0.0', port=8100)
+    # Avvia il server con SocketIO
+    socketio.run(app, debug=True, host='0.0.0.0', port=8100)

@@ -1,6 +1,6 @@
 {
     "serial": {
-        "port": "/dev/ttyUSB0",
+        "port": "COM5",
         "baudrate": 9600,
         "timeout": 1,
         "bytesize": 8,
