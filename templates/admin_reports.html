@@ -743,42 +743,26 @@
                 <table class="transactions-table">
                     <thead>
                         <tr>
-                            <th>Grado</th>
-                            <th>Dipendente</th>
-
-                            <th>Codice</th>
+                            <th>Ufficiale</th>
                             <th>Credito Negativo</th>
-                            <th>Integrità</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for employee in negative_credit_employees %}
                         <tr class="text-danger">
-                            <td>
-                                <span class="badge bg-secondary">{{ employee.rank }}</span>
-                            </td>
                             <td class="transaction-employee">
                                 <div class="transaction-employee-avatar">
                                     {{ employee.first_name[0] }}{{ employee.last_name[0] }}
                                 </div>
                                 <div>
-                                    <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>
+                                    <strong>{{ employee.rank }} {{ employee.first_name }} {{ employee.last_name }}</strong>
                                 </div>
                             </td>
                             
                             <td>
-                                <code>{{ employee.code }}</code>
-                            </td>
-                            <td>
                                 <strong class="text-danger">-€ {{ "%.2f"|format(employee.credit|abs) }}</strong>
                             </td>
-                            <td>
-                                {% if employee.verify_credit_integrity() %}
-                                    <span class="badge bg-success">OK</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Errore</span>
-                                {% endif %}
-                            </td>
+
                         </tr>
                         {% endfor %}
                     </tbody>

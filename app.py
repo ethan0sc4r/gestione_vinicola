@@ -574,7 +574,7 @@ def get_system_stats():
     total_transactions = Transaction.query.filter(Transaction.transaction_type != 'cancellation').count()
     
     # Transazioni recenti (ultime 24 ore)
-    yesterday = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     recent_transactions = Transaction.query.filter(Transaction.timestamp >= yesterday, Transaction.transaction_type != 'cancellation').count()
     
     # Lista dipendenti per l'interfaccia prodotti-prima (escludi cassa centrale)
@@ -1401,7 +1401,7 @@ def admin_dashboard():
     employees_count = Employee.query.count()
     total_credit = db.session.query(db.func.sum(Employee.credit)).scalar() or 0
     transactions_today = Transaction.query.filter(
-        Transaction.timestamp >= datetime.today().replace(hour=0, minute=0, second=0),
+        Transaction.timestamp >= datetime.now().replace(hour=0, minute=0, second=0),
         Transaction.transaction_type != 'cancellation'
     ).count()
     
@@ -1850,9 +1850,9 @@ def admin_reports():
             start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
             
-            # Converti in UTC per il filtro sul database
-            start_date_utc = local_tz.localize(start_date).astimezone(pytz.UTC)
-            end_date_utc = local_tz.localize(end_date).astimezone(pytz.UTC)
+            # I timestamp nel database sono già in ora locale, quindi non serve conversione UTC
+            start_date_utc = start_date
+            end_date_utc = end_date
             
             report_title = f"Report dal {start_date.strftime('%d/%m/%Y')} al {end_date.strftime('%d/%m/%Y')}"
             report_date = end_date  # Usa la data di fine come data di riferimento
@@ -1868,9 +1868,9 @@ def admin_reports():
             start_date = report_date.replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = report_date.replace(hour=23, minute=59, second=59, microsecond=999999)
             
-            # Converti in UTC per il filtro sul database
-            start_date_utc = local_tz.localize(start_date).astimezone(pytz.UTC)
-            end_date_utc = local_tz.localize(end_date).astimezone(pytz.UTC)
+            # I timestamp nel database sono già in ora locale, quindi non serve conversione UTC
+            start_date_utc = start_date
+            end_date_utc = end_date
             
             report_title = f"Report del {report_date.strftime('%d/%m/%Y')}"
         
@@ -1903,8 +1903,8 @@ def admin_reports():
             # Ottieni i dati dell'operatore
             operator_name = t.operator.username if t.operator else "N/A"
             
-            # Converti il timestamp UTC in ora locale
-            local_timestamp = t.timestamp.replace(tzinfo=pytz.UTC).astimezone(local_tz)
+            # Il timestamp è già in ora locale, quindi non serve conversione
+            local_timestamp = t.timestamp
             
             # Aggiungi i dati alla lista
             transaction_data.append({

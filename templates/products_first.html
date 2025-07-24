@@ -1541,19 +1541,33 @@ function buildSpeechMessage(employee, totalAmount, creditAmount, isPurchase = tr
         .filter(item => item.enabled)
         .sort((a, b) => a.order - b.order);
     
+    // Check if employee has a nickname
+    const hasNickname = speechConfig.nicknames[employee.id];
+    let nicknameUsed = false;
+    
     for (const item of sortedTemplate) {
         if (item.type === 'text') {
             message += item.value;
         } else if (item.type === 'parameter') {
             switch (item.value) {
                 case 'GRADO':
-                    message += formatRankForSpeech(employee.rank);
-                    break;
                 case 'COGNOME':
-                    message += employee.last_name;
-                    break;
                 case 'NOME':
-                    message += employee.first_name;
+                    if (hasNickname && !nicknameUsed) {
+                        // Use nickname instead of individual name components
+                        message += hasNickname;
+                        nicknameUsed = true;
+                    } else if (!hasNickname) {
+                        // No nickname, use original logic
+                        if (item.value === 'GRADO') {
+                            message += formatRankForSpeech(employee.rank);
+                        } else if (item.value === 'COGNOME') {
+                            message += employee.last_name;
+                        } else if (item.value === 'NOME') {
+                            message += employee.first_name;
+                        }
+                    }
+                    // If hasNickname and nicknameUsed is true, skip this parameter
                     break;
                 case 'TOTALE_ACQUISTO':
                     message += formatAmountForSpeech(totalAmount);

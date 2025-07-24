@@ -1,9 +1,4 @@
 {
-  "_comment": "Configurazione avanzata sintesi vocale",
-  "2": "ETHAN",
-  "3": "Alpha Team Leader",
-  "5": "Charlie",
-  "8": "Commander Beta",
   "speech_enabled": true,
   "speech_rate": 2,
   "speech_template": [

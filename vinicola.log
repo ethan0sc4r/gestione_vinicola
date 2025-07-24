@@ -27461,3 +27461,407 @@ WHERE product.id = ?]
 2025-07-25 00:10:44,747 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:10:44] "GET /api/cash_balance HTTP/1.1" 200 -
 2025-07-25 00:10:44,748 - vinicola - INFO - Found 30 transactions for filter: custom, custom_date: 2025-07-24
 2025-07-25 00:10:44,755 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:10:44] "GET /api/recent_transactions?date_filter=custom&custom_date=2025-07-24 HTTP/1.1" 200 -
+2025-07-25 00:16:13,865 - vinicola - INFO - NumPy version: 1.24.3
+2025-07-25 00:16:14,235 - vinicola - INFO - Pandas version: 1.5.3
+2025-07-25 00:16:14,807 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-07-25 00:16:14,808 - vinicola - INFO - Configurazione seriale caricata da config_serial.json
+2025-07-25 00:16:14,910 - vinicola - INFO - Backup folder already exists: C:\Users\Ethan PC\source\repos\gestione_vinicola\backup
+2025-07-25 00:16:14,910 - vinicola - ERROR - Errore configurazione lettore di codici a barre: could not open port 'COM5': FileNotFoundError(2, 'Impossibile trovare il file specificato.', None, 2)
+2025-07-25 00:16:14,910 - vinicola - INFO - Avvio server Flask su 127.0.0.1:5000
+2025-07-25 00:16:14,921 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-25 00:16:14,921 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-25 00:16:17,771 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:17] "GET /products_first HTTP/1.1" 200 -
+2025-07-25 00:16:17,806 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:17] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:16:18,011 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:16:18,027 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:16:18,042 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:16:18,043 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:16:18,045 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:16:18,058 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "[36mGET /static/webfonts/fa-solid-900.woff2 HTTP/1.1[0m" 304 -
+2025-07-25 00:16:18,089 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "GET /api/speech_nicknames HTTP/1.1" 200 -
+2025-07-25 00:16:18,090 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:18] "GET /api/system_stats HTTP/1.1" 200 -
+2025-07-25 00:16:20,290 - vinicola - INFO - Found 0 transactions for filter: today, custom_date: 
+2025-07-25 00:16:20,290 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:20] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:16:20,292 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:20] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:16:25,089 - vinicola - INFO - Filtering transactions for date: 2025-07-25
+2025-07-25 00:16:25,093 - vinicola - INFO - Found 0 transactions for filter: custom, custom_date: 2025-07-25
+2025-07-25 00:16:25,093 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:25] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:16:25,094 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:25] "GET /api/recent_transactions?date_filter=custom&custom_date=2025-07-25 HTTP/1.1" 200 -
+2025-07-25 00:16:31,170 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:16:31,193 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:16:31,194 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:16:31,194 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:16:31,195 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:16:31,197 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:16:31,198 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:16:31,209 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:31] "[36mGET /static/webfonts/fa-solid-900.woff2 HTTP/1.1[0m" 304 -
+2025-07-25 00:16:32,432 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "GET /admin/speech_config HTTP/1.1" 200 -
+2025-07-25 00:16:32,452 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:16:32,461 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:16:32,462 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:16:32,463 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:16:32,465 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:16:32,466 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:16:32,488 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:32] "GET /admin/speech_config/load HTTP/1.1" 200 -
+2025-07-25 00:16:49,834 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:49] "POST /deduct_credit HTTP/1.1" 200 -
+2025-07-25 00:16:49,844 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:49] "[35m[1mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 206 -
+2025-07-25 00:16:50,264 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:16:50] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-25 00:17:05,040 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:05] "POST /deduct_credit HTTP/1.1" 200 -
+2025-07-25 00:17:05,058 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:05] "[35m[1mGET /static/sounds/negativo.mp3 HTTP/1.1[0m" 206 -
+2025-07-25 00:17:18,445 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:18] "GET /api/employees HTTP/1.1" 200 -
+2025-07-25 00:17:20,012 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:20] "GET /api/employees HTTP/1.1" 200 -
+2025-07-25 00:17:20,496 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:20] "GET /api/employees HTTP/1.1" 200 -
+2025-07-25 00:17:20,881 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:20] "GET /api/employees HTTP/1.1" 200 -
+2025-07-25 00:17:23,413 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "GET /products_first HTTP/1.1" 200 -
+2025-07-25 00:17:23,433 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:17:23,434 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:17:23,435 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:17:23,438 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:17:23,441 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:17:23,441 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:17:23,452 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "[36mGET /static/webfonts/fa-solid-900.woff2 HTTP/1.1[0m" 304 -
+2025-07-25 00:17:23,464 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "GET /api/speech_nicknames HTTP/1.1" 200 -
+2025-07-25 00:17:23,464 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:23] "GET /api/system_stats HTTP/1.1" 200 -
+2025-07-25 00:17:48,050 - vinicola - INFO - Found 2 transactions for filter: today, custom_date: 
+2025-07-25 00:17:48,052 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:48] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:17:48,054 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:48] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:17:58,292 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:17:58] "GET /api/transaction/72 HTTP/1.1" 200 -
+2025-07-25 00:18:02,188 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:18:02,216 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:18:02,218 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:18:02,219 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:18:02,221 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:18:02,222 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:18:02,223 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:02] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:18:10,998 - vinicola - INFO - Transazione 72 eliminata dall'operatore utente1
+2025-07-25 00:18:10,998 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:10] "POST /api/delete_transaction/72 HTTP/1.1" 200 -
+2025-07-25 00:18:10,998 - vinicola - INFO - Found 1 transactions for filter: today, custom_date: 
+2025-07-25 00:18:10,998 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:10] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:18:10,998 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:10] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:18:30,271 - vinicola - INFO - Filtering transactions between 2025-07-25 00:00:00 and 2025-07-25 23:59:59.999999
+2025-07-25 00:18:30,271 - vinicola - INFO - Found 2 transactions
+2025-07-25 00:18:30,271 - vinicola - INFO - Reading product logs from: vinicola.log
+2025-07-25 00:18:30,312 - vinicola - INFO - Log parsing summary: 27544 total lines, 13 PRODUCT_LOG lines, 0 parsed logs, 0 logs in period
+2025-07-25 00:18:30,312 - vinicola - INFO - Date range filter: 2025-07-25 00:00:00 to 2025-07-25 23:59:59.999999
+2025-07-25 00:18:30,346 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-25 00:18:30,365 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:18:30,372 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:18:30,373 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:18:30,375 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:18:30,376 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:18:30,377 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:18:30] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:20:24,530 - vinicola - INFO - NumPy version: 1.24.3
+2025-07-25 00:20:24,868 - vinicola - INFO - Pandas version: 1.5.3
+2025-07-25 00:20:25,254 - vinicola - INFO - PySerial disponibile, supporto lettore seriale attivato
+2025-07-25 00:20:25,254 - vinicola - INFO - Configurazione seriale caricata da config_serial.json
+2025-07-25 00:20:25,362 - vinicola - INFO - Backup folder already exists: C:\Users\Ethan PC\source\repos\gestione_vinicola\backup
+2025-07-25 00:20:25,362 - vinicola - ERROR - Errore configurazione lettore di codici a barre: could not open port 'COM5': FileNotFoundError(2, 'Impossibile trovare il file specificato.', None, 2)
+2025-07-25 00:20:25,362 - vinicola - INFO - Avvio server Flask su 127.0.0.1:5000
+2025-07-25 00:20:25,373 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-25 00:20:25,374 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-25 00:20:27,806 - vinicola - INFO - Filtering transactions between 2025-07-25 00:00:00 and 2025-07-25 23:59:59.999999
+2025-07-25 00:20:27,806 - vinicola - INFO - Found 2 transactions
+2025-07-25 00:20:27,806 - vinicola - INFO - Reading product logs from: vinicola.log
+2025-07-25 00:20:27,842 - vinicola - INFO - Log parsing summary: 27566 total lines, 13 PRODUCT_LOG lines, 0 parsed logs, 0 logs in period
+2025-07-25 00:20:27,842 - vinicola - INFO - Date range filter: 2025-07-25 00:00:00 to 2025-07-25 23:59:59.999999
+2025-07-25 00:20:27,943 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:27] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-25 00:20:27,963 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:27] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:20:28,130 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:28] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:20:28,168 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:20:28,168 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:28] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:20:28,168 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:28] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:20:28,176 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:28] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:20:50,492 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:20:50,514 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:20:50,522 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:20:50,523 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:20:50,524 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:20:50,527 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:20:50,528 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:20:50] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:22:08,941 - vinicola - INFO - Operator password verified for operator 1 (utente1)
+2025-07-25 00:22:08,941 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:08] "POST /verify_operator_password HTTP/1.1" 200 -
+2025-07-25 00:22:08,975 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:08] "POST /deduct_credit HTTP/1.1" 200 -
+2025-07-25 00:22:08,982 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:08] "[35m[1mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 206 -
+2025-07-25 00:22:09,405 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-25 00:22:17,198 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:22:17,216 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:22:17,224 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:22:17,224 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:22:17,224 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:22:17,225 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:22:17,226 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:17] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:22:39,854 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:39] "POST /deduct_credit HTTP/1.1" 200 -
+2025-07-25 00:22:46,973 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:22:46,990 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:22:46,992 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:22:46,993 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:22:46,993 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:22:46,994 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:22:46,995 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:22:46] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:07,092 - vinicola - INFO - Found 4 transactions for filter: today, custom_date: 
+2025-07-25 00:23:07,097 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:07] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:23:07,099 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:07] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:23:10,589 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:10] "GET /api/transaction/76 HTTP/1.1" 200 -
+2025-07-25 00:23:14,798 - vinicola - INFO - Transazione 76 eliminata dall'operatore utente1
+2025-07-25 00:23:14,798 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:14] "POST /api/delete_transaction/76 HTTP/1.1" 200 -
+2025-07-25 00:23:14,798 - vinicola - INFO - Found 3 transactions for filter: today, custom_date: 
+2025-07-25 00:23:14,798 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:14] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:23:14,798 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:14] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:23:19,119 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:23:19,136 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:19,138 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:23:19,138 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:23:19,138 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:19,141 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:23:19,142 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:19] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:23:37,190 - vinicola - INFO - Total credit reset performed by admin admin: 5 employees affected
+2025-07-25 00:23:37,190 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:37] "POST /admin/reset_total_credit HTTP/1.1" 200 -
+2025-07-25 00:23:38,712 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:23:38,730 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:38,733 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:38,738 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:23:38,740 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:23:38,744 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:23:38,744 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:38] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:23:46,492 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:46] "POST /admin/reset_today_transactions HTTP/1.1" 200 -
+2025-07-25 00:23:54,012 - vinicola - INFO - Today's transactions reset performed by admin admin: 5 transactions deleted
+2025-07-25 00:23:54,012 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:54] "POST /admin/reset_today_transactions HTTP/1.1" 200 -
+2025-07-25 00:23:55,537 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:23:55,551 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:55,557 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:23:55,560 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:23:55,561 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:23:55,563 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:23:55,564 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:23:55] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:10,870 - vinicola - INFO - Found 0 transactions for filter: today, custom_date: 
+2025-07-25 00:24:10,870 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:10] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:24:10,870 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:10] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:24:18,537 - vinicola - INFO - Found 0 transactions for filter: today, custom_date: 
+2025-07-25 00:24:18,539 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:18] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:24:18,539 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:18] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:24:22,472 - vinicola - INFO - Filtering transactions for date: 2025-07-25
+2025-07-25 00:24:22,474 - vinicola - INFO - Found 0 transactions for filter: custom, custom_date: 2025-07-25
+2025-07-25 00:24:22,475 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:22] "GET /api/recent_transactions?date_filter=custom&custom_date=2025-07-25 HTTP/1.1" 200 -
+2025-07-25 00:24:22,475 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:22] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:24:23,209 - vinicola - INFO - Filtering transactions for date: 2025-07-25
+2025-07-25 00:24:23,209 - vinicola - INFO - Found 0 transactions for filter: custom, custom_date: 2025-07-25
+2025-07-25 00:24:23,209 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:23] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:24:23,209 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:23] "GET /api/recent_transactions?date_filter=custom&custom_date=2025-07-25 HTTP/1.1" 200 -
+2025-07-25 00:24:30,886 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "GET /admin/employees HTTP/1.1" 200 -
+2025-07-25 00:24:30,907 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:24:30,915 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:24:30,915 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:30,916 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:24:30,916 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:30,918 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:30] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:24:51,354 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:51] "POST /admin/employee/1/adjust_credit HTTP/1.1" 200 -
+2025-07-25 00:24:52,392 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "GET /admin/employees HTTP/1.1" 200 -
+2025-07-25 00:24:52,409 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:24:52,419 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:52,420 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:24:52,420 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:52,421 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:24:52,422 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:52] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:24:56,856 - vinicola - INFO - Filtering transactions between 2025-07-25 00:00:00 and 2025-07-25 23:59:59.999999
+2025-07-25 00:24:56,857 - vinicola - INFO - Found 1 transactions
+2025-07-25 00:24:56,858 - vinicola - INFO - Reading product logs from: vinicola.log
+2025-07-25 00:24:56,886 - vinicola - INFO - Log parsing summary: 27669 total lines, 13 PRODUCT_LOG lines, 0 parsed logs, 0 logs in period
+2025-07-25 00:24:56,886 - vinicola - INFO - Date range filter: 2025-07-25 00:00:00 to 2025-07-25 23:59:59.999999
+2025-07-25 00:24:56,886 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-25 00:24:56,908 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:24:56,914 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:24:56,914 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:24:56,915 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:56,917 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:24:56,918 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:24:56] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:03,632 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "GET /admin/admins HTTP/1.1" 200 -
+2025-07-25 00:25:03,657 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:03,662 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:03,663 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:03,664 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:03,664 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:03,664 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:03] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:04,964 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:04] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:25:04,987 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:04] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:04,997 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:04] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:04,997 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:04] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:04,998 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:04] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:04,999 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:04] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:05,000 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:05] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:15,777 - vinicola - INFO - Today's transactions reset performed by admin admin: 1 transactions deleted
+2025-07-25 00:25:15,777 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:15] "POST /admin/reset_today_transactions HTTP/1.1" 200 -
+2025-07-25 00:25:17,294 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:25:17,325 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:17,329 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:17,329 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:17,330 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:17,333 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:17,333 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:17] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:21,984 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:21] "GET /admin/employees HTTP/1.1" 200 -
+2025-07-25 00:25:22,006 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:22] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:22,015 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:22] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:22,016 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:22] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:22,016 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:22] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:22,017 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:22] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:22,018 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:22] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:38,239 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:38] "POST /admin/employee/2/adjust_credit HTTP/1.1" 200 -
+2025-07-25 00:25:39,258 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "GET /admin/employees HTTP/1.1" 200 -
+2025-07-25 00:25:39,273 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:39,282 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:39,282 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:39,283 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:39,283 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:39,283 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:39] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:45,619 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:25:45,644 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:45,649 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:45,650 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:45,650 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:45,650 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:45,651 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:45] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,207 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "GET /products_first HTTP/1.1" 200 -
+2025-07-25 00:25:57,221 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,221 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,225 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,226 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,229 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:25:57,230 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,245 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "[36mGET /static/webfonts/fa-solid-900.woff2 HTTP/1.1[0m" 304 -
+2025-07-25 00:25:57,270 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "GET /api/speech_nicknames HTTP/1.1" 200 -
+2025-07-25 00:25:57,277 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:25:57] "GET /api/system_stats HTTP/1.1" 200 -
+2025-07-25 00:26:04,362 - vinicola - WARNING - Credit integrity fixed during deduction for employee 2
+2025-07-25 00:26:04,362 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:04] "POST /deduct_credit HTTP/1.1" 200 -
+2025-07-25 00:26:04,381 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:04] "[35m[1mGET /static/sounds/purchase.mp3 HTTP/1.1[0m" 206 -
+2025-07-25 00:26:04,795 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:04] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-25 00:26:09,085 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:26:09,100 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:26:09,100 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:26:09,100 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:26:09,107 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:26:09,109 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:26:09,110 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:09] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:26:25,823 - vinicola - INFO - Operator password verified for operator 1 (utente1)
+2025-07-25 00:26:25,823 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:25] "POST /verify_operator_password HTTP/1.1" 200 -
+2025-07-25 00:26:25,837 - vinicola - WARNING - Credit integrity fixed during deduction for employee 1
+2025-07-25 00:26:25,855 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:25] "POST /deduct_credit HTTP/1.1" 200 -
+2025-07-25 00:26:29,589 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:26:29,615 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:26:29,615 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:26:29,615 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:26:29,625 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:26:29,626 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:26:29,626 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:29] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:26:36,067 - vinicola - INFO - Found 3 transactions for filter: today, custom_date: 
+2025-07-25 00:26:36,068 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:36] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:26:36,070 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:36] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:26:39,451 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:39] "GET /api/transaction/74 HTTP/1.1" 200 -
+2025-07-25 00:26:43,910 - vinicola - INFO - Transazione 74 eliminata dall'operatore utente1
+2025-07-25 00:26:43,910 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:43] "POST /api/delete_transaction/74 HTTP/1.1" 200 -
+2025-07-25 00:26:43,926 - vinicola - INFO - Found 2 transactions for filter: today, custom_date: 
+2025-07-25 00:26:43,926 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:43] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:26:43,926 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:43] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:26:50,344 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:26:50,366 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:26:50,368 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:26:50,369 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:26:50,371 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:26:50,373 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:26:50,373 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:26:50] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,606 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "GET /products_first HTTP/1.1" 200 -
+2025-07-25 00:27:19,628 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,629 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,630 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,633 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,635 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,636 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:19,643 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "[36mGET /static/webfonts/fa-solid-900.woff2 HTTP/1.1[0m" 304 -
+2025-07-25 00:27:19,657 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "GET /api/speech_nicknames HTTP/1.1" 200 -
+2025-07-25 00:27:19,661 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:19] "GET /api/system_stats HTTP/1.1" 200 -
+2025-07-25 00:27:20,785 - vinicola - INFO - Found 2 transactions for filter: today, custom_date: 
+2025-07-25 00:27:20,786 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:20] "GET /api/cash_balance HTTP/1.1" 200 -
+2025-07-25 00:27:20,787 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:20] "GET /api/recent_transactions?date_filter=today HTTP/1.1" 200 -
+2025-07-25 00:27:42,535 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:27:42,552 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:42,553 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:42,554 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:42,554 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:42,555 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:42,555 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:42] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,118 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:27:43,138 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,146 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,146 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,147 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,149 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,149 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:43,315 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:27:43,334 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,334 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,334 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,334 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,334 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,334 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:43,499 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:27:43,518 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,534 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,534 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,534 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,534 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,534 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:43,708 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:27:43,729 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,731 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,731 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,731 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:43,731 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:43,731 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:43] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:49,377 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:49] "POST /admin/withdraw_cash HTTP/1.1" 200 -
+2025-07-25 00:27:50,891 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-25 00:27:50,900 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:27:50,900 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:50,900 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:27:50,900 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:27:50,900 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:27:50,900 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:27:50] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:28,049 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "GET /admin/employees HTTP/1.1" 200 -
+2025-07-25 00:28:28,072 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:28,083 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:28:28,085 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:28,085 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:28,086 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:28,086 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:28] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:28:30,399 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "GET /admin/products HTTP/1.1" 200 -
+2025-07-25 00:28:30,420 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:30,424 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:28:30,425 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:28:30,425 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:30,426 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:30,426 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:30] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:32,163 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "GET /admin/operators HTTP/1.1" 200 -
+2025-07-25 00:28:32,184 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:32,190 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:32,191 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:28:32,191 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:28:32,191 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:32,191 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:32] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:33,046 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "GET /admin/admins HTTP/1.1" 200 -
+2025-07-25 00:28:33,070 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:33,080 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:28:33,080 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:33,080 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:33,084 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:33,084 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:33] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:28:34,408 - vinicola - INFO - Filtering transactions between 2025-07-25 00:00:00 and 2025-07-25 23:59:59.999999
+2025-07-25 00:28:34,410 - vinicola - INFO - Found 4 transactions
+2025-07-25 00:28:34,410 - vinicola - INFO - Reading product logs from: vinicola.log
+2025-07-25 00:28:34,436 - vinicola - INFO - Log parsing summary: 27858 total lines, 13 PRODUCT_LOG lines, 0 parsed logs, 0 logs in period
+2025-07-25 00:28:34,436 - vinicola - INFO - Date range filter: 2025-07-25 00:00:00 to 2025-07-25 23:59:59.999999
+2025-07-25 00:28:34,436 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-25 00:28:34,467 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:34,475 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "[36mGET /static/css/all.min.css HTTP/1.1[0m" 304 -
+2025-07-25 00:28:34,478 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "[36mGET /static/logo.png HTTP/1.1[0m" 304 -
+2025-07-25 00:28:34,478 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "[36mGET /static/js/bootstrap.bundle.min.js HTTP/1.1[0m" 304 -
+2025-07-25 00:28:34,480 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "[33mGET /static/js/socket.io/4.7.2/socket.io.js HTTP/1.1[0m" 404 -
+2025-07-25 00:28:34,480 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 00:28:34] "[36mGET /static/js/jquery-3.6.0.min.js HTTP/1.1[0m" 304 -
