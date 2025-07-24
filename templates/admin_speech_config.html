@@ -1,0 +1,760 @@
+<!-- admin_speech_config.html -->
+{% extends "base.html" %}
+
+{% block title %}Configurazione Sintesi Vocale - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        margin-top: 1rem;
+    }
+    
+    .config-section {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .config-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+    
+    .config-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .config-title i {
+        margin-right: 0.75rem;
+        font-size: 1.1em;
+    }
+    
+    .config-body {
+        padding: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 0.5rem;
+    }
+    
+    .template-item {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .template-item.dragging {
+        opacity: 0.5;
+        transform: rotate(5deg);
+    }
+    
+    .drag-handle {
+        cursor: grab;
+        color: #6c757d;
+        font-size: 1.2rem;
+    }
+    
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+    
+    .template-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+    
+    .parameter-badge {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .text-badge {
+        background-color: var(--success-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .template-input {
+        flex: 1;
+        max-width: 300px;
+    }
+    
+    .order-input {
+        width: 60px;
+    }
+    
+    .add-template-item {
+        border: 2px dashed #dee2e6;
+        background-color: transparent;
+        padding: 1rem;
+        text-align: center;
+        border-radius: 8px;
+        color: #6c757d;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .add-template-item:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.05);
+    }
+    
+    .nickname-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .employee-info {
+        display: flex;
+        align-items: center;
+        min-width: 250px;
+    }
+    
+    .employee-avatar {
+        width: 32px;
+        height: 32px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-right: 0.75rem;
+    }
+    
+    .employee-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .employee-name {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .employee-id {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .nickname-input {
+        flex: 1;
+        max-width: 300px;
+    }
+    
+    .test-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .logout-button {
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .logout-button:hover {
+        color: var(--danger-color);
+    }
+    
+    .logout-button i {
+        margin-right: 0.5rem;
+    }
+    
+    .save-button {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .template-item {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+        }
+        
+        .template-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .nickname-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .employee-info {
+            min-width: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('admin_logout') }}" class="logout-button">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Page Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Configurazione Sintesi Vocale</h1>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_employees') }}" class="admin-tab">
+            <i class="fas fa-users"></i> Dipendenti
+        </a>
+        <a href="{{ url_for('admin_products') }}" class="admin-tab">
+            <i class="fas fa-shopping-cart"></i> Prodotti
+        </a>
+        <a href="{{ url_for('admin_operators') }}" class="admin-tab">
+            <i class="fas fa-user-shield"></i> Operatori
+        </a>
+        {% if session.is_super_admin %}
+        <a href="{{ url_for('admin_admins') }}" class="admin-tab">
+            <i class="fas fa-user-cog"></i> Amministratori
+        </a>
+        {% endif %}
+        <a href="{{ url_for('admin_reports') }}" class="admin-tab">
+            <i class="fas fa-chart-bar"></i> Report
+        </a>
+        <a href="{{ url_for('admin_speech_config') }}" class="admin-tab active">
+            <i class="fas fa-volume-up"></i> Sintesi Vocale
+        </a>
+    </div>
+    
+    <!-- General Settings -->
+    <div class="config-section">
+        <div class="config-header">
+            <h3 class="config-title">
+                <i class="fas fa-cog"></i>
+                Impostazioni Generali
+            </h3>
+        </div>
+        <div class="config-body">
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-toggle-on"></i>
+                    Stato Sintesi Vocale
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="speechEnabled" checked>
+                    <label class="form-check-label" for="speechEnabled">
+                        Abilita sintesi vocale
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Velocità di Pronuncia
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-md-6 col-lg-4">
+                        <label for="speechRate" class="form-label">Velocità</label>
+                        <input type="range" class="form-range" id="speechRate" min="0.5" max="2.0" step="0.1" value="1.3">
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-control-plaintext">
+                            <strong id="rateValue">1.3</strong>x
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="testSpeech()">
+                            <i class="fas fa-play me-1"></i> Test Voce
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Speech Template -->
+    <div class="config-section">
+        <div class="config-header">
+            <h3 class="config-title">
+                <i class="fas fa-comments"></i>
+                Template Messaggio Vocale
+            </h3>
+        </div>
+        <div class="config-body">
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-list-ol"></i>
+                    Elementi del Messaggio
+                </div>
+                <p class="text-muted mb-3">
+                    Configura l'ordine e il contenuto del messaggio vocale. Trascina gli elementi per riordinarli.
+                </p>
+                
+                <div id="templateContainer">
+                    <!-- Template items will be populated by JavaScript -->
+                </div>
+                
+                <div class="add-template-item" onclick="showAddItemModal()">
+                    <i class="fas fa-plus me-2"></i>
+                    Aggiungi Elemento
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Employee Nicknames -->
+    <div class="config-section">
+        <div class="config-header">
+            <h3 class="config-title">
+                <i class="fas fa-user-tag"></i>
+                Nickname Dipendenti
+            </h3>
+        </div>
+        <div class="config-body">
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-users"></i>
+                    Personalizzazione Nomi
+                </div>
+                <p class="text-muted mb-3">
+                    Personalizza come vengono pronunciati i nomi dei dipendenti. Lascia vuoto per usare nome e cognome originali.
+                </p>
+                
+                <div id="nicknamesContainer">
+                    {% for employee in employees %}
+                    <div class="nickname-row">
+                        <div class="employee-info">
+                            <div class="employee-avatar">{{ employee.first_name[0] }}{{ employee.last_name[0] }}</div>
+                            <div class="employee-details">
+                                <div class="employee-name">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                <div class="employee-id">ID: {{ employee.id }} - {{ employee.rank }}</div>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control nickname-input" 
+                               data-employee-id="{{ employee.id }}" 
+                               placeholder="Inserisci nickname personalizzato...">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Aggiungi Elemento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Tipo Elemento</label>
+                    <select class="form-select" id="itemType" onchange="toggleItemInput()">
+                        <option value="parameter">Parametro</option>
+                        <option value="text">Testo Libero</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3" id="parameterSelect">
+                    <label class="form-label">Parametro</label>
+                    <select class="form-select" id="parameterValue">
+                        <option value="GRADO">Grado</option>
+                        <option value="COGNOME">Cognome</option>
+                        <option value="NOME">Nome</option>
+                        <option value="TOTALE_ACQUISTO">Totale Acquisto</option>
+                        <option value="CREDITO_RESIDUO">Credito Residuo</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3" id="textInput" style="display: none;">
+                    <label class="form-label">Testo</label>
+                    <input type="text" class="form-control" id="textValue" placeholder="Inserisci il testo...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" onclick="addTemplateItem()">Aggiungi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Button -->
+<button type="button" class="btn btn-success btn-lg save-button" onclick="saveConfiguration()">
+    <i class="fas fa-save me-2"></i>
+    Salva Configurazione
+</button>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+let currentConfig = {
+    speech_enabled: true,
+    speech_rate: 1.3,
+    speech_template: [],
+    nicknames: {}
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadConfiguration();
+    setupSortable();
+    setupRateSlider();
+});
+
+function setupRateSlider() {
+    const rateSlider = document.getElementById('speechRate');
+    const rateValue = document.getElementById('rateValue');
+    
+    rateSlider.addEventListener('input', function() {
+        rateValue.textContent = this.value;
+        currentConfig.speech_rate = parseFloat(this.value);
+    });
+}
+
+function setupSortable() {
+    const container = document.getElementById('templateContainer');
+    new Sortable(container, {
+        handle: '.drag-handle',
+        animation: 150,
+        onEnd: function(evt) {
+            updateTemplateOrder();
+        }
+    });
+}
+
+function loadConfiguration() {
+    fetch('/admin/speech_config/load')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentConfig = data.config;
+                renderConfiguration();
+            } else {
+                showToast('Errore nel caricamento della configurazione', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading config:', error);
+            showToast('Errore di connessione', 'danger');
+        });
+}
+
+function renderConfiguration() {
+    // Render general settings
+    document.getElementById('speechEnabled').checked = currentConfig.speech_enabled;
+    document.getElementById('speechRate').value = currentConfig.speech_rate;
+    document.getElementById('rateValue').textContent = currentConfig.speech_rate;
+    
+    // Render template
+    renderTemplate();
+    
+    // Render nicknames
+    renderNicknames();
+}
+
+function renderTemplate() {
+    const container = document.getElementById('templateContainer');
+    container.innerHTML = '';
+    
+    currentConfig.speech_template
+        .sort((a, b) => a.order - b.order)
+        .forEach((item, index) => {
+            const itemElement = createTemplateItemElement(item, index);
+            container.appendChild(itemElement);
+        });
+}
+
+function createTemplateItemElement(item, index) {
+    const div = document.createElement('div');
+    div.className = 'template-item';
+    div.dataset.index = index;
+    
+    const badge = item.type === 'parameter' 
+        ? `<span class="parameter-badge">${item.value}</span>`
+        : `<span class="text-badge">TESTO</span>`;
+    
+    const inputValue = item.type === 'parameter' ? item.value : item.value;
+    const inputType = item.type === 'parameter' ? 'text' : 'text';
+    const inputReadonly = item.type === 'parameter' ? 'readonly' : '';
+    
+    div.innerHTML = `
+        <div class="drag-handle">
+            <i class="fas fa-grip-vertical"></i>
+        </div>
+        <div class="template-controls">
+            ${badge}
+            <input type="${inputType}" class="form-control template-input" 
+                   value="${inputValue}" ${inputReadonly} 
+                   onchange="updateTemplateItem(${index}, this.value)">
+            <input type="number" class="form-control order-input" 
+                   value="${item.order}" min="1" 
+                   onchange="updateTemplateOrder()">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" 
+                       ${item.enabled ? 'checked' : ''} 
+                       onchange="toggleTemplateItem(${index}, this.checked)">
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" 
+                    onclick="removeTemplateItem(${index})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    return div;
+}
+
+function renderNicknames() {
+    const inputs = document.querySelectorAll('.nickname-input');
+    inputs.forEach(input => {
+        const employeeId = input.dataset.employeeId;
+        if (currentConfig.nicknames[employeeId]) {
+            input.value = currentConfig.nicknames[employeeId];
+        }
+        
+        input.addEventListener('input', function() {
+            currentConfig.nicknames[employeeId] = this.value;
+        });
+    });
+}
+
+function showAddItemModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+function toggleItemInput() {
+    const type = document.getElementById('itemType').value;
+    const parameterSelect = document.getElementById('parameterSelect');
+    const textInput = document.getElementById('textInput');
+    
+    if (type === 'parameter') {
+        parameterSelect.style.display = 'block';
+        textInput.style.display = 'none';
+    } else {
+        parameterSelect.style.display = 'none';
+        textInput.style.display = 'block';
+    }
+}
+
+function addTemplateItem() {
+    const type = document.getElementById('itemType').value;
+    const value = type === 'parameter' 
+        ? document.getElementById('parameterValue').value
+        : document.getElementById('textValue').value;
+    
+    if (!value.trim()) {
+        showToast('Inserisci un valore valido', 'warning');
+        return;
+    }
+    
+    const newItem = {
+        type: type,
+        value: value,
+        enabled: true,
+        order: currentConfig.speech_template.length + 1
+    };
+    
+    currentConfig.speech_template.push(newItem);
+    renderTemplate();
+    
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addItemModal'));
+    modal.hide();
+    
+    // Reset form
+    document.getElementById('textValue').value = '';
+}
+
+function updateTemplateItem(index, value) {
+    if (currentConfig.speech_template[index]) {
+        currentConfig.speech_template[index].value = value;
+    }
+}
+
+function toggleTemplateItem(index, enabled) {
+    if (currentConfig.speech_template[index]) {
+        currentConfig.speech_template[index].enabled = enabled;
+    }
+}
+
+function removeTemplateItem(index) {
+    if (confirm('Sei sicuro di voler rimuovere questo elemento?')) {
+        currentConfig.speech_template.splice(index, 1);
+        renderTemplate();
+    }
+}
+
+function updateTemplateOrder() {
+    const items = document.querySelectorAll('.template-item');
+    items.forEach((item, index) => {
+        const originalIndex = parseInt(item.dataset.index);
+        if (currentConfig.speech_template[originalIndex]) {
+            currentConfig.speech_template[originalIndex].order = index + 1;
+        }
+    });
+    
+    // Re-render to update order inputs
+    renderTemplate();
+}
+
+function testSpeech() {
+    const text = "Test sintesi vocale con velocità " + currentConfig.speech_rate;
+    
+    if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT';
+        utterance.rate = currentConfig.speech_rate;
+        speechSynthesis.speak(utterance);
+    } else {
+        showToast('Sintesi vocale non supportata dal browser', 'warning');
+    }
+}
+
+function saveConfiguration() {
+    // Update general settings
+    currentConfig.speech_enabled = document.getElementById('speechEnabled').checked;
+    currentConfig.speech_rate = parseFloat(document.getElementById('speechRate').value);
+    
+    // Save configuration
+    fetch('/admin/speech_config/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentConfig)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message, 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving config:', error);
+        showToast('Errore nel salvataggio', 'danger');
+    });
+}
+
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+        toastContainer.style.zIndex = 1055;
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast
+    const toastId = 'toast-' + Date.now();
+    const toastElement = document.createElement('div');
+    toastElement.id = toastId;
+    toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+    toastElement.role = 'alert';
+    toastElement.setAttribute('aria-live', 'assertive');
+    toastElement.setAttribute('aria-atomic', 'true');
+    
+    toastElement.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toastElement);
+    
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+</script>
+{% endblock %}

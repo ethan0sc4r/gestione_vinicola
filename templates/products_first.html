@@ -16,20 +16,20 @@
 
 /* Force error modal to be above everything */
 #errorModal {
-    z-index: 1070 !important;
+    z-index: 1100 !important;
 }
 
 #errorModal .modal-backdrop {
-    z-index: 1065 !important;
+    z-index: 1095 !important;
 }
 
 /* Force success modal to be above everything */
 #successModal {
-    z-index: 1070 !important;
+    z-index: 1100 !important;
 }
 
 #successModal .modal-backdrop {
-    z-index: 1065 !important;
+    z-index: 1095 !important;
 }
 
 /* Force transactions modal to be above everything */
@@ -49,6 +49,15 @@
 #transactionsModal input[type="date"] {
     z-index: 1082 !important;
     position: relative;
+}
+
+/* Delete transaction modal should appear above other modals */
+#deleteTransactionModal {
+    z-index: 1090 !important;
+}
+
+#deleteTransactionModal .modal-backdrop {
+    z-index: 1089 !important;
 }
 
 /* Ensure modal backdrop is properly removed */
@@ -465,6 +474,10 @@ body.modal-open {
 <!-- Toggle Interface Button -->
 <div class="interface-toggle">
     <div class="btn-group">
+        <button type="button" class="btn btn-outline-success" id="audioToggleBtn" onclick="toggleAudio()" title="Abilita/Disabilita Sintesi Vocale">
+            <i class="fas fa-volume-up me-1" id="audioToggleIcon"></i>
+            <span id="audioToggleText">Voce ON</span>
+        </button>
         <button type="button" class="btn btn-outline-primary" onclick="showEmployeesList()">
             <i class="fas fa-users me-1"></i>
             Elenco Ufficiali
@@ -611,18 +624,6 @@ body.modal-open {
             <div class="employee-list" id="employee-list">
                 <!-- Sarà popolata dinamicamente -->
             </div>
-            
-            <!-- Cash Register Option -->
-            <div class="employee-item" onclick="selectCashRegister()">
-                <div class="employee-info-left">
-                    <div class="employee-avatar-small">
-                        <i class="fas fa-cash-register"></i>
-                    </div>
-                    <div class="employee-details">
-                        <div class="employee-name-small">Pagamento Contanti</div>
-                        <div class="employee-rank-small">Cliente esterno</div>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -1352,6 +1353,50 @@ body.modal-open {
         </div>
     </div>
 </div>
+
+<!-- Cash Payment Confirmation Modal -->
+<div class="modal fade" id="cashPaymentModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-money-bill me-2"></i>
+                    Conferma Pagamento Contanti
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Stai per processare un pagamento in contanti. Inserisci la password operatore per confermare.
+                </div>
+                
+                <div class="mb-3">
+                    <div id="cashPaymentSummary" class="card mb-3">
+                        <!-- Summary details will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="cashOperatorPassword" class="form-label">
+                        <i class="fas fa-lock me-1"></i>
+                        Password Operatore <span class="text-danger">*</span>
+                    </label>
+                    <input type="password" class="form-control" id="cashOperatorPassword" 
+                           placeholder="Inserisci password operatore..." required 
+                           onkeydown="handleCashPaymentKeyboard(event)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cancelCashPayment()">
+                    <i class="fas fa-times me-1"></i> Annulla
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmCashPayment()">
+                    <i class="fas fa-check me-1"></i> Conferma Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -1362,6 +1407,166 @@ let filteredEmployees = [];
 let lastScannedCode = null;
 let socket = null;
 let scannerTimeoutTimer = null;
+
+// Speech settings management
+let audioEnabled = localStorage.getItem('vinicola_speech_enabled') !== 'false'; // Default to true
+let speechConfig = {
+    speech_enabled: true,
+    speech_rate: 1.3,
+    speech_template: [],
+    nicknames: {}
+}; // Will store complete speech configuration
+
+// Initialize audio toggle button state and load configuration
+document.addEventListener('DOMContentLoaded', function() {
+    updateAudioToggleButton();
+    loadSpeechConfiguration();
+});
+
+// Load speech configuration from server
+function loadSpeechConfiguration() {
+    fetch('/api/speech_nicknames')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                speechConfig = data.config || speechConfig;
+                // Update global speech enabled state from config
+                if (speechConfig.speech_enabled !== undefined) {
+                    audioEnabled = speechConfig.speech_enabled && audioEnabled; // Respect both global and local settings
+                }
+            }
+        })
+        .catch(error => {
+            console.log('Speech configuration not available:', error);
+            speechConfig = {
+                speech_enabled: true,
+                speech_rate: 1.3,
+                speech_template: [],
+                nicknames: {}
+            };
+        });
+}
+
+function toggleAudio() {
+    audioEnabled = !audioEnabled;
+    localStorage.setItem('vinicola_speech_enabled', audioEnabled);
+    updateAudioToggleButton();
+}
+
+function updateAudioToggleButton() {
+    const button = document.getElementById('audioToggleBtn');
+    const icon = document.getElementById('audioToggleIcon');
+    const text = document.getElementById('audioToggleText');
+    
+    if (audioEnabled) {
+        button.className = 'btn btn-outline-success';
+        icon.className = 'fas fa-volume-up me-1';
+        text.textContent = 'Voce ON';
+    } else {
+        button.className = 'btn btn-outline-danger';
+        icon.className = 'fas fa-volume-mute me-1';
+        text.textContent = 'Voce OFF';
+    }
+}
+
+// Text-to-Speech functionality
+function speakText(text) {
+    if (!audioEnabled || !speechConfig.speech_enabled) return; // Don't speak if audio is disabled
+    
+    if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT'; // Italian language
+        utterance.rate = speechConfig.speech_rate || 1.3;     // Speed from configuration
+        utterance.pitch = 1.0;    // Normal pitch
+        utterance.volume = 1.0;   // Maximum volume
+        
+        speechSynthesis.speak(utterance);
+    } else {
+        console.warn('Speech synthesis non supportato dal browser');
+    }
+}
+
+// Format rank for speech (adds dots between letters)
+function formatRankForSpeech(rank) {
+    if (!rank) return '';
+    // Add dots between each character
+    return rank.split('').join('.');
+}
+
+// Format amount for speech (removes .00 for whole numbers)
+function formatAmountForSpeech(amount) {
+    const num = parseFloat(amount);
+    if (num % 1 === 0) {
+        // Whole number, return without decimals
+        return num.toString();
+    } else {
+        // Has decimals, return with 2 decimal places
+        return num.toFixed(2);
+    }
+}
+
+// Get speech name for employee (nickname if available, or formatted rank + name)
+function getSpeechNameForEmployee(employee) {
+    // Check if there's a nickname for this employee ID
+    if (speechConfig.nicknames[employee.id]) {
+        return speechConfig.nicknames[employee.id];
+    }
+    
+    // Fallback to formatted rank + name
+    const formattedRank = formatRankForSpeech(employee.rank);
+    return `${formattedRank} ${employee.first_name} ${employee.last_name}`;
+}
+
+// Build speech message based on template configuration
+function buildSpeechMessage(employee, totalAmount, creditAmount, isPurchase = true) {
+    if (!speechConfig.speech_template.length) {
+        // Fallback to old format if no template is configured
+        const employeeName = getSpeechNameForEmployee(employee);
+        const formattedTotal = formatAmountForSpeech(totalAmount);
+        const formattedCredit = formatAmountForSpeech(creditAmount);
+        
+        if (isPurchase) {
+            return `${employeeName}, totale ${formattedTotal} euro, credito residuo ${formattedCredit} euro`;
+        } else {
+            return `${employeeName}, ricarica ${formattedTotal} euro, nuovo credito ${formattedCredit} euro`;
+        }
+    }
+    
+    // Build message using template
+    let message = '';
+    const sortedTemplate = speechConfig.speech_template
+        .filter(item => item.enabled)
+        .sort((a, b) => a.order - b.order);
+    
+    for (const item of sortedTemplate) {
+        if (item.type === 'text') {
+            message += item.value;
+        } else if (item.type === 'parameter') {
+            switch (item.value) {
+                case 'GRADO':
+                    message += formatRankForSpeech(employee.rank);
+                    break;
+                case 'COGNOME':
+                    message += employee.last_name;
+                    break;
+                case 'NOME':
+                    message += employee.first_name;
+                    break;
+                case 'TOTALE_ACQUISTO':
+                    message += formatAmountForSpeech(totalAmount);
+                    break;
+                case 'CREDITO_RESIDUO':
+                    message += formatAmountForSpeech(creditAmount);
+                    break;
+            }
+        }
+    }
+    
+    return message.trim();
+}
 
 // Inizializza SocketIO per il barcode scanner
 function initializeSocket() {
@@ -1405,6 +1610,7 @@ function loadEmployees() {
         .then(response => response.json())
         .then(data => {
             employees = data.employees || [];
+            console.log('Loaded employees:', employees); // Debug log
             filteredEmployees = [...employees];
             renderEmployeeList();
         })
@@ -1750,6 +1956,8 @@ function renderEmployeeList() {
     const container = document.getElementById('employee-list');
     container.innerHTML = '';
     
+    console.log('Rendering employees:', filteredEmployees.map(emp => `${emp.code} - ${emp.first_name} ${emp.last_name}`)); // Debug log
+    
     filteredEmployees.forEach(employee => {
         const item = document.createElement('div');
         item.className = 'employee-item';
@@ -1775,12 +1983,18 @@ function renderEmployeeList() {
 function filterEmployees() {
     const search = document.getElementById('employee-search').value.toLowerCase();
     
+    console.log('All employees before filter:', employees.map(emp => emp.code)); // Debug log
+    
     filteredEmployees = employees.filter(emp => 
-        emp.first_name.toLowerCase().includes(search) ||
-        emp.last_name.toLowerCase().includes(search) ||
-        emp.rank.toLowerCase().includes(search) ||
-        emp.code.toLowerCase().includes(search)
+        emp.code.toUpperCase() !== 'CASSA' && ( // Exclude cash register from selection (case-insensitive)
+            emp.first_name.toLowerCase().includes(search) ||
+            emp.last_name.toLowerCase().includes(search) ||
+            emp.rank.toLowerCase().includes(search) ||
+            emp.code.toLowerCase().includes(search)
+        )
     );
+    
+    console.log('Filtered employees:', filteredEmployees.map(emp => emp.code)); // Debug log
     
     renderEmployeeList();
 }
@@ -1865,7 +2079,7 @@ function selectCashRegister() {
     });
 }
 
-function processTransaction(employee) {
+function processTransaction(employee, operatorId = null) {
     const totalAmount = Object.values(selectedProducts).reduce(
         (sum, product) => sum + (product.price * product.quantity), 0
     );
@@ -1890,6 +2104,11 @@ function processTransaction(employee) {
         formData.append('employee_id', employee.id);
     }
     
+    // Aggiungi operatore se disponibile
+    if (operatorId) {
+        formData.append('operator_id', operatorId);
+    }
+    
     // Converti selectedProducts nel formato atteso dal server
     const productsArray = Object.values(selectedProducts);
     console.log('Prodotti da inviare:', productsArray);
@@ -1910,6 +2129,23 @@ function processTransaction(employee) {
             }
             playSound(soundType);
             
+            // Annuncio vocale per l'acquisto (dopo il suono)
+            setTimeout(() => {
+                if (employee.id) {
+                    const speechText = buildSpeechMessage(
+                        employee, 
+                        totalAmount, 
+                        data.new_credit || 0, 
+                        true // isPurchase
+                    );
+                    speakText(speechText);
+                } else {
+                    const formattedTotal = formatAmountForSpeech(totalAmount);
+                    const speechText = `Pagamento contanti, totale ${formattedTotal} euro`;
+                    speakText(speechText);
+                }
+            }, 500); // Wait 500ms after sound
+            
             // Crea resoconto dettagliato
             const productsDetail = Object.values(selectedProducts).map(p => 
                 `${p.name} x${p.quantity} = €${(p.price * p.quantity).toFixed(2)}`
@@ -1921,7 +2157,7 @@ function processTransaction(employee) {
             
             const message = employee.id ? 
                 `<div class="text-center">
-                    <h4><strong>${employee.first_name} ${employee.last_name}</strong></h4>
+                    <h4><strong>${employee.rank} ${employee.first_name} ${employee.last_name}</strong></h4>
                     <div class="mb-3">
                         <div class="fs-5">${productsDetail}</div>
                         <hr>
@@ -1961,8 +2197,8 @@ function showSuccessModal(message) {
     
     modalBody.innerHTML = message;
     
-    // Ensure modal is on top
-    modalElement.style.zIndex = '1070';
+    // Ensure modal is on top - higher than delete transaction modal
+    modalElement.style.zIndex = '1095';
     
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
@@ -2009,8 +2245,8 @@ function showErrorModal(message) {
     // Set content
     modalBody.innerHTML = `<div class="alert alert-danger">${message}</div>`;
     
-    // Ensure modal is on top
-    modalElement.style.zIndex = '1070';
+    // Ensure modal is on top - higher than delete transaction modal
+    modalElement.style.zIndex = '1095';
     
     // Create and show modal
     const modal = new bootstrap.Modal(modalElement, {
@@ -2207,19 +2443,46 @@ function processCashPayment() {
         scannerTimeoutTimer = null;
     }
     
-    // Chiudi modal e processa pagamento contanti
+    // Prepara il summary per il modal di conferma
+    let summaryHtml = '<div class="card-header bg-light"><h6 class="mb-0">Riepilogo Acquisto</h6></div><div class="card-body">';
+    let total = 0;
+    
+    for (let productId in selectedProducts) {
+        const product = selectedProducts[productId];
+        const productTotal = product.price * product.quantity;
+        total += productTotal;
+        
+        summaryHtml += `
+            <div class="d-flex justify-content-between mb-2">
+                <span>${product.name} x${product.quantity}</span>
+                <span>€ ${productTotal.toFixed(2)}</span>
+            </div>
+        `;
+    }
+    
+    summaryHtml += `
+        <hr>
+        <div class="d-flex justify-content-between">
+            <strong>Totale:</strong>
+            <strong class="text-success">€ ${total.toFixed(2)}</strong>
+        </div>
+    </div>`;
+    
+    document.getElementById('cashPaymentSummary').innerHTML = summaryHtml;
+    
+    // Chiudi il modal di checkout e apri quello di conferma pagamento contanti
     const checkoutModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
     if (checkoutModal) {
         checkoutModal.hide();
     }
     
-    // Processa come pagamento contanti
-    processTransaction({
-        id: null,
-        first_name: 'Pagamento',
-        last_name: 'Contanti',
-        credit: 999999
-    });
+    const cashPaymentModal = new bootstrap.Modal(document.getElementById('cashPaymentModal'));
+    cashPaymentModal.show();
+    
+    // Focus sul campo password
+    setTimeout(() => {
+        document.getElementById('cashOperatorPassword').focus();
+    }, 500);
 }
 
 function handleCheckoutKeyboard(event) {
@@ -2471,6 +2734,17 @@ function processRecharge() {
         if (data.success) {
             playSound('purchase');
             
+            // Annuncio vocale per la ricarica (dopo il suono)
+            setTimeout(() => {
+                const speechText = buildSpeechMessage(
+                    selectedEmployeeForRecharge, 
+                    amount, 
+                    data.new_credit, 
+                    false // isPurchase - this is a recharge
+                );
+                speakText(speechText);
+            }, 500); // Wait 500ms after sound
+            
             const modal = bootstrap.Modal.getInstance(document.getElementById('creditRechargeModal'));
             if (modal) {
                 modal.hide();
@@ -2480,7 +2754,7 @@ function processRecharge() {
                 <div class="text-center">
                     <h4>Ricarica Completata</h4>
                     <div class="mb-3">
-                        <strong>${selectedEmployeeForRecharge.first_name} ${selectedEmployeeForRecharge.last_name}</strong><br>
+                        <strong>${selectedEmployeeForRecharge.rank} ${selectedEmployeeForRecharge.first_name} ${selectedEmployeeForRecharge.last_name}</strong><br>
                         <div class="fs-5 mt-2">Ricaricati: €${amount.toFixed(2)}</div>
                         <div class="text-muted">Nuovo credito: €${data.new_credit.toFixed(2)}</div>
                     </div>
@@ -2636,8 +2910,8 @@ function populateTransactionsTable(transactions) {
         
         // Amount with sign
         const amount = transaction.transaction_type === 'credit'
-            ? `+€${Math.abs(transaction.amount).toFixed(2)}`
-            : `-€${Math.abs(transaction.amount).toFixed(2)}`;
+            ? `€${Math.abs(transaction.amount).toFixed(2)}`
+            : `€${Math.abs(transaction.amount).toFixed(2)}`;
         
         // Product info
         const productInfo = transaction.product_name || transaction.custom_product_name || '-';
@@ -2824,8 +3098,8 @@ function showDeleteTransactionModal(transaction) {
         : '<span class="badge bg-danger">Acquisto</span>';
     
     const amount = transaction.transaction_type === 'credit'
-        ? `+€${Math.abs(transaction.amount).toFixed(2)}`
-        : `-€${Math.abs(transaction.amount).toFixed(2)}`;
+        ? `€${Math.abs(transaction.amount).toFixed(2)}`
+        : `€${Math.abs(transaction.amount).toFixed(2)}`;
     
     const productInfo = transaction.product_name || transaction.custom_product_name || 'Nessun prodotto';
     
@@ -2952,7 +3226,7 @@ function populateEmployeesTable(employeesList) {
 
             <td><code>${employee.code.toUpperCase()}</code></td>
             <td class="text-end">
-                <span class="${creditClass}">€${employee.credit.toFixed(2)}</span>
+                <span class="${creditClass}">€-50</span>
             </td>
             <td class="text-end">
                 <small class="text-muted">€ -50</small>
@@ -3482,6 +3756,80 @@ function confirmDeleteProduct() {
     .catch(error => {
         console.error('Error deleting product:', error);
         showErrorModal('Errore di rete durante l\'eliminazione del prodotto');
+    });
+}
+
+// Cash payment confirmation functions
+function handleCashPaymentKeyboard(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        confirmCashPayment();
+    } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelCashPayment();
+    }
+}
+
+function cancelCashPayment() {
+    const cashPaymentModal = bootstrap.Modal.getInstance(document.getElementById('cashPaymentModal'));
+    if (cashPaymentModal) {
+        cashPaymentModal.hide();
+    }
+    
+    // Clear password field
+    document.getElementById('cashOperatorPassword').value = '';
+    
+    // Reopen checkout modal
+    const checkoutModal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+    checkoutModal.show();
+}
+
+function confirmCashPayment() {
+    const password = document.getElementById('cashOperatorPassword').value.trim();
+    
+    if (!password) {
+        showErrorModal('Inserisci la password operatore');
+        return;
+    }
+    
+    // Verify operator password
+    fetch('/verify_operator_password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal and process cash payment
+            const cashPaymentModal = bootstrap.Modal.getInstance(document.getElementById('cashPaymentModal'));
+            if (cashPaymentModal) {
+                cashPaymentModal.hide();
+            }
+            
+            // Clear password field
+            document.getElementById('cashOperatorPassword').value = '';
+            
+            // Process as cash payment with operator information
+            processTransaction({
+                id: null,
+                first_name: 'Pagamento',
+                last_name: 'Contanti',
+                credit: 999999
+            }, data.operator_id);
+        } else {
+            showErrorModal(data.message || 'Password operatore non valida');
+            document.getElementById('cashOperatorPassword').focus();
+            document.getElementById('cashOperatorPassword').select();
+        }
+    })
+    .catch(error => {
+        console.error('Error verifying operator password:', error);
+        showErrorModal('Errore durante la verifica della password');
     });
 }
 </script>

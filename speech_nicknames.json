@@ -1,0 +1,62 @@
+{
+  "_comment": "Configurazione avanzata sintesi vocale",
+  "2": "ETHAN",
+  "3": "Alpha Team Leader",
+  "5": "Charlie",
+  "8": "Commander Beta",
+  "speech_enabled": true,
+  "speech_rate": 2,
+  "speech_template": [
+    {
+      "enabled": false,
+      "order": 1,
+      "type": "parameter",
+      "value": "GRADO"
+    },
+    {
+      "enabled": true,
+      "order": 2,
+      "type": "parameter",
+      "value": "NOME"
+    },
+    {
+      "enabled": true,
+      "order": 3,
+      "type": "parameter",
+      "value": "COGNOME"
+    },
+    {
+      "enabled": true,
+      "order": 4,
+      "type": "text",
+      "value": ", totale "
+    },
+    {
+      "enabled": true,
+      "order": 5,
+      "type": "parameter",
+      "value": "TOTALE_ACQUISTO"
+    },
+    {
+      "enabled": true,
+      "order": 6,
+      "type": "text",
+      "value": " euro, residuo "
+    },
+    {
+      "enabled": true,
+      "order": 7,
+      "type": "parameter",
+      "value": "CREDITO_RESIDUO"
+    },
+    {
+      "enabled": true,
+      "order": 8,
+      "type": "text",
+      "value": " euro"
+    }
+  ],
+  "nicknames": {
+    "2": "ethan"
+  }
+}

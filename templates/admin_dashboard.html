@@ -353,6 +353,9 @@
         <a href="{{ url_for('admin_reports') }}" class="admin-tab">
             <i class="fas fa-chart-bar"></i> Report
         </a>
+        <a href="{{ url_for('admin_speech_config') }}" class="admin-tab">
+            <i class="fas fa-volume-up"></i> Sintesi Vocale
+        </a>
     </div>
     
     <!-- Stats Row -->
@@ -371,6 +374,9 @@
             </div>
             <div class="stat-value">€ {{ "%.2f"|format(total_credit) }}</div>
             <div class="stat-label">Totale Credito</div>
+            <button type="button" class="btn btn-sm btn-outline-warning mt-2" onclick="openResetTotalCreditModal()" title="Reset Totale Credito">
+                <i class="fas fa-undo me-1"></i> Reset
+            </button>
         </div>
         
         <div class="stat-card">
@@ -379,6 +385,9 @@
             </div>
             <div class="stat-value">{{ transactions_today }}</div>
             <div class="stat-label">Transazioni Oggi</div>
+            <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="openResetTodayTransactionsModal()" title="Reset Transazioni Oggi">
+                <i class="fas fa-trash me-1"></i> Reset
+            </button>
         </div>
         
         <div class="stat-card">
@@ -427,6 +436,18 @@
                 <i class="fas fa-arrow-right me-1"></i> Vai
             </button>
         </a>
+        
+        
+        <div class="action-card text-decoration-none" style="cursor: pointer;" onclick="openBackupModal()">
+            <div class="action-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h3 class="action-title">Backup Database</h3>
+            <p class="action-description">Crea backup o importa un backup del database</p>
+            <button class="btn btn-info">
+                <i class="fas fa-database me-1"></i> Gestisci
+            </button>
+        </div>
     </div>
     
     <!-- Operators Section -->
@@ -567,6 +588,186 @@
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Chiudi</button>
                 <button type="button" class="btn btn-primary" id="printPasswordsBtn">
                     <i class="fas fa-print me-1"></i> Stampa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Total Credit Modal -->
+<div class="modal fade" id="resetTotalCreditModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-undo me-2"></i>
+                    Reset Totale Credito
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attenzione!</strong> Questa operazione resetterà a zero il credito di tutti i dipendenti e non può essere annullata.
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Credito totale attuale: <strong>€ {{ "%.2f"|format(total_credit) }}</strong>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="confirmResetCredit">
+                    <label class="form-check-label" for="confirmResetCredit">
+                        <strong>Confermo di voler azzerare il credito di tutti i dipendenti</strong>
+                    </label>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <label for="resetCreditPassword" class="form-label">
+                        <i class="fas fa-lock me-1"></i>
+                        Password Amministratore <span class="text-danger">*</span>
+                    </label>
+                    <input type="password" class="form-control" id="resetCreditPassword" placeholder="Inserisci password amministratore..." required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Annulla
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmResetTotalCredit()">
+                    <i class="fas fa-exclamation-triangle me-1"></i> Reset Totale Credito
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Today Transactions Modal -->
+<div class="modal fade" id="resetTodayTransactionsModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash me-2"></i>
+                    Reset Transazioni Oggi
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attenzione!</strong> Questa operazione cancellerà tutte le transazioni di oggi e non può essere annullata.
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Transazioni oggi: <strong>{{ transactions_today }}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="resetTransactionsPassword" class="form-label">
+                        <i class="fas fa-key me-1"></i> Password Amministratore
+                    </label>
+                    <input type="password" class="form-control" id="resetTransactionsPassword" 
+                           placeholder="Inserisci la tua password per confermare">
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmResetTransactions">
+                    <label class="form-check-label text-danger fw-bold" for="confirmResetTransactions">
+                        <i class="fas fa-check me-1"></i> 
+                        Confermo di voler cancellare tutte le transazioni di oggi
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Annulla
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmResetTodayTransactions()">
+                    <i class="fas fa-trash me-1"></i> Cancella Transazioni Oggi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backup/Import Modal -->
+<div class="modal fade" id="backupModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-database me-2"></i>
+                    Gestione Backup Database
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-download me-1"></i> Crea Backup
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p>Crea un backup completo del database. Il file verrà salvato nella cartella <code>backup/</code> con timestamp.</p>
+                                <button type="button" class="btn btn-success w-100" onclick="createBackup()">
+                                    <i class="fas fa-download me-1"></i> Crea Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-upload me-1"></i> Importa Backup
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-danger mb-3">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <small><strong>Attenzione!</strong> L'importazione sostituirà tutti i dati esistenti.</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="backupFile" class="form-label">Seleziona file backup:</label>
+                                    <input type="file" class="form-control" id="backupFile" accept=".db,.sqlite,.sqlite3">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="importPassword" class="form-label">
+                                        <i class="fas fa-lock me-1"></i>
+                                        Password Amministratore <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" class="form-control" id="importPassword" placeholder="Conferma con password...">
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="confirmImport">
+                                    <label class="form-check-label" for="confirmImport">
+                                        <small>Confermo di voler sostituire tutti i dati esistenti</small>
+                                    </label>
+                                </div>
+                                
+                                <button type="button" class="btn btn-danger w-100" onclick="importBackup()">
+                                    <i class="fas fa-upload me-1"></i> Importa Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Chiudi
                 </button>
             </div>
         </div>
@@ -951,5 +1152,244 @@
             });
         }
     });
+    
+    // Functions for opening modals
+    function openResetTotalCreditModal() {
+        const resetModal = new bootstrap.Modal(document.getElementById('resetTotalCreditModal'));
+        resetModal.show();
+    }
+    
+    function openBackupModal() {
+        const backupModal = new bootstrap.Modal(document.getElementById('backupModal'));
+        backupModal.show();
+    }
+    
+    function openResetTodayTransactionsModal() {
+        const resetModal = new bootstrap.Modal(document.getElementById('resetTodayTransactionsModal'));
+        resetModal.show();
+    }
+    
+    // Reset total credit functionality
+    function confirmResetTotalCredit() {
+        const password = document.getElementById('resetCreditPassword').value.trim();
+        const confirmCheckbox = document.getElementById('confirmResetCredit');
+        
+        if (!password) {
+            showErrorMessage('Inserisci la password amministratore');
+            return;
+        }
+        
+        if (!confirmCheckbox.checked) {
+            showErrorMessage('Conferma l\'operazione spuntando la casella');
+            return;
+        }
+        
+        // Disable button and show loading
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Resettando...';
+        
+        fetch('/admin/reset_total_credit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(data.message);
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('resetTotalCreditModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('resetCreditPassword').value = '';
+                document.getElementById('confirmResetCredit').checked = false;
+                // Reload page to show updated credit
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showErrorMessage(data.message || 'Errore durante il reset del credito');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> Reset Totale Credito';
+        });
+    }
+    
+    // Reset today transactions functionality
+    function confirmResetTodayTransactions() {
+        const password = document.getElementById('resetTransactionsPassword').value.trim();
+        const confirmCheckbox = document.getElementById('confirmResetTransactions');
+        
+        if (!password) {
+            showErrorMessage('Inserisci la password amministratore');
+            return;
+        }
+        
+        if (!confirmCheckbox.checked) {
+            showErrorMessage('Conferma l\'operazione spuntando la casella');
+            return;
+        }
+        
+        // Disable button and show loading
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Cancellando...';
+        
+        fetch('/admin/reset_today_transactions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(data.message);
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('resetTodayTransactionsModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('resetTransactionsPassword').value = '';
+                document.getElementById('confirmResetTransactions').checked = false;
+                // Reload page to show updated counts
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showErrorMessage(data.message || 'Errore durante il reset delle transazioni');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-trash me-1"></i> Cancella Transazioni Oggi';
+        });
+    }
+    
+    // Backup functionality
+    function createBackup() {
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Creando backup...';
+        
+        fetch('/admin/create_backup', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(`Backup creato con successo: ${data.filename}`);
+            } else {
+                showErrorMessage(data.message || 'Errore durante la creazione del backup');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-download me-1"></i> Crea Backup';
+        });
+    }
+    
+    function importBackup() {
+        const fileInput = document.getElementById('backupFile');
+        const password = document.getElementById('importPassword').value.trim();
+        const confirmCheckbox = document.getElementById('confirmImport');
+        
+        if (!fileInput.files[0]) {
+            showErrorMessage('Seleziona un file di backup');
+            return;
+        }
+        
+        if (!password) {
+            showErrorMessage('Inserisci la password amministratore');
+            return;
+        }
+        
+        if (!confirmCheckbox.checked) {
+            showErrorMessage('Conferma la sostituzione dei dati esistenti');
+            return;
+        }
+        
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Importando...';
+        
+        const formData = new FormData();
+        formData.append('backup_file', fileInput.files[0]);
+        formData.append('password', password);
+        
+        fetch('/admin/import_backup', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(data.message);
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('backupModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('importPassword').value = '';
+                document.getElementById('confirmImport').checked = false;
+                fileInput.value = '';
+                // Reload page after successful import
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                showErrorMessage(data.message || 'Errore durante l\'importazione del backup');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-upload me-1"></i> Importa Backup';
+        });
+    }
+    
+    // Helper functions for showing messages
+    function showSuccessMessage(message) {
+        // Create a success alert or toast
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    }
+    
+    function showErrorMessage(message) {
+        // Create an error alert or toast
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    }
 </script>
 {% endblock %}

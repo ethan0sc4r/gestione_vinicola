@@ -365,11 +365,7 @@
                                 </div>
                                 
                                 <div class="{% if transaction.transaction_type == 'credit' %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
-                                    {% if transaction.transaction_type == 'credit' %}
-                                        +€ {{ "%.2f"|format(transaction.amount) }}
-                                    {% else %}
-                                        -€ {{ "%.2f"|format(transaction.amount|abs) }}
-                                    {% endif %}
+                                    € {{ "%.2f"|format(transaction.amount|abs) }}
                                 </div>
                             </div>
                         </div>

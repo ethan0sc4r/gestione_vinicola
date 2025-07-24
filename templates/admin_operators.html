@@ -280,6 +280,9 @@
         <a href="{{ url_for('admin_reports') }}" class="admin-tab">
             <i class="fas fa-chart-bar"></i> Report
         </a>
+        <a href="{{ url_for('admin_speech_config') }}" class="admin-tab">
+            <i class="fas fa-volume-up"></i> Sintesi Vocale
+        </a>
     </div>
     
     <!-- Regenerate Section -->
@@ -490,8 +493,56 @@
         
         // Function to regenerate a single password
         function regenerateSinglePassword(operatorId) {
-            // This would be implemented on the server side
-            showToast('Funzionalità non implementata.', 'warning');
+            const button = document.querySelector(`[data-operator-id="${operatorId}"]`);
+            if (!button) return;
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Rigenerazione...';
+            
+            fetch("{{ url_for('admin_regenerate_single_password') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    operator_id: operatorId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update password in UI
+                    document.querySelectorAll('.operator-card').forEach(card => {
+                        const regenerateBtn = card.querySelector('.regenerate-single-btn');
+                        if (regenerateBtn && regenerateBtn.dataset.operatorId === operatorId) {
+                            const passwordElement = card.querySelector('.operator-password');
+                            passwordElement.textContent = data.new_password;
+                            
+                            // Highlight the new password briefly
+                            passwordElement.style.backgroundColor = '#d4edda';
+                            passwordElement.style.border = '1px solid #c3e6cb';
+                            setTimeout(() => {
+                                passwordElement.style.backgroundColor = '#f8f9fa';
+                                passwordElement.style.border = '1px dashed #ced4da';
+                            }, 2000);
+                        }
+                    });
+                    
+                    showToast(`Password rigenerata per ${data.username}`, 'success');
+                } else {
+                    showToast(data.message || 'Errore durante la rigenerazione della password.', 'danger');
+                }
+                
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Rigenera';
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showToast('Errore di connessione.', 'danger');
+                
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Rigenera';
+            });
         }
         
         // Function to toggle operator active status
@@ -541,6 +592,41 @@
         function createStandardOperators() {
             // This would be implemented on the server side
             showToast('Funzionalità non implementata.', 'warning');
+        }
+        
+        // Function to show toast messages
+        function showToast(message, type = 'info') {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+            toast.className = `toast align-items-center text-white ${bgColor} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Initialize and show toast
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+            
+            // Remove from DOM after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
         }
         
         // Event listeners

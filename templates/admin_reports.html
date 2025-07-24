@@ -220,6 +220,20 @@
         color: var(--danger-color);
     }
     
+    /* Cancellation transaction styles */
+    .transaction-type-cancellation {
+        background-color: rgba(255, 140, 0, 0.1);
+        color: #ff8c00;
+    }
+    
+    .transaction-amount-cancellation {
+        color: #ff8c00;
+    }
+    
+    .cancellation-row {
+        background-color: rgba(255, 255, 0, 0.2) !important;
+    }
+    
     .transaction-employee {
         display: flex;
         align-items: center;
@@ -337,9 +351,23 @@
     }
     
     /* Print styles */
+    @page {
+        size: landscape;
+        margin: 0.5in;
+    }
+    
     @media print {
         body * {
             visibility: hidden;
+        }
+        
+        .print-only {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        .print-only, .print-only * {
+            visibility: visible !important;
         }
         
         .print-content, .print-content * {
@@ -361,6 +389,39 @@
         .page-break {
             page-break-after: always;
         }
+        
+        .print-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+        
+        .print-section {
+            margin-bottom: 30px;
+        }
+        
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .print-table th, .print-table td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+            font-size: 10px;
+        }
+        
+        .print-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+    }
+    
+    .print-only {
+        display: none;
     }
 </style>
 {% endblock %}
@@ -380,9 +441,14 @@
             <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
                 <i class="fas fa-arrow-left me-1"></i> Torna al Sistema
             </a>
-            <button type="button" class="btn btn-primary" id="printReportBtn">
-                <i class="fas fa-print me-1"></i> Stampa Report
-            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="printReportBtn">
+                    <i class="fas fa-print me-1"></i> Stampa Report
+                </button>
+                <button type="button" class="btn btn-success" id="exportCsvBtn">
+                    <i class="fas fa-file-csv me-1"></i> Export CSV
+                </button>
+            </div>
         </div>
     </div>
     
@@ -407,6 +473,9 @@
         {% endif %}
         <a href="{{ url_for('admin_reports') }}" class="admin-tab active">
             <i class="fas fa-chart-bar"></i> Report
+        </a>
+        <a href="{{ url_for('admin_speech_config') }}" class="admin-tab">
+            <i class="fas fa-volume-up"></i> Sintesi Vocale
         </a>
     </div>
     
@@ -481,7 +550,7 @@
                 <div class="stat-icon stat-icon-green">
                     <i class="fas fa-arrow-up"></i>
                 </div>
-                <div class="stat-value">€ {{ "%.2f"|format(credit_sum) }}</div>
+                <div class="stat-value" data-summary="credit">€ {{ "%.2f"|format(credit_sum) }}</div>
                 <div class="stat-label">Totale Ricariche</div>
             </div>
             
@@ -489,7 +558,7 @@
                 <div class="stat-icon stat-icon-red">
                     <i class="fas fa-arrow-down"></i>
                 </div>
-                <div class="stat-value">€ {{ "%.2f"|format(debit_sum) }}</div>
+                <div class="stat-value" data-summary="debit">€ {{ "%.2f"|format(debit_sum) }}</div>
                 <div class="stat-label">Totale Acquisti</div>
             </div>
             
@@ -537,7 +606,7 @@
             </div>
             
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped" id="productSummaryTable">
                     <thead>
                         <tr>
                             <th>Prodotto</th>
@@ -593,7 +662,7 @@
             </div>
             
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped" id="productLogsTable">
                     <thead>
                         <tr>
                             <th>Data/Ora</th>
@@ -657,6 +726,69 @@
         
         <div class="page-break"></div>
         
+        <!-- Negative Credit Employees Section -->
+        {% if negative_credit_employees %}
+        <div class="transactions-table-container">
+            <div class="table-toolbar">
+                <h3 class="table-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Ufficiali con Credito Negativo
+                </h3>
+                <div class="table-controls no-print">
+                    <span class="badge bg-warning">{{ negative_credit_employees|length }} Ufficiali</span>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Grado</th>
+                            <th>Dipendente</th>
+
+                            <th>Codice</th>
+                            <th>Credito Negativo</th>
+                            <th>Integrità</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in negative_credit_employees %}
+                        <tr class="text-danger">
+                            <td>
+                                <span class="badge bg-secondary">{{ employee.rank }}</span>
+                            </td>
+                            <td class="transaction-employee">
+                                <div class="transaction-employee-avatar">
+                                    {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                                </div>
+                                <div>
+                                    <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <code>{{ employee.code }}</code>
+                            </td>
+                            <td>
+                                <strong class="text-danger">-€ {{ "%.2f"|format(employee.credit|abs) }}</strong>
+                            </td>
+                            <td>
+                                {% if employee.verify_credit_integrity() %}
+                                    <span class="badge bg-success">OK</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Errore</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="page-break"></div>
+        {% endif %}
+        
         <!-- Transactions Table -->
         <div class="transactions-table-container">
             <div class="table-toolbar">
@@ -673,7 +805,7 @@
             
             {% if transactions %}
             <div class="table-responsive">
-                <table class="transactions-table">
+                <table class="transactions-table" id="transactionsTable">
                     <thead>
                         <tr>
                             <th>Ora</th>
@@ -686,29 +818,27 @@
                     </thead>
                     <tbody>
                         {% for transaction in transactions %}
-                        <tr data-type="{{ transaction.transaction_type }}">
+                        <tr data-type="{{ transaction.transaction_type }}" {% if transaction.transaction_type == 'cancellation' %}class="cancellation-row"{% endif %}>
                             <td>
                                 <div>{{ transaction.timestamp.strftime('%d/%m/%Y') }}</div>
                                 <div class="transaction-time">{{ transaction.timestamp.strftime('%H:%M:%S') }}</div>
                             </td>
                             <td>
-                                <span class="transaction-type {% if transaction.transaction_type == 'credit' %}transaction-type-credit{% elif transaction.transaction_type == 'admin_adjustment' %}transaction-type-admin{% else %}transaction-type-debit{% endif %}">
+                                <span class="transaction-type {% if transaction.transaction_type == 'credit' %}transaction-type-credit{% elif transaction.transaction_type == 'admin_adjustment' %}transaction-type-admin{% elif transaction.transaction_type == 'cancellation' %}transaction-type-cancellation{% else %}transaction-type-debit{% endif %}">
                                     {% if transaction.transaction_type == 'credit' %}
                                         <i class="fas fa-plus-circle me-1"></i> Ricarica
                                     {% elif transaction.transaction_type == 'admin_adjustment' %}
                                         <i class="fas fa-cog me-1"></i> Regolazione Admin
+                                    {% elif transaction.transaction_type == 'cancellation' %}
+                                        <i class="fas fa-undo me-1"></i> Annullamento Transazione
                                     {% else %}
                                         <i class="fas fa-minus-circle me-1"></i> Acquisto
                                     {% endif %}
                                 </span>
                             </td>
                             <td>
-                                <span class="transaction-amount {% if transaction.transaction_type == 'credit' or (transaction.transaction_type == 'admin_adjustment' and transaction.amount > 0) %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
-                                    {% if transaction.transaction_type == 'credit' or (transaction.transaction_type == 'admin_adjustment' and transaction.amount > 0) %}
-                                        +€ {{ "%.2f"|format(transaction.amount) }}
-                                    {% else %}
-                                        -€ {{ "%.2f"|format(transaction.amount|abs) }}
-                                    {% endif %}
+                                <span class="transaction-amount {% if transaction.transaction_type == 'credit' or (transaction.transaction_type == 'admin_adjustment' and transaction.amount > 0) or transaction.employee_code == 'CASSA' %}transaction-amount-positive{% elif transaction.transaction_type == 'cancellation' %}transaction-amount-cancellation{% else %}transaction-amount-negative{% endif %}">
+                                    € {{ "%.2f"|format(transaction.amount|abs) }}
                                 </span>
                             </td>
                             <td class="transaction-employee">
@@ -724,7 +854,15 @@
                                 {% endif %}
                             </td>
                             <td class="transaction-operator">
-                                {{ transaction.operator_name }}
+                                {% if transaction.operator_name and transaction.operator_name != 'N/A' %}
+                                    {{ transaction.operator_name }}
+                                {% elif transaction.transaction_type == 'cancellation' %}
+                                    <span class="text-warning">Sistema (Cancellazione)</span>
+                                {% elif transaction.employee_code == 'CASSA' %}
+                                    <span class="text-info">Pagamento Contanti</span>
+                                {% else %}
+                                    <span class="text-muted">Non identificato</span>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -942,6 +1080,144 @@
                 }, 1000);
             });
         }
+        
+        // Export CSV functionality
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        if (exportCsvBtn) {
+            exportCsvBtn.addEventListener('click', function() {
+                exportToCSV();
+            });
+        }
     });
+    
+    function exportToCSV() {
+        // Get current date info for the files
+        const reportDate = document.getElementById('reportDate').value;
+        const isDaily = document.getElementById('dailyReport').checked;
+        const dateStr = isDaily ? reportDate : `${document.getElementById('startDate').value}_${document.getElementById('endDate').value}`;
+        
+        // Create CSV for transactions
+        exportTransactionsCSV(dateStr);
+        
+        // Create CSV for product logs
+        exportProductLogsCSV(dateStr);
+        
+        // Create CSV for product summary
+        exportProductSummaryCSV(dateStr);
+        
+        // Create CSV for summary
+        exportSummaryCSV(dateStr);
+    }
+    
+    function exportTransactionsCSV(dateStr) {
+        const transactions = [];
+        const rows = document.querySelectorAll('#transactionsTable tbody tr');
+        
+        // Header
+        transactions.push(['Timestamp', 'Tipo', 'Importo', 'Dipendente', 'Prodotto', 'Operatore']);
+        
+        // Data rows
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 6) {
+                transactions.push([
+                    cells[0].textContent.trim(),
+                    cells[1].textContent.trim(),
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim(),
+                    cells[5].textContent.trim()
+                ]);
+            }
+        });
+        
+        downloadCSV(transactions, `transazioni_${dateStr}.csv`);
+    }
+    
+    function exportProductLogsCSV(dateStr) {
+        const productLogs = [];
+        const rows = document.querySelectorAll('#productLogsTable tbody tr');
+        
+        // Header
+        productLogs.push(['Timestamp', 'Azione', 'Prodotto', 'Prezzo', 'Giacenza', 'Utente', 'Info']);
+        
+        // Data rows
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 7) {
+                productLogs.push([
+                    cells[0].textContent.trim(),
+                    cells[1].textContent.trim(),
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim(),
+                    cells[5].textContent.trim(),
+                    cells[6].textContent.trim()
+                ]);
+            }
+        });
+        
+        downloadCSV(productLogs, `prodotti_log_${dateStr}.csv`);
+    }
+    
+    function exportProductSummaryCSV(dateStr) {
+        const productSummary = [];
+        const rows = document.querySelectorAll('#productSummaryTable tbody tr');
+        
+        // Header
+        productSummary.push(['Prodotto', 'Quantità Venduta', 'Giacenza Attuale', 'Differenza', 'Totale']);
+        
+        // Data rows
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 5) {
+                productSummary.push([
+                    cells[0].textContent.trim(),
+                    cells[1].textContent.trim(),
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim()
+                ]);
+            }
+        });
+        
+        downloadCSV(productSummary, `prodotti_riepilogo_${dateStr}.csv`);
+    }
+    
+    function exportSummaryCSV(dateStr) {
+        const summary = [];
+        
+        // Header
+        summary.push(['Tipo', 'Valore']);
+        
+        // Get summary data from the page
+        const creditSum = document.querySelector('[data-summary="credit"]')?.textContent || '0';
+        const debitSum = document.querySelector('[data-summary="debit"]')?.textContent || '0';
+        
+        summary.push(['Totale Ricariche', creditSum]);
+        summary.push(['Totale Acquisti', debitSum]);
+        summary.push(['Data Report', dateStr]);
+        
+        downloadCSV(summary, `riepilogo_${dateStr}.csv`);
+    }
+    
+    function downloadCSV(data, filename) {
+        const csvContent = data.map(row => 
+            row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+        ).join('\n');
+        
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
 </script>
 {% endblock %}

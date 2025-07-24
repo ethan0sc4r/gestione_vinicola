@@ -315,7 +315,7 @@ class Transaction(db.Model):
     Tiene traccia di tutte le operazioni di carico/scarico credito.
     """
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
     employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
     operator_id = db.Column(db.Integer, db.ForeignKey('operator.id'), nullable=True)  # Chi ha eseguito l'operazione
     amount = db.Column(db.Numeric(10, 2))  # Positivo per ricarica, negativo per consumo
@@ -571,11 +571,11 @@ def get_system_stats():
     """Ottiene statistiche globali del sistema."""
     total_employees = Employee.query.count()
     total_credit = db.session.query(db.func.sum(Employee.credit)).scalar() or 0
-    total_transactions = Transaction.query.count()
+    total_transactions = Transaction.query.filter(Transaction.transaction_type != 'cancellation').count()
     
     # Transazioni recenti (ultime 24 ore)
     yesterday = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    recent_transactions = Transaction.query.filter(Transaction.timestamp >= yesterday).count()
+    recent_transactions = Transaction.query.filter(Transaction.timestamp >= yesterday, Transaction.transaction_type != 'cancellation').count()
     
     # Lista dipendenti per l'interfaccia prodotti-prima (escludi cassa centrale)
     employees = Employee.query.filter(Employee.code != 'CASSA').order_by(Employee.last_name, Employee.first_name).all()
@@ -893,7 +893,7 @@ def new_employee():
 def employee_details(id):
     """Visualizza dettagli dipendente."""
     employee = Employee.query.get_or_404(id)
-    transactions = Transaction.query.filter_by(employee_id=id).order_by(Transaction.timestamp.desc()).all()
+    transactions = Transaction.query.filter_by(employee_id=id).filter(Transaction.transaction_type != 'cancellation').order_by(Transaction.timestamp.desc()).all()
     
     # Calcola statistiche credito
     credit_stats = get_credit_stats(id)
@@ -1051,7 +1051,7 @@ def add_credit():
 @app.route('/products_first')
 def products_first():
     """Interfaccia prodotti-prima: selezione prodotti e poi identificazione utente."""
-    products = Product.query.filter_by(active=True).all()
+    products = Product.query.filter_by(active=True).order_by(Product.name.asc()).all()
     return render_template('products_first.html', products=products)
 
 
@@ -1192,6 +1192,7 @@ def deduct_credit():
     products_json = request.form.get('products')
     custom_amount = request.form.get('custom_amount')
     custom_product = request.form.get('custom_product')
+    operator_id = request.form.get('operator_id')
     
     # Prendi il dipendente dal database
     employee = Employee.query.get_or_404(employee_id)
@@ -1228,6 +1229,7 @@ def deduct_credit():
                 # Registra una transazione per ogni prodotto
                 transaction = Transaction(
                     employee_id=employee.id,
+                    operator_id=operator_id if operator_id else None,
                     amount=-product_total,  # Negativo perché stiamo sottraendo
                     transaction_type='debit',
                     product_id=product_id,
@@ -1249,6 +1251,7 @@ def deduct_credit():
             # Registra la transazione per l'importo personalizzato
             transaction = Transaction(
                 employee_id=employee.id,
+                operator_id=operator_id if operator_id else None,
                 amount=-total_amount,  # Negativo perché stiamo sottraendo
                 transaction_type='debit',
                 custom_product_name=product_description
@@ -1310,6 +1313,43 @@ def deduct_credit():
         })
 
 
+@app.route('/verify_operator_password', methods=['POST'])
+def verify_operator_password():
+    """Verifica la password di un operatore."""
+    try:
+        data = request.get_json()
+        password = data.get('password', '').strip()
+        
+        if not password:
+            return jsonify({
+                'success': False,
+                'message': 'Password richiesta'
+            })
+        
+        # Cerca un operatore con la password fornita
+        operators = Operator.query.filter_by(active=True).all()
+        
+        for operator in operators:
+            if operator.password == password:
+                logger.info(f"Operator password verified for operator {operator.id} ({operator.username})")
+                return jsonify({
+                    'success': True,
+                    'operator_id': operator.id
+                })
+        
+        logger.warning(f"Invalid operator password attempt: {password}")
+        return jsonify({
+            'success': False,
+            'message': 'Password operatore non valida'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error verifying operator password: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Errore durante la verifica della password'
+        })
+
         
 @app.route('/admin')
 def admin_login():
@@ -1361,7 +1401,8 @@ def admin_dashboard():
     employees_count = Employee.query.count()
     total_credit = db.session.query(db.func.sum(Employee.credit)).scalar() or 0
     transactions_today = Transaction.query.filter(
-        Transaction.timestamp >= datetime.today().replace(hour=0, minute=0, second=0)
+        Transaction.timestamp >= datetime.today().replace(hour=0, minute=0, second=0),
+        Transaction.transaction_type != 'cancellation'
     ).count()
     
     # Elenco operatori
@@ -1670,7 +1711,7 @@ def admin_products():
     if session.get('admin_logged_in') != True:
         return redirect(url_for('admin_login'))
     
-    products = Product.query.all()
+    products = Product.query.order_by(Product.name.asc()).all()
     return render_template('admin_products.html', products=products)
 
 @app.route('/admin/products/delete/<int:id>', methods=['POST'])
@@ -1835,8 +1876,12 @@ def admin_reports():
         
         logger.info(f"Filtering transactions between {start_date_utc} and {end_date_utc}")
         
-        # Carica le transazioni con le relazioni
-        transactions = Transaction.query.filter(
+        # Carica le transazioni con le relazioni (includi cancellazioni per admin reports)
+        transactions = Transaction.query.options(
+            db.joinedload(Transaction.employee),
+            db.joinedload(Transaction.operator),
+            db.joinedload(Transaction.product)
+        ).filter(
             Transaction.timestamp >= start_date_utc,
             Transaction.timestamp <= end_date_utc
         ).order_by(Transaction.timestamp.desc()).all()
@@ -1868,6 +1913,7 @@ def admin_reports():
                 'amount': float(t.amount),
                 'transaction_type': t.transaction_type,
                 'employee_name': employee_name,
+                'employee_code': t.employee.code if t.employee else None,
                 'product_name': product_name,
                 'operator_name': operator_name,
                 'quantity': t.quantity if t.quantity else 1
@@ -1942,22 +1988,10 @@ def admin_reports():
         # Get product operation logs
         product_logs = get_product_logs_for_period(start_date_utc, end_date_utc)
         
-        # If no logs found, create some test data for debugging
-        if not product_logs:
-            logger.info("No product logs found, creating test data")
-            test_log_timestamp = datetime.now()
-            product_logs = [
-                {
-                    'timestamp': test_log_timestamp,
-                    'action': 'ADD',
-                    'product_id': '999',
-                    'product_name': 'Prodotto Test (DEBUG)',
-                    'price': '€10.50',
-                    'inventory_info': '5',
-                    'user': 'OPERATOR',
-                    'extra_info': 'Log di test per debug'
-                }
-            ]
+        # No debug data needed - show empty if no logs found
+        
+        # Get employees with negative credit (ordered by last name)
+        negative_credit_employees = Employee.query.filter(Employee.credit < 0).order_by(Employee.last_name.asc()).all()
         
         return render_template(
             'admin_reports.html',
@@ -1973,7 +2007,8 @@ def admin_reports():
             operator_stats=operator_stats,
             product_stats=product_stats,
             product_total_quantity=product_total_quantity,
-            product_total_amount=product_total_amount
+            product_total_amount=product_total_amount,
+            negative_credit_employees=negative_credit_employees
         )
     
     except Exception as e:
@@ -1995,6 +2030,303 @@ def admin_regenerate_passwords():
         'message': 'Password rigenerate con successo.',
         'passwords': passwords
     })
+
+
+@app.route('/admin/regenerate_single_password', methods=['POST'])
+def admin_regenerate_single_password():
+    """Rigenera la password di un singolo operatore."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        })
+    
+    try:
+        data = request.get_json()
+        operator_id = data.get('operator_id')
+        
+        if not operator_id:
+            return jsonify({
+                'success': False,
+                'message': 'ID operatore richiesto'
+            })
+        
+        operator = Operator.query.get(operator_id)
+        if not operator:
+            return jsonify({
+                'success': False,
+                'message': 'Operatore non trovato'
+            })
+        
+        # Genera nuova password
+        new_password = generate_random_password()
+        operator.password = new_password
+        db.session.commit()
+        
+        logger.info(f"Password regenerated for operator {operator.username} by admin")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Password rigenerata per {operator.username}',
+            'username': operator.username,
+            'new_password': new_password
+        })
+        
+    except Exception as e:
+        logger.error(f"Error regenerating single operator password: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Errore durante la rigenerazione della password'
+        })
+
+
+@app.route('/admin/reset_total_credit', methods=['POST'])
+def admin_reset_total_credit():
+    """Reset del totale crediti di tutti i dipendenti."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        })
+    
+    try:
+        data = request.get_json()
+        password = data.get('password', '').strip()
+        
+        if not password:
+            return jsonify({
+                'success': False,
+                'message': 'Password amministratore richiesta'
+            })
+        
+        # Verifica password admin corrente
+        admin_username = session.get('admin_username')
+        admin = Admin.query.filter_by(username=admin_username).first()
+        
+        if not admin or not admin.check_password(password):
+            return jsonify({
+                'success': False,
+                'message': 'Password amministratore non valida'
+            })
+        
+        # Reset credito di tutti i dipendenti (esclusa la cassa)
+        employees = Employee.query.filter(Employee.code != 'CASSA').all()
+        reset_count = 0
+        
+        for employee in employees:
+            if employee.credit != 0:
+                employee.update_credit(0.0)
+                reset_count += 1
+        
+        db.session.commit()
+        
+        logger.info(f"Total credit reset performed by admin {admin_username}: {reset_count} employees affected")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Credito azzerato per {reset_count} dipendenti'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error resetting total credit: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Errore durante il reset del credito totale'
+        })
+
+
+@app.route('/admin/reset_today_transactions', methods=['POST'])
+def admin_reset_today_transactions():
+    """Reset di tutte le transazioni di oggi."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        })
+    
+    try:
+        data = request.get_json()
+        password = data.get('password', '').strip()
+        
+        if not password:
+            return jsonify({
+                'success': False,
+                'message': 'Password amministratore richiesta'
+            })
+        
+        # Verifica password admin corrente
+        admin_username = session.get('admin_username')
+        admin = Admin.query.filter_by(username=admin_username).first()
+        
+        if not admin or not admin.check_password(password):
+            return jsonify({
+                'success': False,
+                'message': 'Password amministratore non valida'
+            })
+        
+        # Trova tutte le transazioni di oggi
+        from datetime import date
+        today = date.today()
+        today_transactions = Transaction.query.filter(
+            db.func.date(Transaction.timestamp) == today
+        ).all()
+        
+        transaction_count = len(today_transactions)
+        
+        if transaction_count == 0:
+            return jsonify({
+                'success': True,
+                'message': 'Nessuna transazione di oggi da cancellare'
+            })
+        
+        # Cancella tutte le transazioni di oggi
+        for transaction in today_transactions:
+            db.session.delete(transaction)
+        
+        db.session.commit()
+        
+        logger.info(f"Today's transactions reset performed by admin {admin_username}: {transaction_count} transactions deleted")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Cancellate {transaction_count} transazioni di oggi'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error resetting today's transactions: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Errore durante il reset delle transazioni di oggi'
+        })
+
+
+@app.route('/admin/create_backup', methods=['POST'])
+def admin_create_backup():
+    """Crea un backup del database."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        })
+    
+    try:
+        import shutil
+        from datetime import datetime
+        
+        # Crea timestamp per il nome del file
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f'vinicola_backup_{timestamp}.db'
+        
+        # Percorsi
+        current_db = os.path.join(app.instance_path, 'vinicola.db')
+        backup_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backup')
+        backup_path = os.path.join(backup_folder, backup_filename)
+        
+        # Copia il database
+        shutil.copy2(current_db, backup_path)
+        
+        logger.info(f"Database backup created: {backup_filename}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Backup creato con successo',
+            'filename': backup_filename
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating backup: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante la creazione del backup: {str(e)}'
+        })
+
+
+@app.route('/admin/import_backup', methods=['POST'])
+def admin_import_backup():
+    """Importa un backup del database."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        })
+    
+    try:
+        import shutil
+        from datetime import datetime
+        
+        password = request.form.get('password', '').strip()
+        
+        if not password:
+            return jsonify({
+                'success': False,
+                'message': 'Password amministratore richiesta'
+            })
+        
+        # Verifica password admin corrente
+        admin_username = session.get('admin_username')
+        admin = Admin.query.filter_by(username=admin_username).first()
+        
+        if not admin or not admin.check_password(password):
+            return jsonify({
+                'success': False,
+                'message': 'Password amministratore non valida'
+            })
+        
+        # Ottieni il file caricato
+        if 'backup_file' not in request.files:
+            return jsonify({
+                'success': False,
+                'message': 'Nessun file selezionato'
+            })
+        
+        file = request.files['backup_file']
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'message': 'Nessun file selezionato'
+            })
+        
+        # Crea backup di sicurezza del database corrente
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        safety_backup = f'vinicola_pre_import_backup_{timestamp}.db'
+        current_db = os.path.join(app.instance_path, 'vinicola.db')
+        backup_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backup')
+        safety_backup_path = os.path.join(backup_folder, safety_backup)
+        
+        # Backup di sicurezza
+        shutil.copy2(current_db, safety_backup_path)
+        
+        # Salva il file caricato temporaneamente
+        temp_path = os.path.join(backup_folder, f'temp_import_{timestamp}.db')
+        file.save(temp_path)
+        
+        try:
+            # Sostituisci il database corrente
+            shutil.copy2(temp_path, current_db)
+            
+            # Rimuovi il file temporaneo
+            os.remove(temp_path)
+            
+            logger.info(f"Database import completed by admin {admin_username}. Safety backup: {safety_backup}")
+            
+            return jsonify({
+                'success': True,
+                'message': f'Backup importato con successo. Backup di sicurezza: {safety_backup}'
+            })
+            
+        except Exception as e:
+            # In caso di errore, ripristina il backup di sicurezza
+            shutil.copy2(safety_backup_path, current_db)
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise e
+        
+    except Exception as e:
+        logger.error(f"Error importing backup: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante l\'importazione del backup: {str(e)}'
+        })
 
 
 @app.route('/admin/employee/new', methods=['GET', 'POST'])
@@ -2673,8 +3005,8 @@ def operator_delete_product():
         product_price = product.price
         product_inventory = product.inventory
         
-        # Check if product has been used in transactions
-        transaction_count = Transaction.query.filter_by(product_id=product_id).count()
+        # Check if product has been used in transactions (exclude cancellations)
+        transaction_count = Transaction.query.filter_by(product_id=product_id).filter(Transaction.transaction_type != 'cancellation').count()
         
         # Delete the product
         db.session.delete(product)
@@ -2704,6 +3036,134 @@ def operator_delete_product():
             'message': f'Errore durante l\'eliminazione del prodotto: {str(e)}'
         })
 
+
+@app.route('/admin/speech_config')
+def admin_speech_config():
+    """Pagina di configurazione sintesi vocale."""
+    if session.get('admin_logged_in') != True:
+        return redirect(url_for('admin_login'))
+    
+    try:
+        employees = Employee.query.all()
+        return render_template('admin_speech_config.html', employees=employees)
+    except Exception as e:
+        logger.error(f"Error in admin_speech_config: {str(e)}")
+        flash('Errore nel caricamento della configurazione sintesi vocale', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/speech_config/save', methods=['POST'])
+def admin_speech_config_save():
+    """Salva la configurazione sintesi vocale."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        }), 401
+        
+    try:
+        import json
+        import os
+        
+        # Ottieni i dati dal form
+        data = request.get_json()
+        config_path = 'speech_nicknames.json'
+        
+        # Carica la configurazione esistente o crea una nuova
+        config = {}
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+            except:
+                config = {}
+        
+        # Aggiorna la configurazione
+        config.update({
+            '_comment': 'Configurazione avanzata sintesi vocale',
+            'speech_enabled': data.get('speech_enabled', True),
+            'speech_rate': data.get('speech_rate', 1.3),
+            'speech_template': data.get('speech_template', []),
+            'nicknames': data.get('nicknames', {})
+        })
+        
+        # Salva la configurazione
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+        
+        logger.info(f"Speech configuration saved by admin {session.get('admin_username')}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Configurazione sintesi vocale salvata con successo'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error saving speech config: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore nel salvataggio: {str(e)}'
+        }), 500
+
+@app.route('/admin/speech_config/load')
+def admin_speech_config_load():
+    """Carica la configurazione sintesi vocale."""
+    if session.get('admin_logged_in') != True:
+        return jsonify({
+            'success': False,
+            'message': 'Accesso non autorizzato'
+        }), 401
+        
+    try:
+        import json
+        import os
+        
+        config_path = 'speech_nicknames.json'
+        default_config = {
+            'speech_enabled': True,
+            'speech_rate': 1.3,
+            'speech_template': [
+                {'type': 'parameter', 'value': 'GRADO', 'enabled': True, 'order': 1},
+                {'type': 'parameter', 'value': 'COGNOME', 'enabled': True, 'order': 2},
+                {'type': 'parameter', 'value': 'NOME', 'enabled': True, 'order': 3},
+                {'type': 'text', 'value': ', totale ', 'enabled': True, 'order': 4},
+                {'type': 'parameter', 'value': 'TOTALE_ACQUISTO', 'enabled': True, 'order': 5},
+                {'type': 'text', 'value': ' euro, credito residuo ', 'enabled': True, 'order': 6},
+                {'type': 'parameter', 'value': 'CREDITO_RESIDUO', 'enabled': True, 'order': 7},
+                {'type': 'text', 'value': ' euro', 'enabled': True, 'order': 8}
+            ],
+            'nicknames': {}
+        }
+        
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    
+                # Mantieni i nickname esistenti se non c'è una configurazione completa
+                if 'speech_template' not in config:
+                    config.update(default_config)
+                    # Mantieni i nickname esistenti
+                    if 'nicknames' not in config:
+                        config['nicknames'] = {k: v for k, v in config.items() 
+                                             if k not in ['_comment', 'speech_enabled', 'speech_rate', 'speech_template']}
+                    
+            except Exception as e:
+                logger.warning(f"Error loading speech config: {e}")
+                config = default_config
+        else:
+            config = default_config
+        
+        return jsonify({
+            'success': True,
+            'config': config
+        })
+        
+    except Exception as e:
+        logger.error(f"Error loading speech config: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore nel caricamento: {str(e)}'
+        }), 500
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -2909,7 +3369,7 @@ def api_get_employee_by_code(employee_code):
 def api_products():
     """API per ottenere l'elenco prodotti con inventario."""
     try:
-        products = Product.query.filter_by(active=True).order_by(Product.id).all()
+        products = Product.query.filter_by(active=True).order_by(Product.name.asc()).all()
         products_data = []
         
         for product in products:
@@ -2951,6 +3411,83 @@ def api_cash_balance():
         }), 500
 
 
+@app.route('/api/speech_nicknames')
+def api_speech_nicknames():
+    """API per ottenere la configurazione completa della sintesi vocale."""
+    try:
+        import os
+        import json
+        
+        # Path del file di configurazione
+        config_path = 'speech_nicknames.json'
+        
+        # Configurazione di default
+        default_config = {
+            "_comment": "Configurazione avanzata sintesi vocale",
+            "speech_enabled": True,
+            "speech_rate": 1.3,
+            "speech_template": [
+                {'type': 'parameter', 'value': 'GRADO', 'enabled': True, 'order': 1},
+                {'type': 'parameter', 'value': 'COGNOME', 'enabled': True, 'order': 2},
+                {'type': 'parameter', 'value': 'NOME', 'enabled': True, 'order': 3},
+                {'type': 'text', 'value': ', totale ', 'enabled': True, 'order': 4},
+                {'type': 'parameter', 'value': 'TOTALE_ACQUISTO', 'enabled': True, 'order': 5},
+                {'type': 'text', 'value': ' euro, credito residuo ', 'enabled': True, 'order': 6},
+                {'type': 'parameter', 'value': 'CREDITO_RESIDUO', 'enabled': True, 'order': 7},
+                {'type': 'text', 'value': ' euro', 'enabled': True, 'order': 8}
+            ],
+            "nicknames": {}
+        }
+        
+        # Se il file non esiste, crea un file di esempio
+        if not os.path.exists(config_path):
+            try:
+                with open(config_path, 'w', encoding='utf-8') as f:
+                    json.dump(default_config, f, indent=2, ensure_ascii=False)
+                logger.info(f"Created example speech configuration file: {config_path}")
+            except Exception as e:
+                logger.error(f"Could not create speech configuration file: {e}")
+            config = default_config
+        else:
+            # Leggi la configurazione esistente
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                
+                # Se non ha il formato nuovo, migra la configurazione
+                if 'speech_template' not in config:
+                    # Mantieni i nickname esistenti e aggiungi le nuove impostazioni
+                    old_nicknames = {k: v for k, v in config.items() if not k.startswith('_')}
+                    config = default_config.copy()
+                    config['nicknames'] = old_nicknames
+                    
+                    # Salva la configurazione aggiornata
+                    with open(config_path, 'w', encoding='utf-8') as f:
+                        json.dump(config, f, indent=2, ensure_ascii=False)
+                    logger.info("Migrated speech configuration to new format")
+                
+            except Exception as e:
+                logger.warning(f"Could not load speech configuration: {e}")
+                config = default_config
+        
+        return jsonify({
+            'success': True,
+            'config': config
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in api_speech_nicknames: {str(e)}")
+        return jsonify({
+            'success': False,
+            'config': {
+                'speech_enabled': True,
+                'speech_rate': 1.3,
+                'speech_template': [],
+                'nicknames': {}
+            }
+        })
+
+
 @app.route('/api/recent_transactions')
 def api_recent_transactions():
     """API per ottenere le ultime transazioni con filtro data."""
@@ -2959,11 +3496,12 @@ def api_recent_transactions():
         date_filter = request.args.get('date_filter', 'today')
         custom_date = request.args.get('custom_date', '')
         
-        # Build base query
+        # Build base query (exclude cancellation transactions)
         query = db.session.query(Transaction)\
             .join(Employee)\
             .outerjoin(Operator)\
-            .outerjoin(Product)
+            .outerjoin(Product)\
+            .filter(Transaction.transaction_type != 'cancellation')
         
         # Apply date filtering
         if date_filter == 'today':
@@ -3122,9 +3660,11 @@ def api_delete_transaction(transaction_id):
         cancellation_transaction = Transaction(
             employee_id=employee.id,
             operator_id=operator.id,
-            amount=0,  # Importo neutro per l'annullamento
+            amount=transaction.amount,  # Mantieni l'importo originale
             transaction_type='cancellation',
-            custom_product_name=f"Annullamento transazione ID {transaction.id}"
+            product_id=transaction.product_id,  # Mantieni il prodotto originale
+            custom_product_name=transaction.custom_product_name,  # Mantieni il nome prodotto originale
+            quantity=transaction.quantity  # Mantieni la quantità originale
         )
         db.session.add(cancellation_transaction)
         
@@ -3295,6 +3835,14 @@ if __name__ == '__main__':
         if count > 0:
             db.session.commit()
             logger.info(f"Updated credit hash for {count} employees")
+        
+        # Crea la cartella backup se non esiste
+        backup_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backup')
+        if not os.path.exists(backup_folder):
+            os.makedirs(backup_folder)
+            logger.info(f"Created backup folder: {backup_folder}")
+        else:
+            logger.info(f"Backup folder already exists: {backup_folder}")
     
     # Avvia il lettore di codici a barre seriale se disponibile
     try:

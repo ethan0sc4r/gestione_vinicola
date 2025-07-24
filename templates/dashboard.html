@@ -162,6 +162,12 @@
         <a href="{{ url_for('barcode_scanner') }}" class="btn btn-outline-primary">
             <i class="fas fa-barcode me-1"></i> Scanner
         </a>
+        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetCountersModal">
+            <i class="fas fa-undo me-1"></i> Reset Conteggi
+        </button>
+        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#backupModal">
+            <i class="fas fa-database me-1"></i> Backup/Import
+        </button>
         <a href="{{ url_for('new_employee') }}" class="btn btn-primary">
             <i class="fas fa-plus me-1"></i> Nuovo Dipendente
         </a>
@@ -426,6 +432,154 @@
         </nav>
     </div>
 </div>
+
+<!-- Reset Counters Modal -->
+<div class="modal fade" id="resetCountersModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-undo me-2"></i>
+                    Reset Conteggi
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attenzione!</strong> Questa operazione resetterà i conteggi selezionati e non può essere annullata.
+                </div>
+                
+                <p class="mb-3">Seleziona quali conteggi vuoi azzerare:</p>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="transactions" id="resetTransactions">
+                    <label class="form-check-label" for="resetTransactions">
+                        <i class="fas fa-exchange-alt me-1"></i> Transazioni recenti
+                    </label>
+                </div>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="employee_counters" id="resetEmployeeCounters">
+                    <label class="form-check-label" for="resetEmployeeCounters">
+                        <i class="fas fa-users me-1"></i> Contatori dipendenti
+                    </label>
+                </div>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="product_counters" id="resetProductCounters">
+                    <label class="form-check-label" for="resetProductCounters">
+                        <i class="fas fa-shopping-cart me-1"></i> Contatori prodotti
+                    </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="statistics" id="resetStatistics" disabled>
+                    <label class="form-check-label text-muted" for="resetStatistics">
+                        <i class="fas fa-money-bill-wave me-1"></i> Saldo cassa (non modificabile)
+                    </label>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <label for="resetPassword" class="form-label">
+                        <i class="fas fa-lock me-1"></i>
+                        Password Amministratore <span class="text-danger">*</span>
+                    </label>
+                    <input type="password" class="form-control" id="resetPassword" placeholder="Inserisci password amministratore..." required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Annulla
+                </button>
+                <button type="button" class="btn btn-warning" onclick="confirmReset()">
+                    <i class="fas fa-check me-1"></i> Conferma Reset
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backup/Import Modal -->
+<div class="modal fade" id="backupModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-database me-2"></i>
+                    Gestione Backup Database
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-download me-1"></i> Crea Backup
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p>Crea un backup completo del database. Il file verrà salvato nella cartella <code>backup/</code> con timestamp.</p>
+                                <button type="button" class="btn btn-success w-100" onclick="createBackup()">
+                                    <i class="fas fa-download me-1"></i> Crea Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-upload me-1"></i> Importa Backup
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-danger mb-3">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <small><strong>Attenzione!</strong> L'importazione sostituirà tutti i dati esistenti.</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="backupFile" class="form-label">Seleziona file backup:</label>
+                                    <input type="file" class="form-control" id="backupFile" accept=".db,.sqlite,.sqlite3">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="importPassword" class="form-label">
+                                        <i class="fas fa-lock me-1"></i>
+                                        Password Amministratore <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" class="form-control" id="importPassword" placeholder="Conferma con password...">
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="confirmImport">
+                                    <label class="form-check-label" for="confirmImport">
+                                        <small>Confermo di voler sostituire tutti i dati esistenti</small>
+                                    </label>
+                                </div>
+                                
+                                <button type="button" class="btn btn-danger w-100" onclick="importBackup()">
+                                    <i class="fas fa-upload me-1"></i> Importa Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -663,5 +817,185 @@
             showToast(`Attenzione: rilevati ${integrityIndicators.length} potenziali problemi di integrità del credito.`, 'warning');
         }
     });
+    
+    // Reset counters functionality
+    function confirmReset() {
+        const selectedCounters = [];
+        const password = document.getElementById('resetPassword').value.trim();
+        
+        if (!password) {
+            showErrorMessage('Inserisci la password amministratore');
+            return;
+        }
+        
+        // Check which counters are selected
+        if (document.getElementById('resetTransactions').checked) {
+            selectedCounters.push('transactions');
+        }
+        if (document.getElementById('resetEmployeeCounters').checked) {
+            selectedCounters.push('employee_counters');
+        }
+        if (document.getElementById('resetProductCounters').checked) {
+            selectedCounters.push('product_counters');
+        }
+        
+        if (selectedCounters.length === 0) {
+            showErrorMessage('Seleziona almeno un conteggio da resettare');
+            return;
+        }
+        
+        // Disable button and show loading
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Resettando...';
+        
+        fetch('/admin/reset_counters', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                counters: selectedCounters,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(data.message);
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('resetCountersModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('resetPassword').value = '';
+                document.querySelectorAll('#resetCountersModal input[type="checkbox"]').forEach(cb => cb.checked = false);
+                // Optionally reload page to show updated counters
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showErrorMessage(data.message || 'Errore durante il reset dei conteggi');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-check me-1"></i> Conferma Reset';
+        });
+    }
+    
+    // Backup functionality
+    function createBackup() {
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Creando backup...';
+        
+        fetch('/admin/create_backup', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(`Backup creato con successo: ${data.filename}`);
+            } else {
+                showErrorMessage(data.message || 'Errore durante la creazione del backup');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-download me-1"></i> Crea Backup';
+        });
+    }
+    
+    function importBackup() {
+        const fileInput = document.getElementById('backupFile');
+        const password = document.getElementById('importPassword').value.trim();
+        const confirmCheckbox = document.getElementById('confirmImport');
+        
+        if (!fileInput.files[0]) {
+            showErrorMessage('Seleziona un file di backup');
+            return;
+        }
+        
+        if (!password) {
+            showErrorMessage('Inserisci la password amministratore');
+            return;
+        }
+        
+        if (!confirmCheckbox.checked) {
+            showErrorMessage('Conferma la sostituzione dei dati esistenti');
+            return;
+        }
+        
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Importando...';
+        
+        const formData = new FormData();
+        formData.append('backup_file', fileInput.files[0]);
+        formData.append('password', password);
+        
+        fetch('/admin/import_backup', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(data.message);
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('backupModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('importPassword').value = '';
+                document.getElementById('confirmImport').checked = false;
+                fileInput.value = '';
+                // Reload page after successful import
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                showErrorMessage(data.message || 'Errore durante l\'importazione del backup');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Errore di connessione');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-upload me-1"></i> Importa Backup';
+        });
+    }
+    
+    // Helper functions for showing messages
+    function showSuccessMessage(message) {
+        // Create a success alert or toast
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    }
+    
+    function showErrorMessage(message) {
+        // Create an error alert or toast
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    }
 </script>
 {% endblock %}
