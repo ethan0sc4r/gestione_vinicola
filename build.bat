@@ -38,6 +38,12 @@ if not exist "static\js\jquery-3.6.0.min.js" (
     exit /b 1
 )
 
+if not exist "static\js\socket.io.js" (
+    echo ERRORE: File socket.io.js non trovato in static\js\
+    echo Scaricare jQuery e salvarlo come static\js\socket.io.js
+    pause
+    exit /b 1
+)
 echo [OK] Tutti i file offline sono presenti
 
 REM Pulisce la cartella dist precedente per evitare conflitti
@@ -51,7 +57,7 @@ echo Compilazione in corso...
 pyinstaller app.spec
 
 REM Verifica che la compilazione sia riuscita
-if not exist "dist\app.exe" (
+if not exist "dist\Gestione_Vinicola_Console.exe" (
     echo ERRORE: Compilazione fallita!
     pause
     exit /b 1

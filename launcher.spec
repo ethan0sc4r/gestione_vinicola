@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller spec file per Gestione Vinicola - Versione Console
+# PyInstaller spec file per Gestione Vinicola Desktop Launcher (senza SocketIO)
 
 import sys
 from pathlib import Path
@@ -8,7 +8,7 @@ from pathlib import Path
 base_path = Path('.')
 
 a = Analysis(
-    ['app.py'],
+    ['launcher.py'],
     pathex=[str(base_path)],
     binaries=[],
     datas=[
@@ -16,17 +16,21 @@ a = Analysis(
         ('config_serial.json', '.'),
         ('config_serial_windows.json', '.'),
         
-        # Templates e static files
+        # Templates e static files per Flask
         ('templates', 'templates'),
         ('static', 'static'),
         
+        # File Python dell'app Flask (necessario per il subprocess)
+        ('app.py', '.'),
+        
         # File di requirements (opzionale, per riferimento)
         ('requirements.txt', '.'),
+        ('requirements_launcher.txt', '.'),
     ],
     hiddenimports=[
-        # Dipendenze Flask base
+        # Dipendenze Flask base (senza SocketIO)
         'flask',
-        'flask_sqlalchemy', 
+        'flask_sqlalchemy',
         'flask_login',
         'sqlalchemy',
         'werkzeug',
@@ -36,40 +40,60 @@ a = Analysis(
         'serial.tools',
         'serial.tools.list_ports',
         
+        # Dipendenze tray icon
+        'pystray',
+        'pystray._win32',
+        'PIL',
+        'PIL.Image',
+        'PIL.ImageDraw',
+        
+        # Windows API
+        'win32gui',
+        'win32con',
+        'win32api',
+        
         # Database
         'sqlite3',
         
-        # Altri moduli necessari
+        # Per emulazione tastiera
+        'pynput',
+        'pynput.keyboard',
+        
+        # Altri moduli che potrebbero essere necessari
         'json',
         'threading',
+        'subprocess',
+        'webbrowser',
+        'tkinter',
+        'tkinter.messagebox',
         'hashlib',
         'decimal',
         'datetime',
         'logging',
         'time',
-        
-        # Per emulazione tastiera
-        'keyboard',
-        'pynput',
-        'pynput.keyboard',
+        'pytz',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
-        # Esclude pacchetti non necessari
+        # Esclude pacchetti non necessari per ridurre dimensioni
         'matplotlib',
-        'tkinter',
-        'pystray',
-        'PIL',
+        'numpy',
+        'pandas',
+        'scipy',
+        'jupyter',
+        'notebook',
+        'IPython',
         # Escludi SocketIO problematico
         'flask_socketio',
         'socketio',
         'engineio',
         'eventlet',
+        'dns',
+        'dns.resolver',
     ],
     noarchive=False,
-    optimize=0,
 )
 
 pyz = PYZ(a.pure)
@@ -80,17 +104,19 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Gestione_Vinicola_Console',
+    name='Gestione_Vinicola_Desktop',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,  # Mantieni console per versione tradizionale
+    console=False,  # Nascondi console per applicazione desktop
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=None,  # Aggiungi un file .ico se disponibile
+    version=None,  # Aggiungi informazioni versione se necessario
 )

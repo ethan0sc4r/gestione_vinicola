@@ -1,0 +1,4 @@
+# Dipendenze aggiuntive per il launcher desktop
+pystray>=0.19.4
+Pillow>=10.0.0
+pywin32>=306  # Solo per Windows - gestione finestre

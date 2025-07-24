@@ -584,6 +584,77 @@
         </div>
         {% endif %}
         
+        <!-- Product Operations Log -->
+        {% if product_logs %}
+        <div class="operators-summary">
+            <div class="operators-summary-header">
+                <h3 class="operators-summary-title">Log Operazioni Prodotti</h3>
+                <p class="text-muted">Registrazione di tutte le operazioni sui prodotti (aggiunte, eliminazioni, ricariche giacenze)</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Data/Ora</th>
+                            <th>Operazione</th>
+                            <th>Prodotto</th>
+                            <th>Prezzo</th>
+                            <th>Giacenza</th>
+                            <th>Utente</th>
+                            <th>Dettagli</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in product_logs %}
+                        <tr>
+                            <td>{{ log.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if log.action == 'ADD' %}
+                                    <span class="badge bg-success">Aggiunto</span>
+                                {% elif log.action == 'DELETE' %}
+                                    <span class="badge bg-danger">Eliminato</span>
+                                {% elif log.action == 'RESTOCK' %}
+                                    <span class="badge bg-info">Ricarica</span>
+                                {% elif log.action == 'BULK_RESTOCK' %}
+                                    <span class="badge bg-primary">Ricarica Bulk</span>
+                                {% elif log.action == 'ADMIN_BULK_RESTOCK' %}
+                                    <span class="badge bg-warning">Ricarica Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ log.action }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>#{{ log.product_id }}</strong> {{ log.product_name }}
+                            </td>
+                            <td>{{ log.price }}</td>
+                            <td>
+                                {% if '→' in log.inventory_info %}
+                                    {{ log.inventory_info }}
+                                {% else %}
+                                    {{ log.inventory_info }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.user == 'ADMIN' %}
+                                    <span class="badge bg-warning">Admin</span>
+                                {% elif log.user == 'OPERATOR' %}
+                                    <span class="badge bg-info">Operatore</span>
+                                {% else %}
+                                    {{ log.user }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ log.extra_info }}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
         <div class="page-break"></div>
         
         <!-- Transactions Table -->

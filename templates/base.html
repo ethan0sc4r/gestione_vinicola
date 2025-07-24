@@ -306,7 +306,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content text-center">
-                <span>&copy; {{ now.year|default(2025) }} {{ app_name }}. Tutti i diritti riservati.</span>
+                <span>&copy; {{ now.year|default(2025) }} {{ app_name }} Nave Cavor. DEV. BY OPD.</span>
                 <span> | </span>
                 <span>v{{ app_version }}</span>
             </div>
@@ -318,7 +318,7 @@
     <!-- jQuery -->
     <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
     <!-- Socket.IO Client -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/socket.io/4.7.2/socket.io.js' ) }}"></script>
     
     <!-- Common JavaScript -->
     <script>

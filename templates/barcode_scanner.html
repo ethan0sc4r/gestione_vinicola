@@ -438,6 +438,31 @@
 {% endblock %}
 
 {% block content %}
+<!-- Toggle Interface Button -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">
+        <i class="fas fa-barcode me-2"></i>
+        Scanner Codici
+    </h2>
+    <div class="btn-group">
+        <form method="POST" action="{{ url_for('toggle_interface') }}" style="display: inline;">
+            <input type="hidden" name="interface_type" value="products_first">
+            <button type="submit" class="btn btn-outline-success">
+                <i class="fas fa-shopping-cart me-1"></i>
+                Prodotti Prima
+            </button>
+        </form>
+        <button type="button" class="btn btn-outline-info" onclick="showInventoryReport()">
+            <i class="fas fa-boxes me-1"></i>
+            Giacenze
+        </button>
+        <button type="button" class="btn btn-outline-warning" onclick="showRecentTransactions()">
+            <i class="fas fa-history me-1"></i>
+            Transazioni
+        </button>
+    </div>
+</div>
+
 <div class="scanner-container">
     <!-- Scanner Area -->
     <div class="scanner-area" id="scannerArea">
@@ -459,7 +484,7 @@
         <!-- Tabella dipendenti in stile admin -->
         <div class="employees-table-container">
             <div class="table-toolbar">
-                <h3 class="table-title">Elenco Dipendenti</h3>
+                <h3 class="table-title">Elenco Ufficiali</h3>
                 <div class="table-controls">
                     <div class="input-group table-search">
                         <span class="input-group-text">
@@ -751,6 +776,157 @@
 <a href="{{ url_for('admin_login') }}" class="admin-link">
     <i class="fas fa-cog me-1"></i> Amministrazione
 </a>
+
+<!-- Inventory Report Modal -->
+<div class="modal fade" id="inventoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-boxes me-2"></i>
+                    Resoconto Giacenze
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search input -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="inventorySearch" placeholder="Cerca per nome articolo...">
+                        <button class="btn btn-outline-secondary" type="button" id="clearInventorySearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome Articolo</th>
+                                <th class="text-end">Giacenza</th>
+                                <th class="text-end">Prezzo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            <!-- Dati dinamici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary" onclick="refreshInventory()">
+                    <i class="fas fa-sync-alt me-1"></i> Aggiorna
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions Modal -->
+<div class="modal fade" id="transactionsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-history me-2"></i>
+                    Ultime Transazioni
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search and filters -->
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="transactionSearch" placeholder="Cerca per dipendente, prodotto...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="transactionTypeFilter">
+                                <option value="">Tutti i tipi</option>
+                                <option value="credit">Ricariche</option>
+                                <option value="debit">Acquisti</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-outline-primary" onclick="refreshTransactions()">
+                                <i class="fas fa-sync-alt"></i> Aggiorna
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Data/Ora</th>
+                                <th>Dipendente</th>
+                                <th>Tipo</th>
+                                <th>Importo</th>
+                                <th>Prodotto</th>
+                                <th>Quantità</th>
+                                <th>Operatore</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <!-- Dati dinamici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Transaction Confirmation Modal -->
+<div class="modal fade" id="deleteTransactionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash me-2"></i>
+                    Elimina Transazione
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong>Attenzione!</strong> Stai per eliminare una transazione. Questa operazione:
+                    <ul class="mb-0 mt-2">
+                        <li>Ripristinerà il credito del dipendente</li>
+                        <li>Ripristinerà l'inventario del prodotto (se applicabile)</li>
+                        <li>Verrà registrata nei report amministratore</li>
+                        <li><strong>Non può essere annullata</strong></li>
+                    </ul>
+                </div>
+                
+                <div id="transactionDetails" class="card mb-3">
+                    <!-- Dettagli transazione -->
+                </div>
+                
+                <div class="mb-3">
+                    <label for="operatorPassword" class="form-label">Inserisci password operatore per confermare:</label>
+                    <input type="password" class="form-control" id="operatorPassword" placeholder="Password operatore">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteTransaction" onclick="confirmDeleteTransaction()">
+                    <i class="fas fa-trash me-1"></i> Elimina Transazione
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal per Nuovo Operatore -->
 <div class="modal fade" id="newEmployeeModal" tabindex="-1" aria-labelledby="newEmployeeModalLabel" aria-hidden="true">
@@ -1899,6 +2075,312 @@
             if (operatorPasswordInput) {
                 operatorPasswordInput.focus();
             }
+        });
+    }
+    
+    // Inventory functionality
+    function showInventoryReport() {
+        fetch('/api/products')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    populateInventoryTable(data.products);
+                    const modal = new bootstrap.Modal(document.getElementById('inventoryModal'));
+                    modal.show();
+                } else {
+                    showToast('Errore nel caricamento delle giacenze', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading inventory:', error);
+                showToast('Errore di rete nel caricamento delle giacenze', 'danger');
+            });
+    }
+
+    function populateInventoryTable(products) {
+        const tbody = document.getElementById('inventoryTableBody');
+        tbody.innerHTML = '';
+        
+        products.forEach(product => {
+            const row = document.createElement('tr');
+            
+            // Color coding based on inventory level
+            let inventoryClass = '';
+            let badgeClass = 'bg-success';
+            if (product.inventory <= 0) {
+                badgeClass = 'bg-danger';
+            } else if (product.inventory <= 5) {
+                badgeClass = 'bg-warning';
+            }
+            
+            row.innerHTML = `
+                <td>${product.id}</td>
+                <td>${product.name}</td>
+                <td class="text-end">
+                    <span class="badge ${badgeClass}">${product.inventory}</span>
+                </td>
+                <td class="text-end">€${product.price.toFixed(2)}</td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+
+    function refreshInventory() {
+        // Ricarica solo i dati senza creare un nuovo modal
+        fetch('/api/products')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    populateInventoryTable(data.products);
+                } else {
+                    showToast('Errore nel caricamento delle giacenze', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error refreshing inventory:', error);
+                showToast('Errore di rete nel caricamento delle giacenze', 'danger');
+            });
+    }
+
+    function filterInventoryTable() {
+        const searchTerm = document.getElementById('inventorySearch').value.toLowerCase();
+        const tableRows = document.querySelectorAll('#inventoryTableBody tr');
+        
+        tableRows.forEach(row => {
+            const productName = row.cells[1].textContent.toLowerCase();
+            const productId = row.cells[0].textContent.toLowerCase();
+            
+            if (productName.includes(searchTerm) || productId.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize inventory search when modal is shown
+    document.getElementById('inventoryModal').addEventListener('shown.bs.modal', function () {
+        // Add event listeners for search
+        const searchInput = document.getElementById('inventorySearch');
+        const clearButton = document.getElementById('clearInventorySearch');
+        
+        searchInput.addEventListener('input', filterInventoryTable);
+        clearButton.addEventListener('click', function() {
+            searchInput.value = '';
+            filterInventoryTable();
+            searchInput.focus();
+        });
+        
+        // Clear search when modal opens
+        searchInput.value = '';
+    });
+
+    // Transactions functionality (same as products_first.html)
+    let transactionToDelete = null;
+
+    function showRecentTransactions() {
+        fetch('/api/recent_transactions')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    populateTransactionsTable(data.transactions);
+                    const modal = new bootstrap.Modal(document.getElementById('transactionsModal'));
+                    modal.show();
+                } else {
+                    showToast('Errore nel caricamento delle transazioni', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading transactions:', error);
+                showToast('Errore di rete nel caricamento delle transazioni', 'danger');
+            });
+    }
+
+    function populateTransactionsTable(transactions) {
+        const tbody = document.getElementById('transactionsTableBody');
+        tbody.innerHTML = '';
+        
+        transactions.forEach(transaction => {
+            const row = document.createElement('tr');
+            
+            // Format timestamp
+            const date = new Date(transaction.timestamp);
+            const formattedDate = date.toLocaleString('it-IT');
+            
+            // Transaction type badge
+            const typeBadge = transaction.transaction_type === 'credit' 
+                ? '<span class="badge bg-success">Ricarica</span>'
+                : '<span class="badge bg-danger">Acquisto</span>';
+            
+            // Amount with sign
+            const amount = transaction.transaction_type === 'credit'
+                ? `+€${Math.abs(transaction.amount).toFixed(2)}`
+                : `-€${Math.abs(transaction.amount).toFixed(2)}`;
+            
+            // Product info
+            const productInfo = transaction.product_name || transaction.custom_product_name || '-';
+            const quantity = transaction.quantity || '-';
+            
+            // Operator info
+            const operatorInfo = transaction.operator_name || 'Sistema';
+            
+            row.innerHTML = `
+                <td class="text-nowrap">${formattedDate}</td>
+                <td>${transaction.employee_name}</td>
+                <td>${typeBadge}</td>
+                <td class="${transaction.transaction_type === 'credit' ? 'text-success' : 'text-danger'}">${amount}</td>
+                <td>${productInfo}</td>
+                <td>${quantity}</td>
+                <td>${operatorInfo}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger" onclick="prepareDeleteTransaction(${transaction.id})" 
+                            title="Elimina transazione">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+        
+        // Add search and filter event listeners
+        initializeTransactionFilters();
+    }
+
+    function initializeTransactionFilters() {
+        const searchInput = document.getElementById('transactionSearch');
+        const typeFilter = document.getElementById('transactionTypeFilter');
+        
+        if (searchInput) searchInput.addEventListener('input', filterTransactions);
+        if (typeFilter) typeFilter.addEventListener('change', filterTransactions);
+    }
+
+    function filterTransactions() {
+        const searchTerm = document.getElementById('transactionSearch').value.toLowerCase();
+        const typeFilter = document.getElementById('transactionTypeFilter').value;
+        const rows = document.querySelectorAll('#transactionsTableBody tr');
+        
+        rows.forEach(row => {
+            const employee = row.cells[1].textContent.toLowerCase();
+            const product = row.cells[4].textContent.toLowerCase();
+            const operator = row.cells[6].textContent.toLowerCase();
+            const type = row.cells[2].textContent.includes('Ricarica') ? 'credit' : 'debit';
+            
+            const matchesSearch = employee.includes(searchTerm) || 
+                                product.includes(searchTerm) || 
+                                operator.includes(searchTerm);
+            const matchesType = !typeFilter || type === typeFilter;
+            
+            row.style.display = (matchesSearch && matchesType) ? '' : 'none';
+        });
+    }
+
+    function refreshTransactions() {
+        showRecentTransactions();
+    }
+
+    function prepareDeleteTransaction(transactionId) {
+        // Get transaction details
+        fetch(`/api/transaction/${transactionId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    transactionToDelete = data.transaction;
+                    showDeleteTransactionModal(data.transaction);
+                } else {
+                    showToast('Errore nel caricamento dei dettagli della transazione', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading transaction details:', error);
+                showToast('Errore di rete', 'danger');
+            });
+    }
+
+    function showDeleteTransactionModal(transaction) {
+        const detailsDiv = document.getElementById('transactionDetails');
+        
+        const date = new Date(transaction.timestamp);
+        const formattedDate = date.toLocaleString('it-IT');
+        
+        const typeBadge = transaction.transaction_type === 'credit' 
+            ? '<span class="badge bg-success">Ricarica</span>'
+            : '<span class="badge bg-danger">Acquisto</span>';
+        
+        const amount = transaction.transaction_type === 'credit'
+            ? `+€${Math.abs(transaction.amount).toFixed(2)}`
+            : `-€${Math.abs(transaction.amount).toFixed(2)}`;
+        
+        const productInfo = transaction.product_name || transaction.custom_product_name || 'Nessun prodotto';
+        
+        detailsDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title">Dettagli Transazione</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Data/Ora:</strong> ${formattedDate}<br>
+                        <strong>Dipendente:</strong> ${transaction.employee_name}<br>
+                        <strong>Tipo:</strong> ${typeBadge}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Importo:</strong> <span class="${transaction.transaction_type === 'credit' ? 'text-success' : 'text-danger'}">${amount}</span><br>
+                        <strong>Prodotto:</strong> ${productInfo}<br>
+                        <strong>Quantità:</strong> ${transaction.quantity || '-'}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Clear password field
+        document.getElementById('operatorPassword').value = '';
+        
+        const modal = new bootstrap.Modal(document.getElementById('deleteTransactionModal'));
+        modal.show();
+    }
+
+    function confirmDeleteTransaction() {
+        const password = document.getElementById('operatorPassword').value;
+        
+        if (!password) {
+            showToast('Inserisci la password operatore', 'danger');
+            return;
+        }
+        
+        if (!transactionToDelete) {
+            showToast('Nessuna transazione selezionata', 'danger');
+            return;
+        }
+        
+        // Send delete request with password
+        fetch(`/api/delete_transaction/${transactionToDelete.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                operator_password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close delete modal
+                bootstrap.Modal.getInstance(document.getElementById('deleteTransactionModal')).hide();
+                
+                // Show success message
+                showToast('Transazione eliminata con successo', 'success');
+                
+                // Refresh transactions list
+                refreshTransactions();
+                
+            } else {
+                showToast(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting transaction:', error);
+            showToast('Errore di comunicazione con il server', 'danger');
         });
     }
 </script>

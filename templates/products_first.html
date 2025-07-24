@@ -1,0 +1,3488 @@
+<!-- products_first.html -->
+{% extends "base.html" %}
+
+{% block title %}Vendite - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Ensure error modals are always on top */
+.modal.show {
+    z-index: 1060 !important;
+}
+
+.modal-backdrop {
+    z-index: 1055 !important;
+}
+
+/* Force error modal to be above everything */
+#errorModal {
+    z-index: 1070 !important;
+}
+
+#errorModal .modal-backdrop {
+    z-index: 1065 !important;
+}
+
+/* Force success modal to be above everything */
+#successModal {
+    z-index: 1070 !important;
+}
+
+#successModal .modal-backdrop {
+    z-index: 1065 !important;
+}
+
+/* Force transactions modal to be above everything */
+#transactionsModal {
+    z-index: 1080 !important;
+}
+
+#transactionsModal .modal-dialog {
+    z-index: 1081 !important;
+}
+
+#transactionsModal .modal-backdrop {
+    z-index: 1075 !important;
+}
+
+/* Date input field in transactions modal */
+#transactionsModal input[type="date"] {
+    z-index: 1082 !important;
+    position: relative;
+}
+
+/* Ensure modal backdrop is properly removed */
+body.modal-open {
+    overflow: hidden;
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+/* Custom sizing for transactions modal */
+.transactions-modal-custom {
+    max-width: calc(100vw - 30px);
+    width: 1500px; /* +300px wider than xl (1200px) */
+    max-height: calc(100vh - 100px);
+}
+
+.transactions-modal-custom .modal-content {
+    height: calc(100vh - 100px);
+    max-height: calc(100vh - 100px);
+}
+
+.transactions-modal-custom .modal-body {
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Transactions table container with dynamic height */
+.transactions-table-container {
+    max-height: calc(100vh - 350px);
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    flex: 1;
+}
+
+.transactions-table-container .table {
+    margin-bottom: 0;
+}
+
+.transactions-table-container .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Ensure cash register info doesn't scroll with table */
+.cash-register-info {
+    flex-shrink: 0;
+}
+    .interface-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    .search-products {
+        margin-bottom: 1.5rem;
+    }
+    
+    .products-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .product-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+    
+    .product-card.has-quantity {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .product-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        flex: 1;
+        line-height: 1.3;
+    }
+    
+    .product-id {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--primary-color);
+        margin-bottom: 0.2rem;
+    }
+    
+    .product-card.has-quantity .product-id {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .product-price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--success-color);
+        margin-bottom: 1rem;
+    }
+    
+    .product-card.has-quantity .product-price {
+        color: white;
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .quantity-btn {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: var(--primary-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+    
+    .quantity-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .quantity-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+    
+    .quantity-btn:disabled:hover {
+        background: #f8f9fa;
+        color: #6c757d;
+        border-color: #dee2e6;
+    }
+    
+    .product-card.has-quantity .quantity-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .product-card.has-quantity .quantity-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .quantity-input {
+        background: #f8f9fa;
+        padding: 0.3rem 0.5rem;
+        border-radius: 8px;
+        width: 50px;
+        text-align: center;
+        font-weight: bold;
+        border: 1px solid #dee2e6;
+        color: var(--primary-color);
+        font-size: 0.95rem;
+    }
+    
+    .quantity-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+    }
+    
+    .product-card.has-quantity .quantity-input {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .product-card.has-quantity .quantity-input:focus {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: white;
+    }
+    
+    /* Nascondi spinner nei browser Chrome/Safari/Edge */
+    .quantity-input::-webkit-outer-spin-button,
+    .quantity-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+    /* Nascondi spinner in Firefox */
+    .quantity-input[type=number] {
+        -moz-appearance: textfield;
+    }
+    
+    .cart-summary {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(100%);
+        transition: transform 0.3s;
+    }
+    
+    .cart-summary.show {
+        transform: translateY(0);
+    }
+    
+    .cart-total {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .employee-selector {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .employee-selector.show {
+        display: flex;
+    }
+    
+    .employee-modal {
+        background: white;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .employee-modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .employee-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .scanner-area {
+        background: rgba(0, 122, 255, 0.05);
+        border: 2px dashed var(--primary-color);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .scanner-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .manual-input-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .employee-list {
+        display: grid;
+        gap: 0.5rem;
+    }
+    
+    .employee-item {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .employee-item:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .employee-info-left {
+        display: flex;
+        align-items: center;
+    }
+    
+    .employee-avatar-small {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+    
+    .employee-item:hover .employee-avatar-small {
+        background: white;
+        color: var(--primary-color);
+    }
+    
+    .employee-details {
+        flex: 1;
+    }
+    
+    .employee-name-small {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+    
+    .employee-rank-small {
+        font-size: 0.875rem;
+        opacity: 0.7;
+    }
+    
+    .employee-credit-small {
+        font-weight: 600;
+        color: var(--success-color);
+    }
+    
+    .employee-item:hover .employee-credit-small {
+        color: white;
+    }
+    
+    .search-input {
+        margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        padding: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    @media (max-width: 768px) {
+        .interface-toggle {
+            position: static;
+            margin-bottom: 1rem;
+        }
+        
+        .products-container {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.8rem;
+        }
+        
+        .employee-modal {
+            margin: 10px;
+            max-height: calc(100vh - 40px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Toggle Interface Button -->
+<div class="interface-toggle">
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-primary" onclick="showEmployeesList()">
+            <i class="fas fa-users me-1"></i>
+            Elenco Ufficiali
+        </button>
+        <button type="button" class="btn btn-outline-info" onclick="showInventoryReport()">
+            <i class="fas fa-boxes me-1"></i>
+            Giacenze
+        </button>
+        <button type="button" class="btn btn-outline-success" onclick="showCreditRecharge()">
+            <i class="fas fa-plus-circle me-1"></i>
+            Ricarica
+        </button>
+        <button type="button" class="btn btn-outline-warning" onclick="showRecentTransactions()">
+            <i class="fas fa-history me-1"></i>
+            Transazioni
+        </button>
+        <a href="{{ url_for('admin_login') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-cog me-1"></i>
+            Admin
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Selezione Prodotti
+                </h2>
+                <div class="badge bg-primary fs-6" id="selected-count">0 articoli</div>
+            </div>
+            
+            <!-- Interfaccia Rapida -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-bolt"></i>
+                        </span>
+                        <input type="text" class="form-control" id="quick-add" placeholder="Inserimento rapido: 1:3, 2:1, 5:2..." onkeydown="handleQuickAdd(event)">
+                        <button type="button" class="btn btn-primary" onclick="processQuickAdd()">
+                            <i class="fas fa-plus me-1"></i> Aggiungi
+                        </button>
+                    </div>
+                    <small class="text-muted">Formato: ID:quantità (es. 1:3 per 3x prodotto ID 1)</small>
+                </div>
+                <div class="col-md-6">
+                    <!-- Ricerca Prodotti -->
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="product-search" placeholder="Cerca prodotti..." onkeyup="filterProducts()">
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearProductSearch()" id="clear-search" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prodotti -->
+            <div class="products-container" id="products-container">
+                {% for product in products %}
+                <div class="product-card" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}">
+                    <div class="product-name">
+                        <span class="product-id">#{{ product.id }}</span>
+                        {{ product.name }}
+                    </div>
+                    <div class="product-price">€ {{ "%.2f"|format(product.price) }}</div>
+                    <div class="quantity-controls">
+                        <button type="button" class="quantity-btn" onclick="changeQuantity({{ product.id }}, -1)" id="minus-{{ product.id }}" disabled>
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" class="quantity-input" id="qty-{{ product.id }}" value="0" min="0" max="99" onchange="setQuantityDirect({{ product.id }}, this.value)" onkeydown="handleQuantityKeydown(event, {{ product.id }})">
+                        <button type="button" class="quantity-btn" onclick="changeQuantity({{ product.id }}, 1)" id="plus-{{ product.id }}">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if not products %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>
+                Nessun prodotto disponibile. Configurare i prodotti nel pannello amministrativo.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Cart Summary -->
+<div class="cart-summary" id="cart-summary">
+    <div class="cart-total" id="cart-total">Totale: € 0.00</div>
+    <div class="d-flex gap-2 justify-content-center">
+        <button type="button" class="btn btn-outline-secondary" onclick="clearCart()">
+            <i class="fas fa-trash me-1"></i> Svuota
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" onclick="showEmployeeSelector()" id="proceed-btn" disabled>
+            <i class="fas fa-user me-1"></i> Procedi al Pagamento
+        </button>
+    </div>
+</div>
+
+<!-- Employee Selector Modal -->
+<div class="employee-selector" id="employee-selector">
+    <div class="employee-modal">
+        <div class="employee-modal-header">
+            <h5 class="mb-0">Seleziona Ufficiale</h5>
+            <button type="button" class="btn-close" onclick="hideEmployeeSelector()"></button>
+        </div>
+        
+        <div class="employee-modal-body">
+            <!-- Scanner Area -->
+            <div class="scanner-area">
+                <div class="scanner-icon">
+                    <i class="fas fa-barcode scanner-pulse"></i>
+                </div>
+                <div class="h5 mb-2">Scansiona Codice Ufficiale</div>
+                <div class="text-muted">Avvicina il codice a barre dell'ufficiale al lettore</div>
+                <div class="last-scan" id="last-scan" style="display: none;"></div>
+            </div>
+            
+            <!-- Manual Input -->
+            <div class="manual-input-container">
+                <label class="form-label fw-bold">Inserimento Manuale</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="manual-code" placeholder="Codice ufficiale..." onkeypress="if(event.key==='Enter') searchByCode()">
+                    <button type="button" class="btn btn-outline-primary" onclick="searchByCode()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search -->
+            <div class="search-input">
+                <input type="text" class="form-control" id="employee-search" placeholder="Cerca per nome, cognome o grado..." onkeyup="filterEmployees()">
+            </div>
+            
+            <!-- Employee List -->
+            <div class="employee-list" id="employee-list">
+                <!-- Sarà popolata dinamicamente -->
+            </div>
+            
+            <!-- Cash Register Option -->
+            <div class="employee-item" onclick="selectCashRegister()">
+                <div class="employee-info-left">
+                    <div class="employee-avatar-small">
+                        <i class="fas fa-cash-register"></i>
+                    </div>
+                    <div class="employee-details">
+                        <div class="employee-name-small">Pagamento Contanti</div>
+                        <div class="employee-rank-small">Cliente esterno</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" class="btn btn-secondary" onclick="hideEmployeeSelector()">
+                <i class="fas fa-arrow-left me-1"></i> Torna ai Prodotti
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Transazione Completata
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" id="successCloseBtn"></button>
+            </div>
+            <div class="modal-body" id="successModalBody">
+                <!-- Contenuto dinamico -->
+            </div>
+            <div class="modal-footer">
+                <div class="progress w-100 mb-2" style="height: 4px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" id="autoCloseProgress"></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <small class="text-muted">Chiusura automatica in <span id="countdown">10</span> secondi</small>
+                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Chiudi Ora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Errore Transazione
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="errorModalBody">
+                <!-- Contenuto dinamico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Checkout Summary Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-receipt me-2"></i>
+                    Riepilogo Acquisto
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="mb-3">Prodotti Selezionati:</h6>
+                        <div id="checkoutProducts" class="mb-3">
+                            <!-- Lista prodotti dinamica -->
+                        </div>
+                        
+                        <div class="scanner-checkout-area text-center p-4 bg-light rounded">
+                            <div class="scanner-icon mb-3">
+                                <i class="fas fa-barcode scanner-pulse" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            </div>
+                            <h5 class="text-primary mb-2">Scansiona il codice</h5>
+                            <p class="text-muted mb-2" id="scannerWaitText">Avvicina il codice a barre al lettore o digita il codice</p>
+                            
+                            <!-- Input tastiera per codice -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-keyboard"></i>
+                                    </span>
+                                    <input type="text" class="form-control form-control-lg text-center" 
+                                           id="checkoutBarcodeInput" 
+                                           placeholder="Digita codice ufficiale..." 
+                                           onkeydown="handleCheckoutKeyboard(event)"
+                                           style="font-family: monospace; letter-spacing: 2px;">
+                                </div>
+                            </div>
+                            
+                            <div id="checkoutLastScan" style="display: none;" class="alert alert-info">
+                                <!-- Ultimo codice scansionato -->
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    Non hai il codice? 
+                                    <button type="button" class="btn btn-link p-0" onclick="showManualEmployeeSelection()">
+                                        Seleziona manualmente
+                                    </button>
+                                    <span id="scannerTimeout" class="ms-2"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="checkout-summary bg-light p-3 rounded">
+                            <h6 class="mb-3">Riepilogo:</h6>
+                            <div id="checkoutSummaryDetails">
+                                <!-- Dettagli riepilogo -->
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <strong>Totale:</strong>
+                                <strong id="checkoutTotal" class="text-primary fs-5">€ 0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" onclick="cancelCheckout()">
+                    <i class="fas fa-arrow-left me-1"></i> Annulla
+                </button>
+                <button type="button" class="btn btn-success" onclick="processCashPayment()">
+                    <i class="fas fa-money-bill me-1"></i> Pagamento Contanti
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory Report Modal -->
+<div class="modal fade" id="inventoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-boxes me-2"></i>
+                    Resoconto Giacenze
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search input -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="inventorySearch" placeholder="Cerca per nome articolo...">
+                        <button class="btn btn-outline-secondary" type="button" id="clearInventorySearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome Articolo</th>
+                                <th class="text-end">Giacenza</th>
+                                <th class="text-end">Prezzo</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            <!-- Dati dinamici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-success" onclick="showBulkRestock()">
+                    <i class="fas fa-warehouse me-1"></i> Ricarica Giacenze
+                </button>
+                <button type="button" class="btn btn-warning" onclick="showAddProduct()">
+                    <i class="fas fa-plus me-1"></i> Aggiungi Prodotto
+                </button>
+                <button type="button" class="btn btn-primary" onclick="refreshInventory()">
+                    <i class="fas fa-sync-alt me-1"></i> Aggiorna
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Credit Recharge Modal -->
+<div class="modal fade" id="creditRechargeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Ricarica Credito
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="rechargeEmployeeSearch" class="form-label">Cerca Ufficiale:</label>
+                    <input type="text" class="form-control" id="rechargeEmployeeSearch" placeholder="Nome, cognome o codice..." onkeyup="searchEmployeesForRecharge()">
+                </div>
+                
+                <div id="rechargeEmployeesList" class="mb-3" style="max-height: 200px; overflow-y: auto;">
+                    <!-- Lista dipendenti dinamica -->
+                </div>
+                
+                <div id="selectedEmployeeInfo" style="display: none;" class="alert alert-primary">
+                    <!-- Info dipendente selezionato -->
+                </div>
+                
+                <div id="rechargeAmountSection" style="display: none;">
+                    <label for="rechargeAmount" class="form-label">Importo da aggiungere (€):</label>
+                    
+                    <!-- Template ricarica -->
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Template veloci:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-success btn-sm recharge-template" data-amount="2">2€</button>
+                            <button type="button" class="btn btn-outline-success btn-sm recharge-template" data-amount="5">5€</button>
+                            <button type="button" class="btn btn-outline-success btn-sm recharge-template" data-amount="10">10€</button>
+                            <button type="button" class="btn btn-outline-success btn-sm recharge-template" data-amount="20">20€</button>
+                            <button type="button" class="btn btn-outline-success btn-sm recharge-template" data-amount="50">50€</button>
+                        </div>
+                    </div>
+                    
+                    <input type="number" class="form-control" id="rechargeAmount" min="0.01" step="0.01" placeholder="10.00">
+                </div>
+                
+                <!-- Password Operatore -->
+                <div class="mb-3">
+                    <label for="rechargeOperatorPassword" class="form-label">Password Operatore <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="rechargeOperatorPassword" placeholder="Inserisci password operatore" required>
+                    <div class="form-text">Richiesta password operatore per autorizzare la ricarica</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-success" id="processRechargeBtn" onclick="processRecharge()" disabled>
+                    <i class="fas fa-plus me-1"></i> Ricarica Credito
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>
+                    Aggiungi Nuovo Prodotto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="operatorAddProductForm">
+                    <div class="mb-3">
+                        <label for="newProductName" class="form-label">Nome Prodotto</label>
+                        <input type="text" class="form-control" id="newProductName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newProductPrice" class="form-label">Prezzo (€)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control" id="newProductPrice" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newProductInventory" class="form-label">Giacenza Iniziale</label>
+                        <input type="number" class="form-control" id="newProductInventory" value="0" min="0">
+                        <div class="form-text">Quantità iniziale disponibile in magazzino</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-warning" onclick="confirmAddProduct()">
+                    <i class="fas fa-save me-1"></i> Aggiungi Prodotto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Product Modal -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash me-2"></i>
+                    Elimina Prodotto
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attenzione!</strong> Questa azione non può essere annullata.
+                </div>
+                <p>Sei sicuro di voler eliminare il prodotto <strong id="deleteProductName"></strong>?</p>
+                
+                <div class="mb-3">
+                    <label for="deleteProductPassword" class="form-label">Password Operatore</label>
+                    <input type="password" class="form-control" id="deleteProductPassword" placeholder="Inserisci password operatore" required>
+                </div>
+                
+                <input type="hidden" id="deleteProductId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteProduct()">
+                    <i class="fas fa-trash me-1"></i> Elimina Prodotto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions Modal -->
+<div class="modal fade" id="transactionsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered transactions-modal-custom">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-history me-2"></i>
+                    Ultime Transazioni
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search and filters -->
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="transactionSearch" placeholder="Cerca ufficiale, prodotto...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="transactionTypeFilter">
+                                <option value="">Tutti i tipi</option>
+                                <option value="credit">Ricariche</option>
+                                <option value="debit">Acquisti</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control" id="transactionDateFilter">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-primary w-100" onclick="applyDateFilter()" title="Filtra per data">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="clearAllFilters()">
+                                <i class="fas fa-times me-1"></i> Mostra Tutti
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="refreshTransactions()">
+                                <i class="fas fa-sync-alt me-1"></i> Aggiorna
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cash Register Balance -->
+                <div class="cash-register-info mb-3">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-cash-register me-2"></i>
+                        <span><strong>Importo Cassa:</strong> <span id="cashRegisterAmount">€ 0.00</span></span>
+                    </div>
+                </div>
+                
+                <div class="table-responsive transactions-table-container">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Data/Ora</th>
+                                <th>Ufficiale</th>
+                                <th>Tipo</th>
+                                <th>Importo</th>
+                                <th>Prodotto</th>
+                                <th>Quantità</th>
+                                <th>Operatore</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <!-- Dati dinamici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Transaction Confirmation Modal -->
+<div class="modal fade" id="deleteTransactionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash me-2"></i>
+                    Elimina Transazione
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong>Attenzione!</strong> Stai per eliminare una transazione. Questa operazione:
+                    <ul class="mb-0 mt-2">
+                        <li>Ripristinerà il credito dell'ufficiale</li>
+                        <li>Ripristinerà l'inventario del prodotto (se applicabile)</li>
+                        <li>Verrà registrata nei report amministratore</li>
+                        <li><strong>Non può essere annullata</strong></li>
+                    </ul>
+                </div>
+                
+                <div id="transactionDetails" class="card mb-3">
+                    <!-- Dettagli transazione -->
+                </div>
+                
+                <div class="mb-3">
+                    <label for="operatorPassword" class="form-label">Inserisci password operatore per confermare:</label>
+                    <input type="password" class="form-control" id="operatorPassword" placeholder="Password operatore">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteTransaction" onclick="confirmDeleteTransaction()">
+                    <i class="fas fa-trash me-1"></i> Elimina Transazione
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Employees List Modal -->
+<div class="modal fade" id="employeesModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-users me-2"></i>
+                    Elenco Ufficiali
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="employeeSearch" placeholder="Cerca per nome, cognome, grado o codice...">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-success w-100" onclick="showNewEmployeeModal()">
+                            <i class="fas fa-user-plus me-1"></i> Nuovo Ufficiale
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-hover">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Grado</th>
+                                <th>Nome</th>
+                                <th>Codice</th>
+                                <th class="text-end">Credito</th>
+                                <th class="text-end">Limite</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody">
+                            <!-- Dati dinamici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary" onclick="refreshEmployeesList()">
+                    <i class="fas fa-sync-alt me-1"></i> Aggiorna
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Employee Modal -->
+<div class="modal fade" id="newEmployeeModal" tabindex="-1" aria-labelledby="newEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newEmployeeModalLabel">
+                    <i class="fas fa-user-plus me-2"></i> Nuovo Ufficiale
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Attenzione:</strong> Per aggiungere un nuovo ufficiale è necessaria la password di un operatore autorizzato.
+                </div>
+                
+                <form id="newEmployeeForm" action="{{ url_for('admin_new_employee') }}" method="POST">
+                    <input type="hidden" name="redirect_to" value="products_first">
+                    
+                    <!-- Informazioni Personali -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-user me-2"></i> Informazioni Personali
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="new_first_name" class="form-label">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_first_name" name="first_name" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="new_last_name" class="form-label">Cognome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_last_name" name="last_name" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="new_rank" class="form-label">Grado/Ruolo <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_rank" name="rank" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informazioni Codice -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-barcode me-2"></i> Codice Identificativo
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="new_code" class="form-label">Codice <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new_code" name="code" required maxlength="20">
+                                <div class="form-text">Il codice deve essere univoco (max 20 caratteri)</div>
+                            </div>
+                            
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-secondary w-100" id="generateNewCode">
+                                    <i class="fas fa-random me-1"></i> Genera
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Limite Credito (nascosto, utilizza il valore globale di default) -->
+                    <input type="hidden" id="new_credit_limit" name="credit_limit" value="50">
+                    
+                    <!-- Credito Iniziale -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-euro-sign me-2"></i> Credito Iniziale
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Seleziona importo di start <span class="text-danger">*</span></label>
+                                <div class="btn-group-toggle" data-toggle="buttons">
+                                    <div class="row g-2">
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_0" value="0" checked>
+                                            <label class="btn btn-outline-primary" for="startup_0">€ 0</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_5" value="5">
+                                            <label class="btn btn-outline-primary" for="startup_5">€ 5</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_10" value="10">
+                                            <label class="btn btn-outline-primary" for="startup_10">€ 10</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_15" value="15">
+                                            <label class="btn btn-outline-primary" for="startup_15">€ 15</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_20" value="20">
+                                            <label class="btn btn-outline-primary" for="startup_20">€ 20</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_50" value="50">
+                                            <label class="btn btn-outline-primary" for="startup_50">€ 50</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="radio" class="btn-check" name="startup_credit" id="startup_custom" value="custom">
+                                            <label class="btn btn-outline-secondary" for="startup_custom">Personalizzato</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Custom amount input -->
+                                <div class="mt-3" id="customStartupAmount" style="display: none;">
+                                    <div class="input-group">
+                                        <span class="input-group-text">€</span>
+                                        <input type="number" class="form-control" id="custom_startup_amount" name="custom_startup_amount" step="0.01" min="0" placeholder="Inserisci importo">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-text mt-2">Seleziona l'importo di credito da assegnare all'ufficiale alla creazione (default: € 0)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Autorizzazione Operatore -->
+                    <div class="mb-4">
+                        <h6 class="text-danger mb-3">
+                            <i class="fas fa-lock me-2"></i> Autorizzazione Richiesta
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="new_operator_password" class="form-label">Password Operatore <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="new_operator_password" name="operator_password" required>
+                                <div class="form-text">Inserisci la password di un operatore autorizzato per confermare la creazione</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-success" id="saveNewEmployeeBtn">
+                    <i class="fas fa-save me-1"></i> Salva Ufficiale
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Restock Modal -->
+<div class="modal fade" id="bulkRestockModal" tabindex="-1" aria-labelledby="bulkRestockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title" id="bulkRestockModalLabel">
+                    <i class="fas fa-warehouse me-2"></i>
+                    Ricarica Giacenze in Blocco
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Modalità Ricarica Giacenze:</strong> Inserisci le quantità da aggiungere per ogni prodotto e conferma con la password operatore.
+                </div>
+                
+                <!-- Search filter -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="bulkRestockSearch" placeholder="Filtra prodotti per nome...">
+                        <button class="btn btn-outline-secondary" type="button" id="clearBulkRestockSearch">
+                            <i class="fas fa-times"></i> Pulisci
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>Prodotto</th>
+                                <th>Prezzo</th>
+                                <th>Giacenza Attuale</th>
+                                <th>Quantità da Aggiungere</th>
+                                <th>Nuova Giacenza</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkRestockTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="bulkOperatorPassword" class="form-label">
+                            <i class="fas fa-lock me-1"></i>
+                            Password Operatore <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="bulkOperatorPassword" required>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-end h-100">
+                            <button type="button" class="btn btn-success me-2" onclick="confirmBulkRestock()">
+                                <i class="fas fa-check me-1"></i> Conferma Ricariche
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i> Chiudi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedProducts = {};
+let employees = [];
+let filteredEmployees = [];
+let lastScannedCode = null;
+let socket = null;
+let scannerTimeoutTimer = null;
+
+// Inizializza SocketIO per il barcode scanner
+function initializeSocket() {
+    // Controlla se SocketIO è disponibile
+    if (typeof io === 'undefined') {
+        console.warn('SocketIO non disponibile - scanner in modalità manuale');
+        return;
+    }
+    
+    try {
+        // Usa la stessa porta dell'app Flask
+        socket = io();
+    
+    socket.on('connect', function() {
+        console.log('🔗 Socket connected');
+        socket.emit('request_scanner_status');
+    });
+    
+    socket.on('barcode_scanned', function(data) {
+        console.log('📊 Barcode ricevuto:', data);
+        if (data.employee_code) {
+            handleScannedEmployee(data.employee_code, data);
+        }
+    });
+    
+    socket.on('employee_data', function(data) {
+        console.log('👤 Dati dipendente ricevuti:', data);
+        if (data.employee) {
+            selectEmployee(data.employee);
+        }
+    });
+    
+    } catch (error) {
+        console.warn('Errore connessione SocketIO:', error);
+    }
+}
+
+// Carica lista dipendenti
+function loadEmployees() {
+    fetch('/api/system_stats')
+        .then(response => response.json())
+        .then(data => {
+            employees = data.employees || [];
+            filteredEmployees = [...employees];
+            renderEmployeeList();
+        })
+        .catch(error => {
+            console.error('Errore nel caricamento dipendenti:', error);
+        });
+}
+
+// Gestione selezione prodotto
+document.addEventListener('DOMContentLoaded', function() {
+    // Inizializza socket e carica dipendenti
+    initializeSocket();
+    loadEmployees();
+    
+    // Add window resize listener for transactions modal
+    window.addEventListener('resize', function() {
+        setTimeout(() => {
+            adjustTransactionsTableHeight();
+        }, 100);
+    });
+    
+    // Gestione Enter per aprire resoconto
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            // Se siamo in un quantity input, procedi al checkout
+            if (event.target.classList && event.target.classList.contains('quantity-input')) {
+                event.preventDefault();
+                event.stopPropagation();
+                // Focus management is handled in handleQuantityKeydown
+                return;
+            }
+            
+            // Non aprire se siamo in altri input field o textarea
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) {
+                return;
+            }
+            
+            // Non aprire se c'è una modal aperta
+            if (document.querySelector('.modal.show')) {
+                return;
+            }
+            
+            // Apri resoconto se ci sono prodotti selezionati
+            const totalItems = Object.values(selectedProducts).reduce((sum, product) => sum + (product.quantity || 0), 0);
+            if (totalItems > 0) {
+                event.preventDefault();
+                event.stopPropagation();
+                proceedToCheckoutIfReady();
+            }
+        }
+    });
+    
+    // Add modal cleanup event listener
+    const transactionsModal = document.getElementById('transactionsModal');
+    if (transactionsModal) {
+        transactionsModal.addEventListener('hidden.bs.modal', function() {
+            // Remove any remaining backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Ensure body class is properly cleaned
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+});
+
+function changeQuantity(productId, change) {
+    const currentQty = selectedProducts[productId] ? selectedProducts[productId].quantity : 0;
+    const newQty = Math.max(0, currentQty + change);
+    setQuantityDirect(productId, newQty);
+}
+
+function setQuantityDirect(productId, qty) {
+    const card = document.querySelector(`[data-product-id="${productId}"]`);
+    const qtyInput = document.getElementById(`qty-${productId}`);
+    const minusBtn = document.getElementById(`minus-${productId}`);
+    
+    const newQty = Math.max(0, Math.min(99, parseInt(qty) || 0));
+    
+    if (newQty === 0) {
+        // Rimuovi prodotto dal carrello
+        delete selectedProducts[productId];
+        card.classList.remove('has-quantity');
+        minusBtn.disabled = true;
+    } else {
+        // Aggiungi/aggiorna prodotto nel carrello
+        if (!selectedProducts[productId]) {
+            selectedProducts[productId] = {
+                id: productId,
+                name: card.dataset.productName,
+                price: parseFloat(card.dataset.productPrice),
+                quantity: newQty
+            };
+        } else {
+            selectedProducts[productId].quantity = newQty;
+        }
+        card.classList.add('has-quantity');
+        minusBtn.disabled = false;
+    }
+    
+    // Aggiorna display
+    qtyInput.value = newQty;
+    updateCartSummary();
+}
+
+function handleQuantityKeydown(event, productId) {
+    // Gestisci Enter per completare transazione
+    if (event.keyCode === 13 || event.key === 'Enter') { // Enter
+        console.log('Enter key pressed in quantity input for product', productId);
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Applica la quantità e verifica se ci sono prodotti selezionati
+        const input = event.target;
+        const newQuantity = parseInt(input.value) || 0;
+        console.log('Setting quantity', newQuantity, 'for product', productId);
+        setQuantityDirect(productId, newQuantity);
+        
+        // Rimuovi il focus dall'input immediatamente
+        input.blur();
+        
+        // Procedi sempre al checkout se ci sono prodotti selezionati
+        setTimeout(() => {
+            console.log('Calling proceedToCheckoutIfReady, selectedProducts:', selectedProducts);
+            proceedToCheckoutIfReady();
+        }, 100);
+        return;
+    }
+    
+    // Permetti: backspace, delete, tab, escape
+    if ([8, 9, 27, 46].indexOf(event.keyCode) !== -1 ||
+        // Permetti: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+        (event.keyCode === 65 && event.ctrlKey === true) ||
+        (event.keyCode === 67 && event.ctrlKey === true) ||
+        (event.keyCode === 86 && event.ctrlKey === true) ||
+        (event.keyCode === 88 && event.ctrlKey === true)) {
+        return;
+    }
+    // Assicurati che sia un numero
+    if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+        event.preventDefault();
+    }
+}
+
+function proceedToCheckoutIfReady() {
+    const totalItems = Object.values(selectedProducts).reduce((sum, product) => sum + (product.quantity || 0), 0);
+    if (totalItems > 0) {
+        // Remove focus from any input
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+        // Proceed to checkout
+        showCheckoutSummary();
+    } else {
+        console.log('No products selected for checkout');
+    }
+}
+
+function updateCartSummary() {
+    const cart = document.getElementById('cart-summary');
+    const proceedBtn = document.getElementById('proceed-btn');
+    const selectedCount = document.getElementById('selected-count');
+    
+    const itemCount = Object.keys(selectedProducts).length;
+    let totalQuantity = 0;
+    let totalPrice = 0;
+    
+    Object.values(selectedProducts).forEach(product => {
+        totalQuantity += product.quantity;
+        totalPrice += product.price * product.quantity;
+    });
+    
+    selectedCount.textContent = `${itemCount} articoli (${totalQuantity} pz)`;
+    document.getElementById('cart-total').textContent = `Totale: € ${totalPrice.toFixed(2)}`;
+    
+    if (itemCount > 0) {
+        cart.classList.add('show');
+        proceedBtn.disabled = false;
+    } else {
+        cart.classList.remove('show');
+        proceedBtn.disabled = true;
+    }
+}
+
+function clearCart() {
+    selectedProducts = {};
+    document.querySelectorAll('.product-card.has-quantity').forEach(card => {
+        const productId = card.dataset.productId;
+        card.classList.remove('has-quantity');
+        document.getElementById(`qty-${productId}`).value = '0';
+        document.getElementById(`minus-${productId}`).disabled = true;
+    });
+    updateCartSummary();
+}
+
+function filterProducts() {
+    const search = document.getElementById('product-search').value.toLowerCase();
+    const clearBtn = document.getElementById('clear-search');
+    const cards = document.querySelectorAll('.product-card');
+    
+    // Mostra/nascondi pulsante clear
+    clearBtn.style.display = search ? 'block' : 'none';
+    
+    cards.forEach(card => {
+        const productName = card.dataset.productName.toLowerCase();
+        if (productName.includes(search)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function clearProductSearch() {
+    document.getElementById('product-search').value = '';
+    filterProducts();
+}
+
+function handleQuickAdd(event) {
+    if (event.key === 'Enter') {
+        processQuickAdd();
+    }
+}
+
+function processQuickAdd() {
+    const input = document.getElementById('quick-add');
+    const text = input.value.trim();
+    
+    if (!text) {
+        showErrorModal('Inserisci almeno un prodotto nel formato ID:quantità (es. 1:3)');
+        return;
+    }
+    
+    const items = text.split(',').map(item => item.trim());
+    let errors = [];
+    let success = 0;
+    
+    items.forEach(item => {
+        if (!item) return;
+        
+        const parts = item.split(':');
+        if (parts.length !== 2) {
+            errors.push(`Formato non valido: "${item}"`);
+            return;
+        }
+        
+        const productId = parseInt(parts[0].trim());
+        const quantity = parseInt(parts[1].trim());
+        
+        if (isNaN(productId) || isNaN(quantity) || productId <= 0 || quantity <= 0) {
+            errors.push(`Valori non validi: "${item}"`);
+            return;
+        }
+        
+        // Verifica che il prodotto esista
+        const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+        if (!productCard) {
+            errors.push(`Prodotto ID ${productId} non trovato`);
+            return;
+        }
+        
+        // Aggiungi/aggiorna quantità
+        const currentQty = selectedProducts[productId] ? selectedProducts[productId].quantity : 0;
+        setQuantityDirect(productId, currentQty + quantity);
+        success++;
+    });
+    
+    // Mostra risultati
+    if (success > 0) {
+        input.value = '';
+        const message = `Aggiunti ${success} prodotti al carrello!`;
+        
+        if (errors.length > 0) {
+            showErrorModal(`${message}<br><br><strong>Errori:</strong><br>${errors.join('<br>')}`);
+        } else {
+            // Mostra notifica di successo breve
+            showQuickSuccessNotification(message);
+        }
+    } else if (errors.length > 0) {
+        showErrorModal(`Errori nell'inserimento:<br>${errors.join('<br>')}`);
+    }
+}
+
+function showQuickSuccessNotification(message) {
+    // Crea una notifica temporanea in alto a destra
+    const notification = document.createElement('div');
+    notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <i class="fas fa-check me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Rimuovi automaticamente dopo 3 secondi
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+function showEmployeeSelector() {
+    showCheckoutSummary();
+}
+
+function showCheckoutSummary() {
+    if (Object.keys(selectedProducts).length === 0) {
+        showErrorModal('Seleziona almeno un prodotto prima di procedere.');
+        return;
+    }
+    
+    // Popola il resoconto
+    populateCheckoutSummary();
+    
+    // Mostra la modal
+    const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+    modal.show();
+    
+    // Aspetta che la modal sia completamente visibile, poi attiva focus
+    document.getElementById('checkoutModal').addEventListener('shown.bs.modal', function() {
+        const barcodeInput = document.getElementById('checkoutBarcodeInput');
+        if (barcodeInput) {
+            barcodeInput.focus();
+            barcodeInput.value = ''; // Pulisci input
+        }
+    }, { once: true });
+    
+    // Avvia la modalità scanner
+    startScannerMode();
+}
+
+function hideEmployeeSelector() {
+    document.getElementById('employee-selector').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function renderEmployeeList() {
+    const container = document.getElementById('employee-list');
+    container.innerHTML = '';
+    
+    filteredEmployees.forEach(employee => {
+        const item = document.createElement('div');
+        item.className = 'employee-item';
+        item.onclick = () => selectEmployee(employee);
+        
+        item.innerHTML = `
+            <div class="employee-info-left">
+                <div class="employee-avatar-small">
+                    ${employee.first_name[0]}${employee.last_name[0]}
+                </div>
+                <div class="employee-details">
+                    <div class="employee-name-small">${employee.first_name} ${employee.last_name}</div>
+                    <div class="employee-rank-small">${employee.rank} - Codice: ${employee.code}</div>
+                </div>
+            </div>
+            <div class="employee-credit-small">€ ${employee.credit.toFixed(2)}</div>
+        `;
+        
+        container.appendChild(item);
+    });
+}
+
+function filterEmployees() {
+    const search = document.getElementById('employee-search').value.toLowerCase();
+    
+    filteredEmployees = employees.filter(emp => 
+        emp.first_name.toLowerCase().includes(search) ||
+        emp.last_name.toLowerCase().includes(search) ||
+        emp.rank.toLowerCase().includes(search) ||
+        emp.code.toLowerCase().includes(search)
+    );
+    
+    renderEmployeeList();
+}
+
+function searchByCode() {
+    const code = document.getElementById('manual-code').value.trim();
+    const searchBtn = document.querySelector('[onclick="searchByCode()"]');
+    
+    if (!code) {
+        showErrorModal('Inserisci un codice ufficiale');
+        return;
+    }
+    
+    // Mostra stato di caricamento
+    const originalText = searchBtn.innerHTML;
+    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    searchBtn.disabled = true;
+    
+    // Cerca tramite API
+    fetch(`/api/employee/${encodeURIComponent(code)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                selectEmployee(data.employee);
+            } else {
+                showErrorModal(data.message);
+                // Reset campo
+                document.getElementById('manual-code').value = '';
+                document.getElementById('manual-code').focus();
+            }
+        })
+        .catch(error => {
+            console.error('Errore ricerca dipendente:', error);
+            showErrorModal('Errore durante la ricerca dell\'ufficiale.');
+        })
+        .finally(() => {
+            // Ripristina bottone
+            searchBtn.innerHTML = originalText;
+            searchBtn.disabled = false;
+        });
+}
+
+function handleScannedEmployee(code, employeeData = null) {
+    lastScannedCode = code;
+    document.getElementById('last-scan').textContent = `Ultimo scan: ${code}`;
+    document.getElementById('last-scan').style.display = 'block';
+    
+    if (employeeData && employeeData.employee) {
+        selectEmployee(employeeData.employee);
+    } else {
+        // Cerca tramite API
+        fetch(`/api/employee/${encodeURIComponent(code)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    selectEmployee(data.employee);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Errore ricerca dipendente:', error);
+                alert('Errore durante la ricerca dell\'ufficiale.');
+            });
+    }
+}
+
+function selectEmployee(employee) {
+    // Chiudi la selezione dipendenti
+    hideEmployeeSelector();
+    processTransaction(employee);
+}
+
+function selectCashRegister() {
+    // Chiudi la selezione dipendenti  
+    hideEmployeeSelector();
+    processTransaction({
+        id: null,
+        first_name: 'Pagamento',
+        last_name: 'Contanti',
+        credit: 999999
+    });
+}
+
+function processTransaction(employee) {
+    const totalAmount = Object.values(selectedProducts).reduce(
+        (sum, product) => sum + (product.price * product.quantity), 0
+    );
+    
+    // Verifica credito sufficiente per dipendenti reali (con limite negativo configurabile)
+    if (employee.id) {
+        const newBalance = employee.credit - totalAmount;
+        const creditLimit = -Math.abs(employee.credit_limit || 50.00); // Usa il limite dell'utente o 50€ di default
+        
+        if (newBalance < creditLimit) {
+            const maxSpendable = employee.credit + Math.abs(creditLimit);
+            showLimitExceededModal(`Credito insufficiente. Disponibile: €${employee.credit.toFixed(2)}, Massimo spendibile: €${maxSpendable.toFixed(2)}, Richiesto: €${totalAmount.toFixed(2)}`);
+            return;
+        }
+    }
+    
+    // Processa direttamente senza modal loading
+    
+    // Prepara dati per l'invio
+    const formData = new FormData();
+    if (employee.id) {
+        formData.append('employee_id', employee.id);
+    }
+    
+    // Converti selectedProducts nel formato atteso dal server
+    const productsArray = Object.values(selectedProducts);
+    console.log('Prodotti da inviare:', productsArray);
+    formData.append('products', JSON.stringify(productsArray));
+    
+    // Invia transazione
+    fetch('/deduct_credit', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Determina quale suono riprodurre in base al credito finale
+            let soundType = 'purchase';
+            if (employee.id && data.new_credit < 0) {
+                soundType = 'negativo'; // Suono speciale per credito negativo
+            }
+            playSound(soundType);
+            
+            // Crea resoconto dettagliato
+            const productsDetail = Object.values(selectedProducts).map(p => 
+                `${p.name} x${p.quantity} = €${(p.price * p.quantity).toFixed(2)}`
+            ).join('<br>');
+            
+            const isNegative = employee.id && data.new_credit < 0;
+            const creditClass = isNegative ? 'text-danger' : 'text-muted';
+            const creditWarning = isNegative ? '<div class="alert alert-warning mt-2"><i class="fas fa-exclamation-triangle me-2"></i>Credito in negativo!</div>' : '';
+            
+            const message = employee.id ? 
+                `<div class="text-center">
+                    <h4><strong>${employee.first_name} ${employee.last_name}</strong></h4>
+                    <div class="mb-3">
+                        <div class="fs-5">${productsDetail}</div>
+                        <hr>
+                        <div class="fs-4"><strong>Totale: €${totalAmount.toFixed(2)}</strong></div>
+                        <div class="${creditClass} mt-2">Credito residuo: €${data.new_credit ? data.new_credit.toFixed(2) : 'N/A'}</div>
+                        ${creditWarning}
+                    </div>
+                </div>` :
+                `<div class="text-center">
+                    <h4><strong>Pagamento Contanti</strong></h4>
+                    <div class="mb-3">
+                        <div class="fs-5">${productsDetail}</div>
+                        <hr>
+                        <div class="fs-4"><strong>Totale: €${totalAmount.toFixed(2)}</strong></div>
+                    </div>
+                </div>`;
+            
+            showSuccessModal(message);
+            
+            // Reset interfaccia
+            clearCart();
+        } else {
+            showErrorModal(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Errore transazione:', error);
+        showErrorModal('Errore di comunicazione con il server.');
+    });
+}
+
+let successTimer = null;
+
+function showSuccessModal(message) {
+    const modalElement = document.getElementById('successModal');
+    const modalBody = document.getElementById('successModalBody');
+    
+    modalBody.innerHTML = message;
+    
+    // Ensure modal is on top
+    modalElement.style.zIndex = '1070';
+    
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    
+    // Pulisci timer esistente se presente
+    if (successTimer) {
+        clearInterval(successTimer);
+    }
+    
+    // Avvia countdown per chiusura automatica (5 secondi)
+    let countdown = 5;
+    const countdownElement = document.getElementById('countdown');
+    const progressBar = document.getElementById('autoCloseProgress');
+    
+    // Reset valori iniziali
+    countdownElement.textContent = countdown;
+    progressBar.style.width = '100%';
+    
+    successTimer = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+        progressBar.style.width = `${(countdown / 5) * 100}%`;
+        
+        if (countdown <= 0) {
+            clearInterval(successTimer);
+            successTimer = null;
+            modal.hide();
+        }
+    }, 1000);
+    
+    // Se l'utente chiude manualmente, ferma il timer
+    modalElement.addEventListener('hidden.bs.modal', function() {
+        if (successTimer) {
+            clearInterval(successTimer);
+            successTimer = null;
+        }
+    }, { once: true });
+}
+
+function showErrorModal(message) {
+    const modalElement = document.getElementById('errorModal');
+    const modalBody = document.getElementById('errorModalBody');
+    
+    // Set content
+    modalBody.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+    
+    // Ensure modal is on top
+    modalElement.style.zIndex = '1070';
+    
+    // Create and show modal
+    const modal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: true
+    });
+    
+    modal.show();
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+        if (modal._isShown) {
+            modal.hide();
+        }
+    }, 5000);
+}
+
+function populateCheckoutSummary() {
+    const productsContainer = document.getElementById('checkoutProducts');
+    const summaryDetails = document.getElementById('checkoutSummaryDetails');
+    const totalElement = document.getElementById('checkoutTotal');
+    
+    let totalAmount = 0;
+    let productsHtml = '';
+    let summaryHtml = '';
+    
+    Object.values(selectedProducts).forEach(product => {
+        const subtotal = product.price * product.quantity;
+        totalAmount += subtotal;
+        
+        productsHtml += `
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <div>
+                    <strong>${product.name}</strong>
+                    <small class="text-muted d-block">€${product.price.toFixed(2)} x ${product.quantity}</small>
+                </div>
+                <div class="text-end">
+                    <strong>€${subtotal.toFixed(2)}</strong>
+                </div>
+            </div>
+        `;
+        
+        summaryHtml += `
+            <div class="d-flex justify-content-between">
+                <span>${product.name} x${product.quantity}:</span>
+                <span>€${subtotal.toFixed(2)}</span>
+            </div>
+        `;
+    });
+    
+    productsContainer.innerHTML = productsHtml || '<p class="text-muted">Nessun prodotto selezionato</p>';
+    summaryDetails.innerHTML = summaryHtml;
+    totalElement.textContent = `€ ${totalAmount.toFixed(2)}`;
+}
+
+function startScannerMode() {
+    // Mantieni il focus sull'input tastiera
+    const barcodeInput = document.getElementById('checkoutBarcodeInput');
+    const focusInterval = setInterval(() => {
+        if (document.getElementById('checkoutModal').classList.contains('show')) {
+            if (barcodeInput && document.activeElement !== barcodeInput) {
+                barcodeInput.focus();
+            }
+        } else {
+            clearInterval(focusInterval);
+        }
+    }, 1000);
+    
+    // Ascolta per nuovi scan
+    if (socket) {
+        // Remove existing listeners to avoid duplicates
+        socket.off('barcode_scanned');
+        socket.off('employee_data');
+        
+        socket.on('barcode_scanned', function(data) {
+            console.log('Barcode ricevuto in checkout:', data);
+            if (data.employee_code) {
+                handleCheckoutScan(data.employee_code, data);
+            }
+        });
+        
+        socket.on('employee_data', function(data) {
+            console.log('Dati dipendente ricevuti in checkout:', data);
+            if (data.employee) {
+                processCheckoutWithEmployee(data.employee);
+            }
+        });
+    }
+    
+    // Avvia timeout per fallback selezione manuale (30 secondi)
+    let timeoutSeconds = 30;
+    const timeoutElement = document.getElementById('scannerTimeout');
+    
+    scannerTimeoutTimer = setInterval(() => {
+        timeoutSeconds--;
+        timeoutElement.textContent = `(${timeoutSeconds}s)`;
+        
+        if (timeoutSeconds <= 0) {
+            clearInterval(scannerTimeoutTimer);
+            timeoutElement.textContent = '';
+            showManualEmployeeSelection();
+        }
+    }, 1000);
+    
+    timeoutElement.textContent = `(${timeoutSeconds}s)`;
+}
+
+function handleCheckoutScan(code, employeeData = null) {
+    const lastScanElement = document.getElementById('checkoutLastScan');
+    lastScanElement.textContent = `Ultimo scan: ${code}`;
+    lastScanElement.style.display = 'block';
+    
+    if (employeeData && employeeData.employee) {
+        processCheckoutWithEmployee(employeeData.employee);
+    } else {
+        // Cerca tramite API
+        fetch(`/api/employee/${encodeURIComponent(code)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    processCheckoutWithEmployee(data.employee);
+                } else {
+                    lastScanElement.innerHTML = `<strong>Errore:</strong> ${data.message}`;
+                    lastScanElement.className = 'alert alert-danger';
+                }
+            })
+            .catch(error => {
+                console.error('Errore ricerca dipendente:', error);
+                lastScanElement.innerHTML = '<strong>Errore:</strong> Impossibile verificare l\'ufficiale';
+                lastScanElement.className = 'alert alert-danger';
+            });
+    }
+}
+
+function processCheckoutWithEmployee(employee) {
+    // Ferma il timer
+    if (scannerTimeoutTimer) {
+        clearInterval(scannerTimeoutTimer);
+        scannerTimeoutTimer = null;
+    }
+    
+    // Chiudi la modal checkout
+    const checkoutModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+    if (checkoutModal) {
+        checkoutModal.hide();
+    }
+    
+    // Processa la transazione
+    processTransaction(employee);
+}
+
+function showManualEmployeeSelection() {
+    // Ferma il timer
+    if (scannerTimeoutTimer) {
+        clearInterval(scannerTimeoutTimer);
+        scannerTimeoutTimer = null;
+    }
+    
+    // Chiudi checkout modal e apri selezione dipendenti
+    const checkoutModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+    if (checkoutModal) {
+        checkoutModal.hide();
+    }
+    
+    // Aspetta che la modal si chiuda completamente prima di aprire la nuova
+    setTimeout(() => {
+        document.getElementById('employee-selector').classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        // Reset input
+        document.getElementById('manual-code').value = '';
+        document.getElementById('employee-search').value = '';
+        filterEmployees();
+    }, 300);
+}
+
+function cancelCheckout() {
+    // Ferma il timer
+    if (scannerTimeoutTimer) {
+        clearInterval(scannerTimeoutTimer);
+        scannerTimeoutTimer = null;
+    }
+    
+    const checkoutModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+    if (checkoutModal) {
+        checkoutModal.hide();
+    }
+}
+
+function processCashPayment() {
+    // Ferma il timer
+    if (scannerTimeoutTimer) {
+        clearInterval(scannerTimeoutTimer);
+        scannerTimeoutTimer = null;
+    }
+    
+    // Chiudi modal e processa pagamento contanti
+    const checkoutModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+    if (checkoutModal) {
+        checkoutModal.hide();
+    }
+    
+    // Processa come pagamento contanti
+    processTransaction({
+        id: null,
+        first_name: 'Pagamento',
+        last_name: 'Contanti',
+        credit: 999999
+    });
+}
+
+function handleCheckoutKeyboard(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const code = event.target.value.trim();
+        if (code) {
+            handleCheckoutScan(code);
+            event.target.value = ''; // Pulisci dopo la scansione
+        }
+    } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelCheckout();
+    }
+    
+    // Mantieni sempre il focus sul campo
+    setTimeout(() => {
+        if (document.getElementById('checkoutModal').classList.contains('show')) {
+            event.target.focus();
+        }
+    }, 10);
+}
+
+function showLimitExceededModal(message) {
+    // Riproduci suono di limite superato
+    playSound('terminato');
+    
+    // Usa la stessa logica di showErrorModal
+    showErrorModal(message);
+}
+
+function showInventoryReport() {
+    // Carica dati giacenze dal server
+    fetch('/api/products')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateInventoryTable(data.products);
+                const modal = new bootstrap.Modal(document.getElementById('inventoryModal'));
+                modal.show();
+            } else {
+                showErrorModal('Errore nel caricamento delle giacenze');
+            }
+        })
+        .catch(error => {
+            console.error('Errore caricamento giacenze:', error);
+            showErrorModal('Errore di comunicazione con il server');
+        });
+}
+
+function populateInventoryTable(products) {
+    const tbody = document.getElementById('inventoryTableBody');
+    tbody.innerHTML = '';
+    
+    products.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>#${product.id}</strong></td>
+            <td>${product.name}</td>
+            <td class="text-end">
+                <span class="badge ${product.inventory <= 5 ? 'bg-danger' : product.inventory <= 10 ? 'bg-warning' : 'bg-success'}">
+                    ${product.inventory}
+                </span>
+            </td>
+            <td class="text-end">€${product.price.toFixed(2)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function refreshInventory() {
+    // Ricarica solo i dati senza creare un nuovo modal
+    fetch('/api/products')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateInventoryTable(data.products);
+            } else {
+                showErrorModal('Errore nel caricamento delle giacenze');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing inventory:', error);
+            showErrorModal('Errore di rete nel caricamento delle giacenze');
+        });
+}
+
+function filterInventoryTable() {
+    const searchTerm = document.getElementById('inventorySearch').value.toLowerCase();
+    const tableRows = document.querySelectorAll('#inventoryTableBody tr');
+    
+    tableRows.forEach(row => {
+        const productName = row.cells[1].textContent.toLowerCase();
+        const productId = row.cells[0].textContent.toLowerCase();
+        
+        if (productName.includes(searchTerm) || productId.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Initialize inventory search when modal is shown
+document.getElementById('inventoryModal').addEventListener('shown.bs.modal', function () {
+    // Add event listeners for search
+    const searchInput = document.getElementById('inventorySearch');
+    const clearButton = document.getElementById('clearInventorySearch');
+    
+    searchInput.addEventListener('input', filterInventoryTable);
+    clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        filterInventoryTable();
+        searchInput.focus();
+    });
+    
+    // Clear search when modal opens
+    searchInput.value = '';
+});
+
+let selectedEmployeeForRecharge = null;
+
+function showCreditRecharge() {
+    selectedEmployeeForRecharge = null;
+    document.getElementById('rechargeEmployeeSearch').value = '';
+    document.getElementById('selectedEmployeeInfo').style.display = 'none';
+    document.getElementById('rechargeAmountSection').style.display = 'none';
+    document.getElementById('processRechargeBtn').disabled = true;
+    
+    // Pulisci il campo password operatore
+    document.getElementById('rechargeOperatorPassword').value = '';
+    
+    // Popola lista dipendenti
+    populateRechargeEmployeesList(employees);
+    
+    const modal = new bootstrap.Modal(document.getElementById('creditRechargeModal'));
+    modal.show();
+}
+
+function populateRechargeEmployeesList(employeesList) {
+    const container = document.getElementById('rechargeEmployeesList');
+    container.innerHTML = '';
+    
+    employeesList.forEach(employee => {
+        const item = document.createElement('div');
+        item.className = 'card mb-2 employee-recharge-item';
+        item.style.cursor = 'pointer';
+        item.onclick = () => selectEmployeeForRecharge(employee);
+        
+        item.innerHTML = `
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${employee.first_name} ${employee.last_name}</strong>
+                        <small class="text-muted d-block">${employee.rank} - Codice: ${employee.code}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="fs-6 ${employee.credit < 0 ? 'text-danger' : 'text-success'}">
+                            €${employee.credit.toFixed(2)}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(item);
+    });
+}
+
+function searchEmployeesForRecharge() {
+    const search = document.getElementById('rechargeEmployeeSearch').value.toLowerCase();
+    
+    const filteredEmployees = employees.filter(emp => 
+        emp.first_name.toLowerCase().includes(search) ||
+        emp.last_name.toLowerCase().includes(search) ||
+        emp.rank.toLowerCase().includes(search) ||
+        emp.code.toLowerCase().includes(search)
+    );
+    
+    populateRechargeEmployeesList(filteredEmployees);
+}
+
+function selectEmployeeForRecharge(employee) {
+    selectedEmployeeForRecharge = employee;
+    
+    // Mostra info dipendente selezionato
+    const infoDiv = document.getElementById('selectedEmployeeInfo');
+    infoDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>${employee.first_name} ${employee.last_name}</strong>
+                <small class="text-muted d-block">${employee.rank} - Codice: ${employee.code}</small>
+            </div>
+            <div class="text-end">
+                <span class="fs-5 ${employee.credit < 0 ? 'text-danger' : 'text-success'}">
+                    €${employee.credit.toFixed(2)}
+                </span>
+            </div>
+        </div>
+    `;
+    infoDiv.style.display = 'block';
+    
+    // Mostra sezione importo
+    document.getElementById('rechargeAmountSection').style.display = 'block';
+    document.getElementById('rechargeAmount').focus();
+    
+    // Abilita pulsante ricarica
+    document.getElementById('processRechargeBtn').disabled = false;
+    
+    // Nascondi lista dipendenti
+    document.getElementById('rechargeEmployeesList').style.display = 'none';
+}
+
+function processRecharge() {
+    if (!selectedEmployeeForRecharge) {
+        showErrorModal('Nessun ufficiale selezionato');
+        return;
+    }
+    
+    const amount = parseFloat(document.getElementById('rechargeAmount').value);
+    if (!amount || amount <= 0) {
+        showErrorModal('Inserisci un importo valido');
+        return;
+    }
+    
+    const operatorPassword = document.getElementById('rechargeOperatorPassword').value.trim();
+    if (!operatorPassword) {
+        showErrorModal('Inserisci la password operatore');
+        return;
+    }
+    
+    // Invia richiesta di ricarica
+    const formData = new FormData();
+    formData.append('employee_id', selectedEmployeeForRecharge.id);
+    formData.append('amount', amount);
+    formData.append('operator_password', operatorPassword);
+    
+    fetch('/add_credit', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            playSound('purchase');
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('creditRechargeModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            showSuccessModal(`
+                <div class="text-center">
+                    <h4>Ricarica Completata</h4>
+                    <div class="mb-3">
+                        <strong>${selectedEmployeeForRecharge.first_name} ${selectedEmployeeForRecharge.last_name}</strong><br>
+                        <div class="fs-5 mt-2">Ricaricati: €${amount.toFixed(2)}</div>
+                        <div class="text-muted">Nuovo credito: €${data.new_credit.toFixed(2)}</div>
+                    </div>
+                </div>
+            `);
+            
+            // Aggiorna credito nella lista locale
+            const employeeIndex = employees.findIndex(emp => emp.id === selectedEmployeeForRecharge.id);
+            if (employeeIndex !== -1) {
+                employees[employeeIndex].credit = data.new_credit;
+            }
+            
+        } else {
+            showErrorModal(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Errore ricarica:', error);
+        showErrorModal('Errore di comunicazione con il server');
+    });
+}
+
+// Initialize recharge template buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for recharge template buttons
+    document.querySelectorAll('.recharge-template').forEach(button => {
+        button.addEventListener('click', function() {
+            const amount = this.dataset.amount;
+            document.getElementById('rechargeAmount').value = amount;
+            
+            // Visual feedback
+            this.classList.remove('btn-outline-success');
+            this.classList.add('btn-success');
+            
+            // Remove active class from other buttons
+            document.querySelectorAll('.recharge-template').forEach(btn => {
+                if (btn !== this) {
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-success');
+                }
+            });
+            
+            // Reset button styles after 1 second
+            setTimeout(() => {
+                this.classList.remove('btn-success');
+                this.classList.add('btn-outline-success');
+            }, 1000);
+        });
+    });
+});
+
+let transactionToDelete = null;
+
+function adjustTransactionsTableHeight() {
+    const modal = document.getElementById('transactionsModal');
+    const tableContainer = document.querySelector('.transactions-table-container');
+    
+    if (modal && tableContainer && modal.classList.contains('show')) {
+        // Calculate available height
+        const modalContent = modal.querySelector('.modal-content');
+        const modalHeader = modal.querySelector('.modal-header');
+        const modalFooter = modal.querySelector('.modal-footer');
+        const filtersSection = modal.querySelector('.mb-3'); // Search and filters
+        const cashRegisterInfo = modal.querySelector('.cash-register-info');
+        
+        if (modalContent && modalHeader) {
+            const modalContentHeight = modalContent.offsetHeight;
+            const headerHeight = modalHeader.offsetHeight;
+            const footerHeight = modalFooter ? modalFooter.offsetHeight : 0;
+            const filtersHeight = filtersSection ? filtersSection.offsetHeight : 0;
+            const cashInfoHeight = cashRegisterInfo ? cashRegisterInfo.offsetHeight : 0;
+            const padding = 60; // Extra padding for spacing
+            
+            const availableHeight = modalContentHeight - headerHeight - footerHeight - filtersHeight - cashInfoHeight - padding;
+            
+            // Set the calculated height
+            if (availableHeight > 200) {
+                tableContainer.style.maxHeight = availableHeight + 'px';
+            }
+        }
+    }
+}
+
+function showRecentTransactions() {
+    // Get date filter parameters
+    const customDate = document.getElementById('transactionDateFilter')?.value || '';
+    
+    // Build API URL with date filter
+    let apiUrl = '/api/recent_transactions';
+    if (customDate) {
+        apiUrl += '?date_filter=custom&custom_date=' + encodeURIComponent(customDate);
+    } else {
+        apiUrl += '?date_filter=today';
+    }
+    
+    // Load both transactions and cash balance
+    Promise.all([
+        fetch(apiUrl).then(response => response.json()),
+        fetch('/api/cash_balance').then(response => response.json())
+    ])
+    .then(([transactionsData, cashData]) => {
+        if (transactionsData.success) {
+            populateTransactionsTable(transactionsData.transactions);
+        } else {
+            showErrorModal('Errore nel caricamento delle transazioni');
+            return;
+        }
+        
+        if (cashData.success) {
+            updateCashBalance(cashData.cash_balance);
+        } else {
+            console.error('Error loading cash balance:', cashData.message);
+            // Don't show error for cash balance, just set default
+            updateCashBalance(0);
+        }
+        
+        // Use existing modal instance or create new one
+        let modal = bootstrap.Modal.getInstance(document.getElementById('transactionsModal'));
+        if (!modal) {
+            modal = new bootstrap.Modal(document.getElementById('transactionsModal'), {
+                backdrop: true,
+                keyboard: true
+            });
+        }
+        modal.show();
+        
+        // Adjust table height after modal is shown and data is loaded
+        setTimeout(() => {
+            adjustTransactionsTableHeight();
+        }, 100);
+    })
+    .catch(error => {
+        console.error('Error loading transactions:', error);
+        showErrorModal('Errore di rete nel caricamento delle transazioni');
+    });
+}
+
+function populateTransactionsTable(transactions) {
+    const tbody = document.getElementById('transactionsTableBody');
+    tbody.innerHTML = '';
+    
+    transactions.forEach(transaction => {
+        const row = document.createElement('tr');
+        
+        // Format timestamp
+        const date = new Date(transaction.timestamp);
+        const formattedDate = date.toLocaleString('it-IT');
+        
+        // Transaction type badge
+        const typeBadge = transaction.transaction_type === 'credit' 
+            ? '<span class="badge bg-success">Ricarica</span>'
+            : '<span class="badge bg-danger">Acquisto</span>';
+        
+        // Amount with sign
+        const amount = transaction.transaction_type === 'credit'
+            ? `+€${Math.abs(transaction.amount).toFixed(2)}`
+            : `-€${Math.abs(transaction.amount).toFixed(2)}`;
+        
+        // Product info
+        const productInfo = transaction.product_name || transaction.custom_product_name || '-';
+        const quantity = transaction.quantity || '-';
+        
+        // Operator info
+        const operatorInfo = transaction.operator_name || 'Sistema';
+        
+        row.innerHTML = `
+            <td class="text-nowrap">${formattedDate}</td>
+            <td>${transaction.employee_name}</td>
+            <td>${typeBadge}</td>
+            <td class="${transaction.transaction_type === 'credit' ? 'text-success' : 'text-danger'}">${amount}</td>
+            <td>${productInfo}</td>
+            <td>${quantity}</td>
+            <td>${operatorInfo}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="prepareDeleteTransaction(${transaction.id})" 
+                        title="Elimina transazione">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Add search and filter event listeners
+    initializeTransactionFilters();
+    
+    // Adjust table height after data is populated
+    setTimeout(() => {
+        adjustTransactionsTableHeight();
+    }, 50);
+}
+
+function updateCashBalance(balance) {
+    const cashBalanceElement = document.getElementById('cashRegisterAmount');
+    if (cashBalanceElement) {
+        cashBalanceElement.textContent = `€ ${balance.toFixed(2)}`;
+        
+        // Update color based on balance
+        const alertElement = cashBalanceElement.closest('.alert');
+        if (alertElement) {
+            alertElement.classList.remove('alert-info', 'alert-success', 'alert-warning', 'alert-danger');
+            if (balance > 100) {
+                alertElement.classList.add('alert-success');
+            } else if (balance > 0) {
+                alertElement.classList.add('alert-info');
+            } else if (balance >= -50) {
+                alertElement.classList.add('alert-warning');
+            } else {
+                alertElement.classList.add('alert-danger');
+            }
+        }
+    }
+}
+
+let filtersInitialized = false;
+
+function initializeTransactionFilters() {
+    // Only initialize once to avoid duplicate event listeners
+    if (filtersInitialized) return;
+    
+    const searchInput = document.getElementById('transactionSearch');
+    const typeFilter = document.getElementById('transactionTypeFilter');
+    const dateFilterRadios = document.querySelectorAll('input[name="dateFilterOptions"]');
+    const dateInput = document.getElementById('transactionDateFilter');
+    
+    // Don't set any default date - let user choose
+    
+    if (searchInput) searchInput.addEventListener('input', filterTransactions);
+    if (typeFilter) typeFilter.addEventListener('change', filterTransactions);
+    
+    // Handle custom date input
+    if (dateInput) {
+        // Don't automatically refresh on date change - let user click "Filtra" button
+        dateInput.addEventListener('change', function() {
+            // Just store the selected date, don't auto-refresh
+            console.log('Data selezionata:', this.value);
+        });
+        
+        // Ensure date input is properly styled and positioned
+        dateInput.style.position = 'relative';
+        dateInput.style.zIndex = '1082';
+        dateInput.style.display = 'block';
+    }
+    
+    // Mark filters as initialized
+    filtersInitialized = true;
+}
+
+function filterTransactions() {
+    const searchTerm = document.getElementById('transactionSearch').value.toLowerCase();
+    const typeFilter = document.getElementById('transactionTypeFilter').value;
+    const rows = document.querySelectorAll('#transactionsTableBody tr');
+    
+    rows.forEach(row => {
+        const employee = row.cells[1].textContent.toLowerCase();
+        const product = row.cells[4].textContent.toLowerCase();
+        const operator = row.cells[6].textContent.toLowerCase();
+        const type = row.cells[2].textContent.includes('Ricarica') ? 'credit' : 'debit';
+        
+        const matchesSearch = employee.includes(searchTerm) || 
+                            product.includes(searchTerm) || 
+                            operator.includes(searchTerm);
+        const matchesType = !typeFilter || type === typeFilter;
+        
+        row.style.display = (matchesSearch && matchesType) ? '' : 'none';
+    });
+}
+
+function refreshTransactions() {
+    showRecentTransactions();
+}
+
+function filterTransactionsByDate() {
+    // Automatically refresh when date changes
+    if (document.getElementById('transactionsModal').classList.contains('show')) {
+        showRecentTransactions();
+    }
+}
+
+function clearDateFilter() {
+    // Clear the date input
+    document.getElementById('transactionDateFilter').value = '';
+    // Refresh transactions to show all
+    if (document.getElementById('transactionsModal').classList.contains('show')) {
+        showRecentTransactions();
+    }
+}
+
+function applyDateFilter() {
+    // Apply the date filter by refreshing transactions
+    if (document.getElementById('transactionsModal').classList.contains('show')) {
+        const dateValue = document.getElementById('transactionDateFilter').value;
+        if (dateValue) {
+            // Load transactions with date filter
+            showRecentTransactions();
+        } else {
+            showErrorModal('Seleziona una data per applicare il filtro');
+        }
+    }
+}
+
+function clearAllFilters() {
+    // Clear all filter inputs
+    document.getElementById('transactionSearch').value = '';
+    document.getElementById('transactionTypeFilter').value = '';
+    document.getElementById('transactionDateFilter').value = '';
+    
+    // Refresh transactions to show all (this will reload from server without date filter)
+    if (document.getElementById('transactionsModal').classList.contains('show')) {
+        showRecentTransactions();
+    }
+}
+
+function prepareDeleteTransaction(transactionId) {
+    // Get transaction details
+    fetch(`/api/transaction/${transactionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                transactionToDelete = data.transaction;
+                showDeleteTransactionModal(data.transaction);
+            } else {
+                showErrorModal('Errore nel caricamento dei dettagli della transazione');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading transaction details:', error);
+            showErrorModal('Errore di rete');
+        });
+}
+
+function showDeleteTransactionModal(transaction) {
+    const detailsDiv = document.getElementById('transactionDetails');
+    
+    const date = new Date(transaction.timestamp);
+    const formattedDate = date.toLocaleString('it-IT');
+    
+    const typeBadge = transaction.transaction_type === 'credit' 
+        ? '<span class="badge bg-success">Ricarica</span>'
+        : '<span class="badge bg-danger">Acquisto</span>';
+    
+    const amount = transaction.transaction_type === 'credit'
+        ? `+€${Math.abs(transaction.amount).toFixed(2)}`
+        : `-€${Math.abs(transaction.amount).toFixed(2)}`;
+    
+    const productInfo = transaction.product_name || transaction.custom_product_name || 'Nessun prodotto';
+    
+    detailsDiv.innerHTML = `
+        <div class="card-body">
+            <h6 class="card-title">Dettagli Transazione</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Data/Ora:</strong> ${formattedDate}<br>
+                    <strong>Ufficiale:</strong> ${transaction.employee_name}<br>
+                    <strong>Tipo:</strong> ${typeBadge}
+                </div>
+                <div class="col-md-6">
+                    <strong>Importo:</strong> <span class="${transaction.transaction_type === 'credit' ? 'text-success' : 'text-danger'}">${amount}</span><br>
+                    <strong>Prodotto:</strong> ${productInfo}<br>
+                    <strong>Quantità:</strong> ${transaction.quantity || '-'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Clear password field
+    document.getElementById('operatorPassword').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteTransactionModal'));
+    modal.show();
+}
+
+function confirmDeleteTransaction() {
+    const password = document.getElementById('operatorPassword').value;
+    
+    if (!password) {
+        showErrorModal('Inserisci la password operatore');
+        return;
+    }
+    
+    if (!transactionToDelete) {
+        showErrorModal('Nessuna transazione selezionata');
+        return;
+    }
+    
+    // Send delete request with password
+    fetch(`/api/delete_transaction/${transactionToDelete.id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            operator_password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close delete modal
+            bootstrap.Modal.getInstance(document.getElementById('deleteTransactionModal')).hide();
+            
+            // Show success message
+            showSuccessMessage('Transazione eliminata con successo');
+            
+            // Refresh transactions list
+            refreshTransactions();
+            
+        } else {
+            showErrorModal(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting transaction:', error);
+        showErrorModal('Errore di comunicazione con il server');
+    });
+}
+
+function showSuccessMessage(message) {
+    // Use the success modal for consistency
+    showSuccessModal(message);
+}
+
+// Employees list functionality
+function showEmployeesList() {
+    fetch('/api/employees')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateEmployeesTable(data.employees);
+                const modal = new bootstrap.Modal(document.getElementById('employeesModal'));
+                modal.show();
+            } else {
+                showErrorModal('Errore nel caricamento dei dipendenti');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading employees:', error);
+            showErrorModal('Errore di rete nel caricamento dei dipendenti');
+        });
+}
+
+function populateEmployeesTable(employeesList) {
+    const tbody = document.getElementById('employeesTableBody');
+    tbody.innerHTML = '';
+    
+    employeesList.forEach(employee => {
+        const row = document.createElement('tr');
+        
+        // Credit display with color coding
+        let creditClass = '';
+        if (employee.credit < 0) {
+            creditClass = 'text-danger';
+        } else if (employee.credit < 10) {
+            creditClass = 'text-warning';
+        } else {
+            creditClass = 'text-success';
+        }
+        
+        // Credit limit display
+        const limitDisplay = employee.credit_limit < 0 ? `${employee.credit_limit}€` : 'Nessuno';
+        
+        row.innerHTML = `
+            <td>${employee.rank.toUpperCase()}</td>
+            <td>
+                <strong>${employee.first_name.toUpperCase()} ${employee.last_name.toUpperCase()}</strong><br>
+                <small class="text-muted">Codice: ${employee.code.toUpperCase()}</small>
+            </td>
+
+            <td><code>${employee.code.toUpperCase()}</code></td>
+            <td class="text-end">
+                <span class="${creditClass}">€${employee.credit.toFixed(2)}</span>
+            </td>
+            <td class="text-end">
+                <small class="text-muted">€ -50</small>
+            </td>
+            <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="rechargeEmployeeCredit(${employee.id}, '${employee.first_name} ${employee.last_name}')" title="Ricarica credito">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Initialize search functionality
+    initializeEmployeesSearch();
+}
+
+function initializeEmployeesSearch() {
+    const searchInput = document.getElementById('employeeSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterEmployeesTable);
+    }
+}
+
+function filterEmployeesTable() {
+    const searchTerm = document.getElementById('employeeSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('#employeesTableBody tr');
+    
+    rows.forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        const rank = row.cells[1].textContent.toLowerCase();
+        const code = row.cells[2].textContent.toLowerCase();
+        
+        const matches = name.includes(searchTerm) || 
+                       rank.includes(searchTerm) || 
+                       code.includes(searchTerm);
+        
+        row.style.display = matches ? '' : 'none';
+    });
+}
+
+function refreshEmployeesList() {
+    showEmployeesList();
+}
+
+function rechargeEmployeeCredit(employeeId, employeeName) {
+    // Close employees modal first
+    bootstrap.Modal.getInstance(document.getElementById('employeesModal')).hide();
+    
+    // Find employee in the employees array
+    const employee = employees.find(emp => emp.id === employeeId);
+    if (employee) {
+        selectedEmployeeForRecharge = employee;
+        document.getElementById('selectedEmployeeInfo').innerHTML = `
+            <strong>Ufficiale selezionato:</strong><br>
+            ${employee.first_name} ${employee.last_name} (${employee.rank})<br>
+            <small>Credito attuale: €${employee.credit.toFixed(2)}</small>
+        `;
+        document.getElementById('selectedEmployeeInfo').style.display = 'block';
+        document.getElementById('rechargeAmountSection').style.display = 'block';
+        document.getElementById('processRechargeBtn').disabled = false;
+        
+        // Clear search, amount and password fields
+        document.getElementById('rechargeEmployeeSearch').value = '';
+        document.getElementById('rechargeAmount').value = '';
+        document.getElementById('rechargeOperatorPassword').value = '';
+        
+        // Show credit recharge modal
+        const modal = new bootstrap.Modal(document.getElementById('creditRechargeModal'));
+        modal.show();
+    }
+}
+
+function showNewEmployeeModal() {
+    // Close employees modal first
+    bootstrap.Modal.getInstance(document.getElementById('employeesModal')).hide();
+    
+    // Clear the form
+    document.getElementById('newEmployeeForm').reset();
+    
+    // Show new employee modal
+    const modal = new bootstrap.Modal(document.getElementById('newEmployeeModal'));
+    modal.show();
+}
+
+// Initialize new employee form functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate code button
+    const generateCodeBtn = document.getElementById('generateNewCode');
+    const newCodeInput = document.getElementById('new_code');
+    
+    if (generateCodeBtn && newCodeInput) {
+        generateCodeBtn.addEventListener('click', function() {
+            // Generate random alphanumeric code
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            newCodeInput.value = code;
+        });
+    }
+    
+    // Startup credit radio buttons functionality
+    const startupCreditRadios = document.querySelectorAll('input[name="startup_credit"]');
+    const customStartupDiv = document.getElementById('customStartupAmount');
+    const customStartupInput = document.getElementById('custom_startup_amount');
+    
+    startupCreditRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customStartupDiv.style.display = 'block';
+                customStartupInput.required = true;
+                customStartupInput.focus();
+            } else {
+                customStartupDiv.style.display = 'none';
+                customStartupInput.required = false;
+                customStartupInput.value = '';
+            }
+        });
+    });
+    
+    // Save new employee button
+    const saveNewEmployeeBtn = document.getElementById('saveNewEmployeeBtn');
+    const newEmployeeForm = document.getElementById('newEmployeeForm');
+    
+    if (saveNewEmployeeBtn && newEmployeeForm) {
+        saveNewEmployeeBtn.addEventListener('click', function() {
+            // Validation
+            const firstName = document.getElementById('new_first_name').value.trim();
+            const lastName = document.getElementById('new_last_name').value.trim();
+            const rank = document.getElementById('new_rank').value.trim();
+            const code = document.getElementById('new_code').value.trim();
+            const operatorPassword = document.getElementById('new_operator_password').value.trim();
+            
+            if (!firstName || !lastName || !rank || !code || !operatorPassword) {
+                showErrorModal('Tutti i campi obbligatori devono essere compilati');
+                return;
+            }
+            
+            if (newEmployeeForm.checkValidity()) {
+                // Disable button and show loading
+                saveNewEmployeeBtn.disabled = true;
+                saveNewEmployeeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvataggio...';
+                
+                // Prepare form data
+                const formData = new FormData(newEmployeeForm);
+                
+                // Send AJAX request
+                fetch('/admin/employee/new', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('Create employee response status:', response.status);
+                    
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    
+                    if (response.ok && contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        // Get response text for debugging
+                        return response.text().then(text => {
+                            console.error('Non-JSON response:', text.substring(0, 500));
+                            throw new Error(`Server error ${response.status}: Expected JSON response but got ${contentType}`);
+                        });
+                    }
+                })
+                .then(data => {
+                    // Re-enable button
+                    saveNewEmployeeBtn.disabled = false;
+                    saveNewEmployeeBtn.innerHTML = '<i class="fas fa-save me-1"></i> Salva Ufficiale';
+                    
+                    if (data.success) {
+                        // Success: close modal and show success message
+                        bootstrap.Modal.getInstance(document.getElementById('newEmployeeModal')).hide();
+                        showSuccessMessage(data.message || 'Ufficiale creato con successo');
+                        
+                        // Refresh employees list if it's open
+                        const employeesModal = document.getElementById('employeesModal');
+                        if (employeesModal && employeesModal.classList.contains('show')) {
+                            refreshEmployeesList();
+                        }
+                        
+                        // Clear form
+                        newEmployeeForm.reset();
+                    } else {
+                        // Error: show error modal
+                        showErrorModal(data.message || 'Errore durante la creazione dell\'ufficiale');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error creating employee:', error);
+                    
+                    // Re-enable button
+                    saveNewEmployeeBtn.disabled = false;
+                    saveNewEmployeeBtn.innerHTML = '<i class="fas fa-save me-1"></i> Salva Ufficiale';
+                    
+                    showErrorModal('Errore di comunicazione con il server');
+                });
+            } else {
+                newEmployeeForm.reportValidity();
+            }
+        });
+    }
+    
+    // Reset form when modal closes
+    document.getElementById('newEmployeeModal').addEventListener('hidden.bs.modal', function() {
+        if (newEmployeeForm) {
+            newEmployeeForm.reset();
+        }
+        
+        if (saveNewEmployeeBtn) {
+            saveNewEmployeeBtn.disabled = false;
+            saveNewEmployeeBtn.innerHTML = '<i class="fas fa-save me-1"></i> Salva Dipendente';
+        }
+    });
+});
+
+function playSound(type) {
+    try {
+        const audio = new Audio(`/static/sounds/${type}.mp3`);
+        audio.play().catch(e => console.log('Audio non disponibile'));
+    } catch (e) {
+        console.log('Audio non disponibile');
+    }
+}
+
+// Bulk restock functionality
+function showBulkRestock() {
+    fetch('/api/products')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateBulkRestockTable(data.products);
+                const modal = new bootstrap.Modal(document.getElementById('bulkRestockModal'));
+                modal.show();
+            } else {
+                showErrorModal('Errore nel caricamento dei prodotti');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading products for bulk restock:', error);
+            showErrorModal('Errore di rete nel caricamento dei prodotti');
+        });
+}
+
+function populateBulkRestockTable(products) {
+    const tbody = document.getElementById('bulkRestockTableBody');
+    tbody.innerHTML = '';
+    
+    // Initialize search functionality
+    initializeBulkRestockSearch();
+    
+    products.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center">
+                    <div>
+                        <strong>${product.name}</strong><br>
+                        <small class="text-muted">#${product.id}</small>
+                    </div>
+                </div>
+            </td>
+            <td>€ ${product.price.toFixed(2)}</td>
+            <td>
+                <span class="badge ${product.inventory > 0 ? 'bg-success' : product.inventory === 0 ? 'bg-warning text-dark' : 'bg-danger'}">
+                    ${product.inventory}
+                </span>
+            </td>
+            <td>
+                <input type="number" class="form-control restock-input" 
+                       data-product-id="${product.id}" 
+                       data-current-inventory="${product.inventory}"
+                       min="0" max="9999" value="0"
+                       onchange="updateNewInventoryDisplay(this)"
+                       onkeyup="updateNewInventoryDisplay(this)"
+                       style="width: 120px;">
+            </td>
+            <td>
+                <span class="new-inventory-display badge bg-info" data-product-id="${product.id}">
+                    ${product.inventory}
+                </span>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function updateNewInventoryDisplay(input) {
+    const productId = input.dataset.productId;
+    const currentInventory = parseInt(input.dataset.currentInventory) || 0;
+    const addQuantity = parseInt(input.value) || 0;
+    const newInventory = currentInventory + addQuantity;
+    
+    const display = document.querySelector(`span.new-inventory-display[data-product-id="${productId}"]`);
+    if (display) {
+        display.textContent = newInventory;
+        
+        // Color coding for the new inventory
+        display.className = 'new-inventory-display badge ';
+        if (addQuantity > 0) {
+            display.className += 'bg-success';
+        } else if (newInventory > 0) {
+            display.className += 'bg-info';
+        } else {
+            display.className += 'bg-warning text-dark';
+        }
+    }
+}
+
+function confirmBulkRestock() {
+    const password = document.getElementById('bulkOperatorPassword').value.trim();
+    if (!password) {
+        showErrorModal('Inserisci la password operatore');
+        return;
+    }
+    
+    // Collect restock data
+    const restockData = [];
+    const restockInputs = document.querySelectorAll('.restock-input');
+    
+    restockInputs.forEach(input => {
+        const quantity = parseInt(input.value) || 0;
+        if (quantity > 0) {
+            restockData.push({
+                product_id: input.dataset.productId,
+                quantity: quantity
+            });
+        }
+    });
+    
+    if (restockData.length === 0) {
+        showErrorModal('Inserisci almeno una quantità da ricaricare');
+        return;
+    }
+    
+    // Send bulk restock request
+    const formData = new FormData();
+    formData.append('restock_data', JSON.stringify(restockData));
+    formData.append('operator_password', password);
+    
+    const confirmBtn = document.querySelector('[onclick="confirmBulkRestock()"]');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Elaborazione...';
+    
+    fetch('/operator/bulk_restock', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Reset button
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
+        
+        if (data.success) {
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('bulkRestockModal')).hide();
+            
+            // Clear form
+            document.getElementById('bulkOperatorPassword').value = '';
+            document.querySelectorAll('.restock-input').forEach(input => {
+                input.value = 0;
+                updateNewInventoryDisplay(input);
+            });
+            
+            // Show success message
+            showSuccessMessage(data.message);
+        } else {
+            showErrorModal(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error in bulk restock:', error);
+        showErrorModal('Errore di rete durante la ricarica');
+        
+        // Reset button
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
+    });
+}
+
+function initializeBulkRestockSearch() {
+    const searchInput = document.getElementById('bulkRestockSearch');
+    const clearButton = document.getElementById('clearBulkRestockSearch');
+    
+    if (searchInput && !searchInput.hasAttribute('data-initialized')) {
+        searchInput.setAttribute('data-initialized', 'true');
+        searchInput.addEventListener('input', filterBulkRestockTable);
+        
+        if (clearButton) {
+            clearButton.addEventListener('click', function() {
+                searchInput.value = '';
+                filterBulkRestockTable();
+                searchInput.focus();
+            });
+        }
+    }
+}
+
+function filterBulkRestockTable() {
+    const searchTerm = document.getElementById('bulkRestockSearch').value.toLowerCase();
+    const tableRows = document.querySelectorAll('#bulkRestockTableBody tr');
+    
+    tableRows.forEach(row => {
+        const productName = row.cells[0].textContent.toLowerCase();
+        
+        if (searchTerm === '' || productName.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Product Management Functions for Operators
+
+function showAddProduct() {
+    // Clear form
+    document.getElementById('operatorAddProductForm').reset();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('addProductModal'));
+    modal.show();
+}
+
+function confirmAddProduct() {
+    const name = document.getElementById('newProductName').value.trim();
+    const price = parseFloat(document.getElementById('newProductPrice').value);
+    const inventory = parseInt(document.getElementById('newProductInventory').value) || 0;
+    
+    if (!name) {
+        showErrorModal('Inserisci il nome del prodotto');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        showErrorModal('Inserisci un prezzo valido');
+        return;
+    }
+    
+    // Send request to add product
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('price', price);
+    formData.append('inventory', inventory);
+    
+    fetch('/operator/add_product', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
+            
+            // Refresh inventory
+            refreshInventory();
+            
+            // Show success message
+            showSuccessModal(`Prodotto "${name}" aggiunto con successo!`);
+        } else {
+            showErrorModal('Errore: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error adding product:', error);
+        showErrorModal('Errore di rete durante l\'aggiunta del prodotto');
+    });
+}
+
+function showDeleteProduct(productId, productName) {
+    // Set product data
+    document.getElementById('deleteProductId').value = productId;
+    document.getElementById('deleteProductName').textContent = productName;
+    
+    // Clear password field
+    document.getElementById('deleteProductPassword').value = '';
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
+    modal.show();
+}
+
+function confirmDeleteProduct() {
+    const productId = document.getElementById('deleteProductId').value;
+    const productName = document.getElementById('deleteProductName').textContent;
+    const password = document.getElementById('deleteProductPassword').value;
+    
+    if (!password) {
+        showErrorModal('Inserisci la password operatore');
+        return;
+    }
+    
+    // Send request to delete product
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    formData.append('operator_password', password);
+    
+    fetch('/operator/delete_product', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('deleteProductModal')).hide();
+            
+            // Refresh inventory
+            refreshInventory();
+            
+            // Show success message
+            showSuccessModal(`Prodotto "${productName}" eliminato con successo!`);
+        } else {
+            showErrorModal('Errore: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting product:', error);
+        showErrorModal('Errore di rete durante l\'eliminazione del prodotto');
+    });
+}
+</script>
+{% endblock %}

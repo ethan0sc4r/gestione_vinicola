@@ -19,9 +19,12 @@ import time
 import io
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Optional, Dict, List, Any, Union
+
+# Configurazioni Globali
+DEFAULT_CREDIT_LIMIT = 50  # Limite di credito negativo massimo in euro (modificabile manualmente)
 
 # Configura logging
 logging.basicConfig(
@@ -61,8 +64,15 @@ import pytz
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_socketio import SocketIO, emit
 from werkzeug.security import generate_password_hash, check_password_hash
+
+# Import per emulazione tastiera (opzionale)
+try:
+    import pynput.keyboard as keyboard
+    KEYBOARD_AVAILABLE = True
+except ImportError:
+    KEYBOARD_AVAILABLE = False
+    logger.warning("pynput non disponibile - emulazione tastiera disabilitata")
 
 # Configurazione per lettore seriale
 # Incapsula in un blocco try/except per rendere opzionale pyserial
@@ -125,8 +135,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Inizializza SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
+# SocketIO rimosso per compatibilità PyInstaller - ora usa emulazione tastiera diretta
 
 # Configurazione del lettore di codici a barre seriale
 serial_port = None
@@ -475,7 +484,7 @@ def read_barcode_serial():
                             
                             # Cerca immediatamente il dipendente e invia via WebSocket
                             with app.app_context():
-                                employee = Employee.query.filter_by(code=barcode).first()
+                                employee = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(barcode)).first()
                                 
                                 if employee:
                                     # Verifica l'integrità del credito
@@ -484,27 +493,31 @@ def read_barcode_serial():
                                         db.session.commit()
                                         logger.warning(f"Credit integrity issue fixed for {employee.first_name} {employee.last_name}")
                                     
-                                    logger.info(f"📤 Invio dipendente via WebSocket: {employee.first_name} {employee.last_name}")
+                                    logger.info(f"Invio dipendente via WebSocket: {employee.first_name} {employee.last_name}")
                                     
-                                    # Invia immediatamente via WebSocket
-                                    socketio.emit('barcode_scanned', {
-                                        'success': True,
-                                        'barcode': barcode,
-                                        'timestamp': last_barcode_time,
-                                        'employee': employee.to_dict()
-                                    })
+                                    # Emula digitazione del codice invece di WebSocket
+                                    if KEYBOARD_AVAILABLE:
+                                        try:
+                                            keyboard_controller = keyboard.Controller()
+                                            keyboard_controller.type(barcode)
+                                            keyboard_controller.press(keyboard.Key.enter)
+                                            keyboard_controller.release(keyboard.Key.enter)
+                                        except Exception as e:
+                                            logger.error(f"Errore emulazione tastiera: {e}")
                                     
-                                    logger.info(f"✅ Evento barcode_scanned inviato con successo")
+                                    logger.info("Evento barcode_scanned inviato con successo")
                                 else:
-                                    logger.warning(f"❌ Dipendente non trovato per barcode: {barcode}")
+                                    logger.warning(f"Dipendente non trovato per barcode: {barcode}")
                                     
-                                    # Dipendente non trovato
-                                    socketio.emit('barcode_scanned', {
-                                        'success': False,
-                                        'message': 'Dipendente non trovato.',
-                                        'barcode': barcode,
-                                        'timestamp': last_barcode_time
-                                    })
+                                    # Dipendente non trovato - emula comunque il codice per permettere inserimento manuale
+                                    if KEYBOARD_AVAILABLE:
+                                        try:
+                                            keyboard_controller = keyboard.Controller()
+                                            keyboard_controller.type(barcode)
+                                            keyboard_controller.press(keyboard.Key.enter)
+                                            keyboard_controller.release(keyboard.Key.enter)
+                                        except Exception as e:
+                                            logger.error(f"Errore emulazione tastiera: {e}")
                                     
                                     logger.info(f"⚠️ Evento barcode_scanned (non trovato) inviato")
                         
@@ -515,10 +528,8 @@ def read_barcode_serial():
             
         except Exception as e:
             logger.error(f"Errore lettura codice a barre: {str(e)}")
-            # Invia errore via WebSocket
-            logger.info(f"📤 Invio errore scanner via WebSocket: {str(e)}")
-            socketio.emit('scanner_error', {'error': str(e)})
-            logger.info(f"🚨 Evento scanner_error inviato")
+            # Log errore scanner (non più inviato via WebSocket)
+            logger.error(f"Errore scanner: {str(e)}")
             time.sleep(1)  # Pausa più lunga in caso di errore
 
 
@@ -566,11 +577,25 @@ def get_system_stats():
     yesterday = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     recent_transactions = Transaction.query.filter(Transaction.timestamp >= yesterday).count()
     
+    # Lista dipendenti per l'interfaccia prodotti-prima (escludi cassa centrale)
+    employees = Employee.query.filter(Employee.code != 'CASSA').order_by(Employee.last_name, Employee.first_name).all()
+    employees_data = []
+    for emp in employees:
+        employees_data.append({
+            'id': emp.id,
+            'code': emp.code,
+            'first_name': emp.first_name,
+            'last_name': emp.last_name,
+            'rank': emp.rank,
+            'credit': float(emp.credit)
+        })
+    
     return {
         'total_employees': total_employees,
         'total_credit': float(total_credit),
         'total_transactions': total_transactions,
-        'recent_transactions': recent_transactions
+        'recent_transactions': recent_transactions,
+        'employees': employees_data
     }
 
 
@@ -704,7 +729,7 @@ def process_employee_row(row):
     code = str(row['Code'])
     
     # Cerca l'impiegato esistente
-    existing_employee = Employee.query.filter_by(code=code).first()
+    existing_employee = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(code)).first()
     
     if existing_employee:
         # Aggiorna l'impiegato esistente
@@ -781,11 +806,9 @@ def reset_all_credit_hashes():
 @app.route('/')
 def index():
     """
-    Pagina principale che mostra direttamente lo scanner di codici a barre.
-    Non è necessario alcun login per utilizzare il sistema base.
+    Pagina principale - reindirizza sempre all'interfaccia prodotti-prima.
     """
-    # Reindirizza direttamente alla pagina dello scanner
-    return redirect(url_for('barcode_scanner'))
+    return redirect(url_for('products_first'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -841,7 +864,7 @@ def new_employee():
         password = request.form.get('password')
         
         # Verifica se il codice è già esistente
-        existing_employee = Employee.query.filter_by(code=code).first()
+        existing_employee = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(code)).first()
         if existing_employee:
             flash('Il codice dipendente esiste già.')
             return redirect(url_for('new_employee'))
@@ -1004,10 +1027,10 @@ def add_credit():
                 custom_product_name="Ricarica credito"
             )
             
-            # Aggiorna anche il saldo della cassa
+            # Aggiorna anche il saldo della cassa (sottrai perché il contante esce dalla cassa)
             cash_register = Employee.query.filter_by(code='CASSA').first()
             if cash_register:
-                cash_register.update_credit(cash_register.credit + amount_decimal)
+                cash_register.update_credit(cash_register.credit - amount_decimal)
             
             db.session.add(transaction)
             db.session.commit()
@@ -1024,6 +1047,24 @@ def add_credit():
                 'success': False,
                 'message': f'Errore: {str(e)}'
             })
+
+@app.route('/products_first')
+def products_first():
+    """Interfaccia prodotti-prima: selezione prodotti e poi identificazione utente."""
+    products = Product.query.filter_by(active=True).all()
+    return render_template('products_first.html', products=products)
+
+
+@app.route('/toggle_interface', methods=['POST'])
+def toggle_interface():
+    """Cambia interfaccia utente."""
+    interface_type = request.form.get('interface_type', 'barcode_scanner')
+    
+    if interface_type == 'products_first':
+        return redirect(url_for('products_first'))
+    else:
+        return redirect(url_for('barcode_scanner'))
+
 
 @app.route('/barcode_scanner')
 def barcode_scanner():
@@ -1058,7 +1099,7 @@ def get_serial_barcode():
     
     if last_barcode:
         # Se è stato letto un codice, cerca il dipendente
-        employee = Employee.query.filter_by(code=last_barcode['barcode']).first()
+        employee = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(last_barcode['barcode'])).first()
         
         if employee:
             # Verifica l'integrità del credito
@@ -1103,7 +1144,7 @@ def scan_barcode():
     if employee_id:
         employee = Employee.query.get(employee_id)
     elif barcode:
-        employee = Employee.query.filter_by(code=barcode).first()
+        employee = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(barcode)).first()
     else:
         return jsonify({'success': False, 'message': 'Nessun codice o ID dipendente fornito.'})
     
@@ -1241,15 +1282,16 @@ def deduct_credit():
                 'credit_limit': credit_limit
             })
         
-        # Aggiorna il credito
-        new_credit = employee.credit - total_amount
-        employee.update_credit(new_credit)
-        
-        # Se l'acquisto è stato fatto dall'utente "cassa", aggiorna il saldo della cassa
+        # Se l'acquisto è stato fatto dall'utente "cassa", gestisci diversamente
         if employee.code == 'CASSA':
-            # Aggiungi l'importo alla cassa (l'importo è già negativo, quindi lo sottraiamo)
-            cash_register = ensure_cash_register_exists()
-            cash_register.update_credit(cash_register.credit + total_amount)
+            # Per i pagamenti in contanti, aggiungi solo l'importo alla cassa
+            # (non sottrarre perché i soldi entrano fisicamente in cassa)
+            new_credit = employee.credit + total_amount
+            employee.update_credit(new_credit)
+        else:
+            # Per i dipendenti normali, sottrai dal loro credito
+            new_credit = employee.credit - total_amount
+            employee.update_credit(new_credit)
         
         db.session.commit()
             
@@ -1643,6 +1685,106 @@ def admin_delete_product(id):
     # torna alla lista prodotti
     return redirect(url_for('admin_products')) 
 
+def get_product_logs_for_period(start_date, end_date):
+    """Estrae i log delle operazioni sui prodotti per il periodo specificato."""
+    import os
+    import re
+    from datetime import datetime
+    
+    product_logs = []
+    
+    # Try multiple possible log file locations
+    possible_log_paths = ['vinicola.log', 'app.log', 'logs/app.log', './app.log']
+    log_file_path = None
+    
+    for path in possible_log_paths:
+        if os.path.exists(path):
+            log_file_path = path
+            break
+    
+    if not log_file_path:
+        logger.warning(f"No log file found in paths: {possible_log_paths}")
+        return product_logs
+    
+    logger.info(f"Reading product logs from: {log_file_path}")
+    
+    try:
+        total_lines = 0
+        product_log_lines = 0
+        parsed_logs = 0
+        
+        with open(log_file_path, 'r', encoding='utf-8', errors='replace') as f:
+            for line in f:
+                total_lines += 1
+                # Look for PRODUCT_LOG entries (exclude DEBUG lines and TEST entries)
+                if 'PRODUCT_LOG|' in line and 'DEBUG:' not in line and 'PRODUCT_LOG|TEST|' not in line:
+                    product_log_lines += 1
+                    try:
+                        # Parse log line: PRODUCT_LOG|ACTION|ID|NAME|PRICE|INVENTORY|USER|TIMESTAMP|EXTRA
+                        # Example: 2023-12-01 10:30:00 - app - INFO - PRODUCT_LOG|ADD|1|Prodotto Test|€10.50|5|OPERATOR|2023-12-01 10:30:00
+                        
+                        # Extract timestamp from the beginning of log line (logger timestamp)
+                        timestamp_match = re.search(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+                        if not timestamp_match:
+                            logger.debug(f"No timestamp found in line: {line[:100]}")
+                            continue
+                            
+                        try:
+                            log_timestamp = datetime.strptime(timestamp_match.group(1), '%Y-%m-%d %H:%M:%S')
+                        except ValueError:
+                            logger.debug(f"Could not parse timestamp: {timestamp_match.group(1)}")
+                            continue
+                        
+                        # Check if log is in the specified period
+                        start_check = start_date.replace(tzinfo=None)
+                        end_check = end_date.replace(tzinfo=None)
+                        
+                        logger.debug(f"Checking timestamp {log_timestamp} against range {start_check} to {end_check}")
+                        
+                        if start_check <= log_timestamp <= end_check:
+                            # Extract PRODUCT_LOG data
+                            # Format: PRODUCT_LOG|ACTION|ID|NAME|PRICE|INVENTORY|USER|TIMESTAMP|EXTRA_INFO
+                            product_log_match = re.search(r'PRODUCT_LOG\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)(?:\|(.+))?', line)
+                            if product_log_match:
+                                action = product_log_match.group(1)
+                                product_id = product_log_match.group(2)
+                                product_name = product_log_match.group(3)
+                                price = product_log_match.group(4)
+                                inventory_info = product_log_match.group(5)
+                                user = product_log_match.group(6)
+                                operation_timestamp = product_log_match.group(7)
+                                extra_info = product_log_match.group(8) if product_log_match.group(8) else ""
+                                
+                                logger.debug(f"Parsed PRODUCT_LOG: action={action}, id={product_id}, name={product_name}")
+                                
+                                product_logs.append({
+                                    'timestamp': log_timestamp,
+                                    'action': action,
+                                    'product_id': product_id,
+                                    'product_name': product_name,
+                                    'price': price,
+                                    'inventory_info': inventory_info,
+                                    'user': user,
+                                    'extra_info': extra_info
+                                })
+                                parsed_logs += 1
+                            else:
+                                logger.debug(f"Could not parse PRODUCT_LOG line: {line[:100]}")
+                    except Exception as e:
+                        logger.error(f"Error parsing product log line: {e}")
+                        continue
+        
+        logger.info(f"Log parsing summary: {total_lines} total lines, {product_log_lines} PRODUCT_LOG lines, {parsed_logs} parsed logs, {len(product_logs)} logs in period")
+        logger.info(f"Date range filter: {start_date.replace(tzinfo=None)} to {end_date.replace(tzinfo=None)}")
+        
+    except Exception as e:
+        logger.error(f"Error reading product logs: {e}")
+    
+    # Sort by timestamp (newest first)
+    product_logs.sort(key=lambda x: x['timestamp'], reverse=True)
+    return product_logs
+
+
 @app.route('/admin/reports')
 def admin_reports():
     """Reports giornalieri o per periodo per l'amministratore."""
@@ -1797,12 +1939,33 @@ def admin_reports():
                     product_total_quantity += quantity
                     product_total_amount += float(abs(t.amount))
         
+        # Get product operation logs
+        product_logs = get_product_logs_for_period(start_date_utc, end_date_utc)
+        
+        # If no logs found, create some test data for debugging
+        if not product_logs:
+            logger.info("No product logs found, creating test data")
+            test_log_timestamp = datetime.now()
+            product_logs = [
+                {
+                    'timestamp': test_log_timestamp,
+                    'action': 'ADD',
+                    'product_id': '999',
+                    'product_name': 'Prodotto Test (DEBUG)',
+                    'price': '€10.50',
+                    'inventory_info': '5',
+                    'user': 'OPERATOR',
+                    'extra_info': 'Log di test per debug'
+                }
+            ]
+        
         return render_template(
             'admin_reports.html',
             transactions=transaction_data,
             report_date=report_date,
             report_title=report_title,
             is_period_report=bool(start_date_str and end_date_str),
+            product_logs=product_logs,
             start_date=start_date if start_date_str else None,
             end_date=end_date if end_date_str else None,
             credit_sum=float(credit_sum),
@@ -1837,8 +2000,33 @@ def admin_regenerate_passwords():
 @app.route('/admin/employee/new', methods=['GET', 'POST'])
 def admin_new_employee():
     """Crea un nuovo dipendente."""
-    if session.get('admin_logged_in') != True:
-        return redirect(url_for('admin_login'))
+    logger.info(f"admin_new_employee called with method: {request.method}")
+    
+    # Per richieste AJAX da products_first, controlliamo la password operatore invece del login admin
+    if request.method == 'POST':
+        redirect_to = request.form.get('redirect_to', '')
+        operator_password = request.form.get('operator_password')
+        is_ajax = redirect_to == 'products_first'
+        
+        logger.info(f"POST request - redirect_to: {redirect_to}, has_password: {bool(operator_password)}, is_ajax: {is_ajax}")
+        
+        # Se è una richiesta AJAX con password operatore, verifica l'operatore
+        if is_ajax and operator_password:
+            operator = Operator.query.filter_by(password=operator_password, active=True).first()
+            if not operator:
+                return jsonify({
+                    'success': False,
+                    'message': 'Password operatore non valida. Verifica la password e riprova.'
+                })
+            # Operatore verificato, procedi senza controllo admin
+        else:
+            # Per altre richieste, richiedi login admin
+            if session.get('admin_logged_in') != True:
+                return redirect(url_for('admin_login'))
+    else:
+        # Per GET requests, richiedi sempre login admin
+        if session.get('admin_logged_in') != True:
+            return redirect(url_for('admin_login'))
     
     if request.method == 'POST':
         code = request.form.get('code')
@@ -1849,15 +2037,24 @@ def admin_new_employee():
         operator_password = request.form.get('operator_password')
         redirect_to = request.form.get('redirect_to', '')
         
+        # Determina se è una richiesta AJAX da products_first
+        is_ajax = redirect_to == 'products_first'
+        
         try:
             # Verifica che tutti i campi obbligatori siano presenti
             if not all([code, first_name, last_name, rank]):
-                flash('Tutti i campi obbligatori devono essere compilati.', 'danger')
-                if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
-                    return redirect(url_for('barcode_scanner'))
-                return redirect(url_for('admin_new_employee'))
+                if is_ajax:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Tutti i campi obbligatori devono essere compilati.'
+                    })
+                else:
+                    flash('Tutti i campi obbligatori devono essere compilati.', 'danger')
+                    if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                        return redirect(url_for('barcode_scanner'))
+                    return redirect(url_for('admin_new_employee'))
             
-            # Se viene dalla pagina barcode_scanner, verifica la password operatore
+            # Per barcode_scanner (non AJAX), verifica ancora la password operatore
             if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
                 if not operator_password:
                     flash('Password operatore richiesta per aggiungere un nuovo dipendente.', 'danger')
@@ -1870,13 +2067,34 @@ def admin_new_employee():
                     return redirect(url_for('barcode_scanner'))
             
             # Controlla se il codice già esiste
-            existing = Employee.query.filter_by(code=code).first()
+            existing = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(code)).first()
             if existing:
-                flash('Esiste già un dipendente con questo codice.', 'danger')
-                # Determina dove reindirizzare in caso di errore
-                if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
-                    return redirect(url_for('barcode_scanner'))
-                return redirect(url_for('admin_new_employee'))
+                if is_ajax:
+                    return jsonify({
+                        'success': False,
+                        'message': f'Esiste già un dipendente con il codice "{code}". Scegli un codice diverso.'
+                    })
+                else:
+                    flash('Esiste già un dipendente con questo codice.', 'danger')
+                    # Determina dove reindirizzare in caso di errore
+                    if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                        return redirect(url_for('barcode_scanner'))
+                    return redirect(url_for('admin_new_employee'))
+            
+            # Gestisci il credito iniziale
+            startup_credit_value = 0
+            startup_credit = request.form.get('startup_credit', '0')
+            if startup_credit == 'custom':
+                custom_amount = request.form.get('custom_startup_amount', '0')
+                try:
+                    startup_credit_value = Decimal(custom_amount)
+                except (ValueError, TypeError):
+                    startup_credit_value = 0
+            else:
+                try:
+                    startup_credit_value = Decimal(startup_credit)
+                except (ValueError, TypeError):
+                    startup_credit_value = 0
             
             # Crea il nuovo dipendente
             employee = Employee(
@@ -1884,28 +2102,56 @@ def admin_new_employee():
                 first_name=first_name,
                 last_name=last_name,
                 rank=rank,
-                credit=0,
+                credit=startup_credit_value,
                 credit_limit=Decimal(credit_limit)
             )
             employee.update_credit_hash()
             
             db.session.add(employee)
+            
+            # Se c'è un credito iniziale maggiore di 0, crea una transazione di ricarica
+            if startup_credit_value > 0:
+                transaction = Transaction(
+                    employee_id=employee.id,
+                    transaction_type='credit',
+                    amount=startup_credit_value,
+                    operator_id=operator.id if 'operator' in locals() else None,
+                    custom_product_name="Credito iniziale alla creazione dipendente"
+                )
+                db.session.add(transaction)
+            
             db.session.commit()
             
-            flash('Dipendente aggiunto con successo.', 'success')
-            
-            # Determina dove reindirizzare dopo il successo
-            if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
-                return redirect(url_for('barcode_scanner'))
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': f'Dipendente "{first_name} {last_name}" aggiunto con successo.'
+                })
             else:
-                return redirect(url_for('admin_employees'))
+                flash('Dipendente aggiunto con successo.', 'success')
+                
+                # Determina dove reindirizzare dopo il successo
+                if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                    return redirect(url_for('barcode_scanner'))
+                elif redirect_to == 'products_first' or (request.referrer and 'products_first' in request.referrer):
+                    return redirect(url_for('products_first'))
+                else:
+                    return redirect(url_for('admin_employees'))
             
         except Exception as e:
-            flash(f'Errore: {str(e)}', 'danger')
-            # Determina dove reindirizzare in caso di errore
-            if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
-                return redirect(url_for('barcode_scanner'))
-            return redirect(url_for('admin_new_employee'))
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': f'Errore durante la creazione del dipendente: {str(e)}'
+                })
+            else:
+                flash(f'Errore: {str(e)}', 'danger')
+                # Determina dove reindirizzare in caso di errore
+                if redirect_to == 'barcode_scanner' or (request.referrer and 'barcode_scanner' in request.referrer):
+                    return redirect(url_for('barcode_scanner'))
+                elif redirect_to == 'products_first' or (request.referrer and 'products_first' in request.referrer):
+                    return redirect(url_for('products_first'))
+                return redirect(url_for('admin_new_employee'))
     
     # In caso di GET request, mostra il form
     return render_template('admin_new_employee.html')
@@ -2102,7 +2348,11 @@ def admin_restock_product(id):
             })
         
         # Aggiorna la giacenza
+        old_inventory = product.inventory
         product.inventory += quantity
+        
+        # Log the inventory change
+        logger.info(f"PRODUCT_LOG|RESTOCK|{product.id}|{product.name}|€{product.price}|{old_inventory}→{product.inventory}|ADMIN|{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}|ADDED:{quantity}")
         
         db.session.commit()
         
@@ -2124,7 +2374,337 @@ def admin_restock_product(id):
             'message': f'Errore: {str(e)}'
         })
 
+
+@app.route('/admin/bulk_restock', methods=['POST'])
+def admin_bulk_restock():
+    """Ricarica giacenze multiple (admin - senza password operatore)."""
+    if session.get('admin_logged_in') != True:
+        return redirect(url_for('admin_login'))
     
+    try:
+        restock_data_json = request.form.get('restock_data')
+        
+        if not restock_data_json:
+            return jsonify({
+                'success': False,
+                'message': 'Dati di ricarica richiesti.'
+            })
+        
+        # Parse restock data
+        try:
+            restock_data = json.loads(restock_data_json)
+        except json.JSONDecodeError:
+            return jsonify({
+                'success': False,
+                'message': 'Formato dati non valido.'
+            })
+        
+        if not restock_data or len(restock_data) == 0:
+            return jsonify({
+                'success': False,
+                'message': 'Nessun prodotto selezionato per la ricarica.'
+            })
+        
+        # Process each restock item
+        updated_products = []
+        total_items_added = 0
+        
+        for item in restock_data:
+            product_id = item.get('product_id')
+            quantity = item.get('quantity', 0)
+            
+            if not product_id or quantity <= 0:
+                continue
+                
+            product = Product.query.get(product_id)
+            if not product:
+                continue
+                
+            old_inventory = product.inventory
+            product.inventory += quantity
+            total_items_added += quantity
+            
+            # Log each product restock in bulk operation (admin)
+            logger.info(f"PRODUCT_LOG|ADMIN_BULK_RESTOCK|{product.id}|{product.name}|€{product.price}|{old_inventory}→{product.inventory}|ADMIN|{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}|ADDED:{quantity}")
+            
+            updated_products.append({
+                'name': product.name,
+                'old_inventory': old_inventory,
+                'added': quantity,
+                'new_inventory': product.inventory
+            })
+        
+        if not updated_products:
+            return jsonify({
+                'success': False,
+                'message': 'Nessun prodotto valido trovato per la ricarica.'
+            })
+        
+        # Save changes
+        db.session.commit()
+        
+        # Create success message
+        products_summary = ', '.join([f"{p['name']} (+{p['added']})" for p in updated_products[:5]])
+        if len(updated_products) > 5:
+            products_summary += f" e altri {len(updated_products) - 5} prodotti"
+        
+        message = f"Ricarica completata con successo! Aggiornati {len(updated_products)} prodotti: {products_summary}. Totale articoli aggiunti: {total_items_added}"
+        
+        return jsonify({
+            'success': True,
+            'message': message,
+            'updated_products': updated_products
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in admin_bulk_restock: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante la ricarica: {str(e)}'
+        })
+
+
+@app.route('/operator/bulk_restock', methods=['POST'])
+def operator_bulk_restock():
+    """Ricarica giacenze multiple per operatori con verifica password."""
+    try:
+        restock_data_json = request.form.get('restock_data')
+        operator_password = request.form.get('operator_password')
+        
+        if not restock_data_json or not operator_password:
+            return jsonify({
+                'success': False,
+                'message': 'Dati di ricarica e password operatore richiesti.'
+            })
+        
+        # Verifica password operatore
+        operator = Operator.query.filter_by(password=operator_password, active=True).first()
+        if not operator:
+            return jsonify({
+                'success': False,
+                'message': 'Password operatore non valida.'
+            })
+        
+        # Parse restock data
+        try:
+            restock_data = json.loads(restock_data_json)
+        except json.JSONDecodeError:
+            return jsonify({
+                'success': False,
+                'message': 'Formato dati non valido.'
+            })
+        
+        if not restock_data or len(restock_data) == 0:
+            return jsonify({
+                'success': False,
+                'message': 'Nessun prodotto selezionato per la ricarica.'
+            })
+        
+        # Process each restock item
+        updated_products = []
+        total_items_added = 0
+        
+        for item in restock_data:
+            product_id = item.get('product_id')
+            quantity = item.get('quantity', 0)
+            
+            if not product_id or quantity <= 0:
+                continue
+                
+            product = Product.query.get(product_id)
+            if not product:
+                continue
+                
+            old_inventory = product.inventory
+            product.inventory += quantity
+            total_items_added += quantity
+            
+            # Log each product restock in bulk operation
+            logger.info(f"PRODUCT_LOG|BULK_RESTOCK|{product.id}|{product.name}|€{product.price}|{old_inventory}→{product.inventory}|{operator.username}|{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}|ADDED:{quantity}")
+            
+            updated_products.append({
+                'name': product.name,
+                'old_inventory': old_inventory,
+                'added': quantity,
+                'new_inventory': product.inventory
+            })
+        
+        if not updated_products:
+            return jsonify({
+                'success': False,
+                'message': 'Nessun prodotto valido trovato per la ricarica.'
+            })
+        
+        # Save changes
+        db.session.commit()
+        
+        # Create success message
+        products_summary = ', '.join([f"{p['name']} (+{p['added']})" for p in updated_products[:5]])
+        if len(updated_products) > 5:
+            products_summary += f" e altri {len(updated_products) - 5} prodotti"
+        
+        message = f"Ricarica completata con successo! Aggiornati {len(updated_products)} prodotti: {products_summary}. Totale articoli aggiunti: {total_items_added}"
+        
+        return jsonify({
+            'success': True,
+            'message': message,
+            'updated_products': updated_products
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in operator_bulk_restock: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante la ricarica: {str(e)}'
+        })
+
+
+@app.route('/operator/add_product', methods=['POST'])
+def operator_add_product():
+    """Aggiunge un nuovo prodotto senza password operatore."""
+    try:
+        name = request.form.get('name', '').strip()
+        price = request.form.get('price')
+        inventory = request.form.get('inventory', '0')
+        
+        if not name:
+            return jsonify({
+                'success': False,
+                'message': 'Nome prodotto richiesto.'
+            })
+        
+        if not price:
+            return jsonify({
+                'success': False,
+                'message': 'Prezzo richiesto.'
+            })
+        
+        try:
+            price = Decimal(str(price))
+            inventory = int(inventory)
+        except (ValueError, TypeError):
+            return jsonify({
+                'success': False,
+                'message': 'Prezzo o giacenza non validi.'
+            })
+        
+        if price <= 0:
+            return jsonify({
+                'success': False,
+                'message': 'Il prezzo deve essere maggiore di zero.'
+            })
+        
+        # Check if product with same name already exists
+        existing_product = Product.query.filter_by(name=name).first()
+        if existing_product:
+            return jsonify({
+                'success': False,
+                'message': f'Esiste già un prodotto con nome "{name}".'
+            })
+        
+        # Create new product
+        new_product = Product(
+            name=name,
+            price=price,
+            inventory=inventory,
+            active=True
+        )
+        
+        db.session.add(new_product)
+        db.session.commit()
+        
+        # Log the action with structured format for admin reports
+        try:
+            safe_name = str(name).replace('|', '_') if name else 'Unknown'
+            log_entry = f"PRODUCT_LOG|ADD|{new_product.id}|{safe_name}|€{price}|{inventory}|OPERATOR|{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            logger.info(log_entry)
+            logger.info(f"DEBUG: Created add product log: {log_entry}")
+        except Exception as e:
+            logger.error(f"Error creating add product log: {e}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Prodotto "{name}" aggiunto con successo.',
+            'product_id': new_product.id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in operator_add_product: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante l\'aggiunta del prodotto: {str(e)}'
+        })
+
+
+@app.route('/operator/delete_product', methods=['POST'])
+def operator_delete_product():
+    """Elimina un prodotto con verifica password operatore e logging admin."""
+    try:
+        product_id = request.form.get('product_id')
+        operator_password = request.form.get('operator_password')
+        
+        if not product_id or not operator_password:
+            return jsonify({
+                'success': False,
+                'message': 'ID prodotto e password operatore richiesti.'
+            })
+        
+        # Verify operator password
+        operator = Operator.query.filter_by(password=operator_password, active=True).first()
+        if not operator:
+            return jsonify({
+                'success': False,
+                'message': 'Password operatore non valida.'
+            })
+        
+        # Find product
+        product = Product.query.get(product_id)
+        if not product:
+            return jsonify({
+                'success': False,
+                'message': 'Prodotto non trovato.'
+            })
+        
+        # Store product info for logging
+        product_name = product.name
+        product_price = product.price
+        product_inventory = product.inventory
+        
+        # Check if product has been used in transactions
+        transaction_count = Transaction.query.filter_by(product_id=product_id).count()
+        
+        # Delete the product
+        db.session.delete(product)
+        db.session.commit()
+        
+        # Log the action for admin with structured format
+        try:
+            safe_name = str(product_name).replace('|', '_') if product_name else 'Unknown'
+            safe_username = str(operator.username).replace('|', '_') if operator.username else 'Unknown'
+            log_entry = f"PRODUCT_LOG|DELETE|{product_id}|{safe_name}|€{product_price}|{product_inventory}|{safe_username}|{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}|TRANSACTIONS:{transaction_count}"
+            logger.warning(log_entry)
+            logger.info(f"DEBUG: Created delete product log: {log_entry}")
+        except Exception as e:
+            logger.error(f"Error creating delete product log: {e}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Prodotto "{product_name}" eliminato con successo.',
+            'transaction_count': transaction_count
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in operator_delete_product: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Errore durante l\'eliminazione del prodotto: {str(e)}'
+        })
+
+
 @app.route('/admin/logout')
 def admin_logout():
     """Gestisce il logout dell'amministratore."""
@@ -2132,7 +2712,7 @@ def admin_logout():
     session.pop('admin_id', None)
     session.pop('admin_username', None)
     session.pop('is_super_admin', None)
-    return redirect(url_for('barcode_scanner'))
+    return redirect(url_for('products_first'))
 
 @app.route('/import_export')
 @login_required
@@ -2290,10 +2870,315 @@ def reset_all_hashes():
 
 
 @app.route('/api/system_stats')
-@login_required
 def api_system_stats():
     """API per ottenere statistiche del sistema."""
     return jsonify(get_system_stats())
+
+
+@app.route('/api/employee/<employee_code>')
+def api_get_employee_by_code(employee_code):
+    """API per ottenere dipendente tramite codice."""
+    try:
+        employee = Employee.query.filter(db.func.upper(Employee.code) == db.func.upper(employee_code)).first()
+        if employee:
+            return jsonify({
+                'success': True,
+                'employee': {
+                    'id': employee.id,
+                    'code': employee.code,
+                    'first_name': employee.first_name,
+                    'last_name': employee.last_name,
+                    'rank': employee.rank,
+                    'credit': float(employee.credit)
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Dipendente con codice "{employee_code}" non trovato.'
+            }), 404
+    except Exception as e:
+        logger.error(f"Errore ricerca dipendente per codice {employee_code}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore interno: {str(e)}'
+        }), 500
+
+
+@app.route('/api/products')
+def api_products():
+    """API per ottenere l'elenco prodotti con inventario."""
+    try:
+        products = Product.query.filter_by(active=True).order_by(Product.id).all()
+        products_data = []
+        
+        for product in products:
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'inventory': product.inventory if product.inventory is not None else 0,
+                'price': float(product.price)
+            })
+        
+        return jsonify({
+            'success': True,
+            'products': products_data
+        })
+    except Exception as e:
+        logger.error(f"Errore API prodotti: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore interno: {str(e)}'
+        }), 500
+
+
+@app.route('/api/cash_balance')
+def api_cash_balance():
+    """API endpoint per ottenere il saldo della cassa"""
+    try:
+        cash_register = Employee.query.filter_by(code='CASSA').first()
+        cash_balance = float(cash_register.credit) if cash_register else 0.0
+        
+        return jsonify({
+            'success': True,
+            'cash_balance': cash_balance
+        })
+    except Exception as e:
+        logger.error(f"Error getting cash balance: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Errore nel recupero del saldo cassa'
+        }), 500
+
+
+@app.route('/api/recent_transactions')
+def api_recent_transactions():
+    """API per ottenere le ultime transazioni con filtro data."""
+    try:
+        # Get date filter parameters
+        date_filter = request.args.get('date_filter', 'today')
+        custom_date = request.args.get('custom_date', '')
+        
+        # Build base query
+        query = db.session.query(Transaction)\
+            .join(Employee)\
+            .outerjoin(Operator)\
+            .outerjoin(Product)
+        
+        # Apply date filtering
+        if date_filter == 'today':
+            today = datetime.now().date()
+            query = query.filter(db.func.date(Transaction.timestamp) == today)
+        elif date_filter == 'yesterday':
+            yesterday = (datetime.now() - timedelta(days=1)).date()
+            query = query.filter(db.func.date(Transaction.timestamp) == yesterday)
+        elif date_filter == 'week':
+            week_ago = datetime.now() - timedelta(days=7)
+            query = query.filter(Transaction.timestamp >= week_ago)
+        elif date_filter == 'month':
+            month_ago = datetime.now() - timedelta(days=30)
+            query = query.filter(Transaction.timestamp >= month_ago)
+        elif date_filter == 'custom' and custom_date:
+            try:
+                filter_date = datetime.strptime(custom_date, '%Y-%m-%d').date()
+                logger.info(f"Filtering transactions for date: {filter_date}")
+                query = query.filter(db.func.date(Transaction.timestamp) == filter_date)
+            except ValueError as e:
+                logger.error(f"Invalid date format '{custom_date}': {e}")
+                # Invalid date format, fall back to today
+                today = datetime.now().date()
+                query = query.filter(db.func.date(Transaction.timestamp) == today)
+        # 'all' means no date filter
+        
+        transactions = query.order_by(Transaction.timestamp.desc()).limit(500).all()
+        logger.info(f"Found {len(transactions)} transactions for filter: {date_filter}, custom_date: {custom_date}")
+        
+        transactions_data = []
+        for transaction in transactions:
+            transactions_data.append({
+                'id': transaction.id,
+                'timestamp': transaction.timestamp.isoformat(),
+                'employee_name': f"{transaction.employee.first_name} {transaction.employee.last_name}",
+                'transaction_type': transaction.transaction_type,
+                'amount': float(transaction.amount),
+                'product_name': transaction.product.name if transaction.product else None,
+                'custom_product_name': transaction.custom_product_name,
+                'quantity': transaction.quantity,
+                'operator_name': transaction.operator.username if transaction.operator else None
+            })
+        
+        return jsonify({
+            'success': True,
+            'transactions': transactions_data
+        })
+    except Exception as e:
+        logger.error(f"Errore API transazioni recenti: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore interno: {str(e)}'
+        }), 500
+
+
+@app.route('/api/transaction/<int:transaction_id>')
+def api_get_transaction(transaction_id):
+    """API per ottenere dettagli di una specifica transazione."""
+    try:
+        transaction = db.session.query(Transaction)\
+            .join(Employee)\
+            .outerjoin(Operator)\
+            .outerjoin(Product)\
+            .filter(Transaction.id == transaction_id)\
+            .first()
+        
+        if not transaction:
+            return jsonify({
+                'success': False,
+                'message': 'Transazione non trovata'
+            }), 404
+        
+        transaction_data = {
+            'id': transaction.id,
+            'timestamp': transaction.timestamp.isoformat(),
+            'employee_name': f"{transaction.employee.first_name} {transaction.employee.last_name}",
+            'employee_id': transaction.employee.id,
+            'transaction_type': transaction.transaction_type,
+            'amount': float(transaction.amount),
+            'product_name': transaction.product.name if transaction.product else None,
+            'product_id': transaction.product.id if transaction.product else None,
+            'custom_product_name': transaction.custom_product_name,
+            'quantity': transaction.quantity,
+            'operator_name': transaction.operator.username if transaction.operator else None
+        }
+        
+        return jsonify({
+            'success': True,
+            'transaction': transaction_data
+        })
+    except Exception as e:
+        logger.error(f"Errore API dettagli transazione {transaction_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore interno: {str(e)}'
+        }), 500
+
+
+@app.route('/api/delete_transaction/<int:transaction_id>', methods=['POST'])
+def api_delete_transaction(transaction_id):
+    """API per eliminare una transazione con autenticazione operatore."""
+    try:
+        data = request.get_json()
+        operator_password = data.get('operator_password')
+        
+        if not operator_password:
+            return jsonify({
+                'success': False,
+                'message': 'Password operatore richiesta'
+            }), 400
+        
+        # Verifica password operatore
+        operator = Operator.query.filter_by(password=operator_password).first()
+        if not operator:
+            return jsonify({
+                'success': False,
+                'message': 'Password operatore non valida'
+            }), 401
+        
+        # Ottieni la transazione
+        transaction = Transaction.query.get(transaction_id)
+        if not transaction:
+            return jsonify({
+                'success': False,
+                'message': 'Transazione non trovata'
+            }), 404
+        
+        # Ottieni il dipendente
+        employee = Employee.query.get(transaction.employee_id)
+        if not employee:
+            return jsonify({
+                'success': False,
+                'message': 'Dipendente non trovato'
+            }), 404
+        
+        # Ripristina il credito del dipendente
+        if transaction.transaction_type == 'credit':
+            # Era una ricarica, sottrai l'importo
+            employee.credit -= transaction.amount
+        else:
+            # Era un acquisto, aggiungi l'importo
+            employee.credit += abs(transaction.amount)
+        
+        # Ripristina l'inventario del prodotto se applicabile
+        if transaction.product_id and transaction.quantity:
+            product = Product.query.get(transaction.product_id)
+            if product and product.inventory is not None:
+                if transaction.transaction_type == 'debit':
+                    # Era un acquisto, ripristina l'inventario
+                    product.inventory += transaction.quantity
+        
+        # Ricalcola l'hash di integrità
+        employee.update_credit_hash()
+        
+        # Registra l'eliminazione come transazione di annullamento per i report
+        cancellation_transaction = Transaction(
+            employee_id=employee.id,
+            operator_id=operator.id,
+            amount=0,  # Importo neutro per l'annullamento
+            transaction_type='cancellation',
+            custom_product_name=f"Annullamento transazione ID {transaction.id}"
+        )
+        db.session.add(cancellation_transaction)
+        
+        # Elimina la transazione originale
+        db.session.delete(transaction)
+        
+        # Salva le modifiche
+        db.session.commit()
+        
+        logger.info(f"Transazione {transaction_id} eliminata dall'operatore {operator.username}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Transazione eliminata con successo',
+            'new_credit': float(employee.credit)
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Errore eliminazione transazione {transaction_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore interno: {str(e)}'
+        }), 500
+
+
+@app.route('/api/employees')
+def api_employees():
+    """API per ottenere l'elenco completo dei dipendenti."""
+    try:
+        employees = Employee.query.filter(Employee.code != 'CASSA').order_by(Employee.last_name, Employee.first_name).all()
+        employees_data = []
+        
+        for employee in employees:
+            employees_data.append({
+                'id': employee.id,
+                'first_name': employee.first_name,
+                'last_name': employee.last_name,
+                'rank': employee.rank,
+                'code': employee.code,
+                'credit': float(employee.credit),
+                'credit_limit': float(employee.credit_limit) if employee.credit_limit else 0
+            })
+        
+        return jsonify({
+            'success': True,
+            'employees': employees_data
+        })
+    except Exception as e:
+        logger.error(f"Errore API dipendenti: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Errore interno: {str(e)}'
+        }), 500
 
 
 @app.route('/api/serial_status')
@@ -2309,6 +3194,7 @@ def api_serial_status():
         'config': SERIAL_CONFIG
     }
     return jsonify(status)
+
 
 
 @app.route('/update_serial_config', methods=['POST'])
@@ -2366,31 +3252,7 @@ def inject_app_info():
 # Gestori SocketIO       #
 ###########################
 
-@socketio.on('connect')
-def handle_connect():
-    """Gestisce la connessione WebSocket."""
-    logger.info(f'🔗 Client connected')
-    emit('connected', {'data': 'Connected to scanner', 'server_time': datetime.now().isoformat()})
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    """Gestisce la disconnessione WebSocket."""
-    logger.info(f'❌ Client disconnected')
-
-@socketio.on('request_scanner_status')
-def handle_scanner_status():
-    """Restituisce lo stato attuale dello scanner."""
-    logger.info(f'📤 Richiesta stato scanner')
-    last_barcode = get_last_barcode()
-    status = {
-        'available': SERIAL_AVAILABLE,
-        'connected': serial_port is not None and serial_port.is_open if serial_port else False,
-        'last_barcode': last_barcode['barcode'] if last_barcode else None,
-        'last_barcode_timestamp': last_barcode['timestamp'] if last_barcode else None,
-        'config': SERIAL_CONFIG
-    }
-    logger.info(f'📊 Invio stato scanner: {status}')
-    emit('scanner_status', status)
+# Funzioni WebSocket rimosse - ora usa emulazione tastiera diretta
 
 
 if __name__ == '__main__':
@@ -2419,8 +3281,8 @@ if __name__ == '__main__':
         
         # Inizializza il limite di credito globale se non esiste
         if not GlobalSetting.get('credit_limit'):
-            GlobalSetting.set('credit_limit', '50', 'Limite di credito negativo globale')
-            logger.info("Initialized global credit limit")
+            GlobalSetting.set('credit_limit', str(DEFAULT_CREDIT_LIMIT), 'Limite di credito negativo globale')
+            logger.info(f"Initialized global credit limit to {DEFAULT_CREDIT_LIMIT}€")
         
         # Aggiorna gli hash del credito per i dipendenti esistenti che non ne hanno
         employees = Employee.query.all()
@@ -2441,5 +3303,11 @@ if __name__ == '__main__':
     except Exception as e:
         logger.warning(f"Barcode reader not initialized: {str(e)}")
     
-    # Avvia il server con SocketIO
-    socketio.run(app, debug=True, host='0.0.0.0', port=8100)
+    # Leggi configurazione da variabili d'ambiente
+    host = os.environ.get('FLASK_RUN_HOST', '127.0.0.1')
+    port = int(os.environ.get('FLASK_RUN_PORT', '5000'))
+    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    # Avvia il server Flask standard (senza SocketIO)
+    logger.info(f"Avvio server Flask su {host}:{port}")
+    app.run(debug=debug, host=host, port=port)
