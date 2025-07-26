@@ -1106,6 +1106,27 @@
         initApp();
         setupEmployeeSearch();
         setupNewEmployeeModal();
+        
+        // Clean up modal backdrops when modals are hidden
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', function() {
+                // Remove any leftover backdrops
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => {
+                    if (backdrop.parentNode) {
+                        backdrop.parentNode.removeChild(backdrop);
+                    }
+                });
+                
+                // Remove modal-open class from body if no modals are shown
+                const openModals = document.querySelectorAll('.modal.show');
+                if (openModals.length === 0) {
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                }
+            });
+        });
     });
     
     // Aggiorna lo stato visivo dello scanner

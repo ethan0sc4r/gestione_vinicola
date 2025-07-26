@@ -1027,10 +1027,10 @@ def add_credit():
                 custom_product_name="Ricarica credito"
             )
             
-            # Aggiorna anche il saldo della cassa (sottrai perché il contante esce dalla cassa)
+            # Aggiorna anche il saldo della cassa (aggiungi perché il contante entra nella cassa)
             cash_register = Employee.query.filter_by(code='CASSA').first()
             if cash_register:
-                cash_register.update_credit(cash_register.credit - amount_decimal)
+                cash_register.update_credit(cash_register.credit + amount_decimal)
             
             db.session.add(transaction)
             db.session.commit()
@@ -1489,8 +1489,20 @@ def admin_withdraw_cash():
         new_balance = current_balance - withdrawal_amount
         
         # Crea una transazione per il prelievo
+        # Crea un operator virtuale per l'admin se non esiste
+        admin_username = session.get('admin_username', 'admin')
+        admin_operator = Operator.query.filter_by(username=f"ADMIN_{admin_username}").first()
+        if not admin_operator:
+            admin_operator = Operator(
+                username=f"ADMIN_{admin_username}",
+                password="N/A"  # Gli admin non hanno password operatore
+            )
+            db.session.add(admin_operator)
+            db.session.flush()  # Per ottenere l'ID
+        
         transaction = Transaction(
             employee_id=cash_register.id,
+            operator_id=admin_operator.id,  # Associa l'admin come operatore
             amount=-withdrawal_amount,  # Negativo perché stiamo sottraendo
             transaction_type='debit',
             custom_product_name="Prelievo cassa da amministratore"
